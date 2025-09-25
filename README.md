@@ -25,4 +25,4 @@ Use the [QT Creator](https://www.qt.io/product/development-tools) app to build a
 ## Related Theses
 
 1. [C. Aranda Bassegoda: Design of continuous envelope surfaces with cylindrical tools, University of Groningen, 2024](https://fse.studenttheses.ub.rug.nl/33739/)
-2. T. Couperus: Towards Surface Design by Envelopes, University of Groningen, 2025 -- To Be Published soon
+2. [T. Couperus: Towards Surface Design by Envelopes, University of Groningen, 2025](https://fse.studenttheses.ub.rug.nl/36627/)
