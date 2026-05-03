@@ -153,7 +153,7 @@ void MainView::initializeGL()
 
     // Set the color to be used by glClear.
     // This is the background color.
-    glClearColor(0.37f, 0.42f, 0.45f, 0.0f);
+    glClearColor(0.37f, 0.42f, 0.45f, 1.0f);
 
     // Set model translation
     modelTranslation.translate(-2, 0, -6);
