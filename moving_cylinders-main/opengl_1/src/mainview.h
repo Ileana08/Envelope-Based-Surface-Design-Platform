@@ -14,11 +14,13 @@
 #include "tools/cylinder.h"
 #include "movement/cylindermovement.h"
 #include "movement/simplepath.h"
+#include "movement/controlpoint.h"
 #include "envelope.h"
 #include "settings.h"
 #include "renderers/toolrenderer.h"
 #include "renderers/enveloperenderer.h"
 #include "renderers/moverenderer.h"
+#include "renderers/controlpointsrenderer.h"
 
 
 /**
@@ -48,6 +50,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Path rendering
     QVector<MoveRenderer*> moveRenderers;
+
+    // Control points rendering
+    ControlPointsRenderer* controlPointsRenderer;
+    QVector<ControlPoint*> controlPoints;
 
     // Envelope rendering
     QVector<Envelope*> envelopes;

@@ -61,6 +61,13 @@ MainView::~MainView()
     envelopeRenderers.clear();
     envelopeRenderers.squeeze();
 
+    delete controlPointsRenderer;
+    for (auto i : controlPoints){
+        delete i;
+    }
+    controlPoints.clear();
+    controlPoints.squeeze();
+
     makeCurrent();
 }
 
@@ -194,6 +201,17 @@ void MainView::initializeGL()
         moveRenderers.append(moveRend);
     }
 
+    controlPoints.append(new ControlPoint(QVector3D(0,0,0), 0.05f, 20));
+    controlPoints.append(new ControlPoint(QVector3D(1.0/3,0,0), 0.05f, 20));
+    controlPoints.append(new ControlPoint(QVector3D(2.0/3,1.0/3,0), 0.05f, 20));
+    controlPoints.append(new ControlPoint(QVector3D(1.0,1.0,1.0), 0.05f, 20));
+
+    ControlPointsRenderer *controlPointsRend = new ControlPointsRenderer();
+    controlPointsRend->init(gl, &settings);
+    controlPointsRend->setModelTransf(modelTransf);
+    controlPointsRend->setProjTransf(projTransf);
+    controlPointsRend->setControlPoints(controlPoints);
+    controlPointsRenderer = controlPointsRend;
     // Trigger buffer update
     updateBuffers();
     updateToolTransf();
@@ -214,6 +232,7 @@ void MainView::updateBuffers(){
         envelopeRenderers[i]->updateBuffers();
         moveRenderers[i]->updateBuffers();
     }
+    controlPointsRenderer->updateBuffers();
 }
 
 void MainView::updateUniforms() {
@@ -225,6 +244,7 @@ void MainView::updateUniforms() {
         moveRenderers[i]->updateUniforms();
         envelopeRenderers[i]->updateUniforms();
     }
+    controlPointsRenderer->updateUniforms();
 }
 
 
@@ -274,6 +294,8 @@ void MainView::paintGL()
         updateAllUniforms = false;
     }
 
+    controlPointsRenderer->paintGL();
+
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;
         if (!envelopes[i]->isActive()) continue;
@@ -305,6 +327,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
         envelopeRenderers[i]->setProjTransf(projTransf);
         moveRenderers[i]->setProjTransf(projTransf);
     }
+    controlPointsRenderer->setProjTransf(projTransf);
     updateAllUniforms = true;
 }
 

@@ -3,6 +3,7 @@
 
 #include <QVector3D>
 #include <QVector>
+#include <QOpenGLDebugLogger>
 #include "../vertex.h"
 
 class ControlPoint
@@ -16,7 +17,7 @@ class ControlPoint
 
     public:
         ControlPoint();
-        ControlPoint(QVector3D position, float radius, int sectors, QVector<Vertex> vertexArr);
+        ControlPoint(QVector3D position, float radius, int sectors);
 
         inline QVector3D getPosition() { return position; }
         inline float getRadius() { return radius; }
@@ -24,9 +25,10 @@ class ControlPoint
         inline void setRadius(float radius) { this->radius = radius; }
         inline void setSectors(int sectors) { this->sectors = sectors;}
         inline int getSectors(){ return sectors; }
+        inline QVector<Vertex> getVertexArr() { return vertexArr; }
 
         Vertex getSphereSurfaceAt(float angle, float rotation);
         void computeSphere();
-}
+};
 
 #endif //CONTROLPOINT_H

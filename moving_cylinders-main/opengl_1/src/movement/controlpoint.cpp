@@ -1,18 +1,22 @@
 #include "controlpoint.h"
 
-ControlPoint:: ControlPoint():
-    position(QVector3D(0,0,0)), 
+ControlPoint::ControlPoint():
+    position(QVector3D(0.0,0.0,0.0)), 
     radius(0.2), 
     sectors(20),
     vertexArr()
-{}
+{
+    computeSphere();
+}
 
-ControlPoint::ControlPoint(QVector3D position, float radius , int sectors, QVector<Vertex> vertexArr) : 
+ControlPoint::ControlPoint(QVector3D position, float radius , int sectors) : 
     position(position), 
     radius(radius), 
     sectors(sectors),
     vertexArr()
-{}
+{
+    computeSphere();
+}
 
 Vertex ControlPoint::getSphereSurfaceAt(float angle, float rotation)
 {
@@ -36,7 +40,6 @@ void ControlPoint::computeSphere() {
     for (int i = 0; i < sectors; i++) {
         float angle0 = i * angle;
         float angle1 = (i + 1) * angle;
-        
         for (int j = 0; j < sectors; j++) {
             float rot0 = -PI/2.0f + j*rotation;
             float rot1 = -PI/2.0f + (j+1)*rotation;

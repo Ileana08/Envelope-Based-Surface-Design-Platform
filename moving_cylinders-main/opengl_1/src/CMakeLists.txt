@@ -32,6 +32,7 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
     movement/simplepath.h movement/simplepath.cpp
     movement/polynomial.h movement/polynomial.cpp
     movement/cylindermovement.h movement/cylindermovement.cpp
+    movement/controlpoint.h movement/controlpoint.cpp
     envelope.h envelope.cpp
     settings.h
     tools/drum.h tools/drum.cpp
@@ -40,12 +41,11 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
     renderers/toolrenderer.h renderers/toolrenderer.cpp
     renderers/enveloperenderer.h renderers/enveloperenderer.cpp
     renderers/moverenderer.h renderers/moverenderer.cpp
+    renderers/controlpointsrenderer.h renderers/controlpointsrenderer.cpp
     tools/sphere.h
     mathutility.h mathutility.cpp
     tooltype.h
     tools/tool.cpp
-
-
 )
 
 target_include_directories(OpenGL_1 PRIVATE ${CMAKE_SOURCE_DIR})
