@@ -71,6 +71,25 @@ void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
  */
 void MainView::mouseMoveEvent(QMouseEvent *ev) {
   qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
+  QVector2D currentMousePos(ev->position());
+
+  if(controlPointPressed == true) {
+    ControlPoint* controlPoint = controlPoints[selectedControlPoint];
+    QVector3D position = controlPoint->getPosition();
+
+    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
+    if (clipCoordinates.w() != 0.0f) {
+      float ndcZ = clipCoordinates.z() / clipCoordinates.w();
+      QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
+      QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
+      QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
+      controlPoint->setPosition(newWorldPos);
+      if (controlPointsRenderer) {
+        controlPointsRenderer->updateBuffers();
+      }
+    }
+  }
+  lastMousePos = currentMousePos;
 
   update();
 }
@@ -81,6 +100,20 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
  */
 void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
+  QVector2D currentMousePos(ev->position());
+
+  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
+      for(int i=0; i<controlPoints.size(); i++){
+          QVector3D pos = controlPoints[i]->getPosition();
+          QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
+          if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
+              selectedControlPoint = i;
+              controlPointPressed = true;
+              lastMousePos = currentMousePos;
+              break;
+          }
+      }
+  }
 
   update();
   // Do not remove the line below, clicking must focus on this widget!
@@ -93,6 +126,8 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
  */
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button released" << ev->button();
+  selectedControlPoint = -1;
+  controlPointPressed = false;
 
   update();
 }

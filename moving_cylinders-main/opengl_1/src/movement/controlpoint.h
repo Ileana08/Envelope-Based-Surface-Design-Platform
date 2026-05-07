@@ -21,9 +21,9 @@ class ControlPoint
 
         inline QVector3D getPosition() { return position; }
         inline float getRadius() { return radius; }
-        inline void setPosition(QVector3D position) { this->position = position; }
-        inline void setRadius(float radius) { this->radius = radius; }
-        inline void setSectors(int sectors) { this->sectors = sectors;}
+        inline void setPosition(QVector3D position) { this->position = position; computeSphere(); }
+        inline void setRadius(float radius) { this->radius = radius; computeSphere(); }
+        inline void setSectors(int sectors) { this->sectors = sectors; }
         inline int getSectors(){ return sectors; }
         inline QVector<Vertex> getVertexArr() { return vertexArr; }
 

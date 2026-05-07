@@ -58,11 +58,13 @@ void ControlPointsRenderer::paintGL()
 {
     qDebug() << "ControlPointsRenderer::paintGL";
     shader.bind();
-    gl->glBindVertexArray(vaoControlPoints);
-    int vertexCount = 0;
-    for (ControlPoint* cp : controlPoints)
-        vertexCount += cp->getVertexArr().size();
-    gl->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    if(settings->showControlPoints) {
+        gl->glBindVertexArray(vaoControlPoints);
+        int vertexCount = 0;
+        for (ControlPoint* cp : controlPoints)
+            vertexCount += cp->getVertexArr().size();
+        gl->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    }
     gl->glBindVertexArray(0);
     shader.release();
 }

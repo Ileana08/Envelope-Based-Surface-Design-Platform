@@ -78,6 +78,14 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="controlPointsCheckBox">
+             <property name="text">
+              <string>Control points</string>
+             </property>
+            </widget>
+           </item>
+
+           <item>
             <widget class="QCheckBox" name="toolAxisCheckBox">
              <property name="text">
               <string>Tool axis</string>

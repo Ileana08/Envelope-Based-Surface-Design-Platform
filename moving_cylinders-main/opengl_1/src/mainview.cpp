@@ -4,6 +4,7 @@
 
 #include <QDateTime>
 #include <QOpenGLVersionFunctionsFactory>
+#include <QVector4D>
 
 /**
  * @brief MainView::MainView Constructs a new main view.
@@ -294,14 +295,13 @@ void MainView::paintGL()
         updateAllUniforms = false;
     }
 
-    controlPointsRenderer->paintGL();
-
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;
         if (!envelopes[i]->isActive()) continue;
         toolRenderers[i]->paintGL();
         moveRenderers[i]->paintGL();
         envelopeRenderers[i]->paintGL();
+        controlPointsRenderer->paintGL();
     }
 }
 
@@ -316,6 +316,9 @@ void MainView::resizeGL(int newWidth, int newHeight)
     qDebug() << "MainView::resizeGL";
     // Get the aspect ratio of the new screen size
     float aspectRatio = newWidth / ((float)newHeight);
+
+    viewportWidth = newWidth;
+    viewportHeight = newHeight;
 
     // Set the viewport to the new size
     projTransf.setToIdentity();
@@ -359,6 +362,7 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
         envelopeRenderers[i]->setModelTransf(modelTransf);
         moveRenderers[i]->setModelTransf(modelTransf);
     }
+    controlPointsRenderer->setModelTransf(modelTransf);
     updateToolTransf();
     updateAllUniforms = true;
     update();
@@ -389,6 +393,7 @@ void MainView::setScale(float scale)
         envelopeRenderers[i]->setModelTransf(modelTransf);
         moveRenderers[i]->setModelTransf(modelTransf);
     }
+    controlPointsRenderer->setModelTransf(modelTransf);
     updateToolTransf();
     updateAllUniforms = true;
     update();
@@ -403,6 +408,24 @@ void MainView::updateToolTransf(){
         if (!envelopes[i]->isActive()) continue;
         toolRenderers[i]->setToolTransf(envelopes[i]->getToolTransformAt(settings.t()));
     }
+}
+
+QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {
+    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(Position, 1.0f);
+    QVector3D normalizedDeviceCoord = clipCoordinates.toVector3D() / clipCoordinates.w();
+    float screenX = normalizedDeviceCoord.x() * 0.5f * viewportWidth + 0.5f * viewportWidth;
+    // Invert y coordinates because in the screen coordinates y goes down
+    float screenY = viewportHeight - normalizedDeviceCoord.y() * 0.5f * viewportHeight - 0.5f* viewportHeight;
+    return QVector2D(screenX, screenY);
+}
+
+QVector3D MainView::toNormalizedWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
+    float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
+    float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
+    QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);
+    QVector4D worldCoordinates4D = modelTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
+    return worldCoordinates;
 }
 
 /**

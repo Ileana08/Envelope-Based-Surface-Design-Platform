@@ -14,6 +14,7 @@ typedef struct Settings {
     bool showEnvelope = true;
     bool showTool = true;
     bool showPath = false;
+    bool showControlPoints = false;
     bool showGrazingCurve = false;
     bool showToolAxis = false;
     bool showNormals = false;

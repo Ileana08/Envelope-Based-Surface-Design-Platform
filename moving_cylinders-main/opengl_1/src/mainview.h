@@ -55,6 +55,11 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     ControlPointsRenderer* controlPointsRenderer;
     QVector<ControlPoint*> controlPoints;
 
+    // Mouse input for control points
+    int selectedControlPoint = -1;
+    bool controlPointPressed = false;
+    QVector2D lastMousePos;
+
     // Envelope rendering
     QVector<Envelope*> envelopes;
     QVector<EnvelopeRenderer*> envelopeRenderers;
@@ -67,6 +72,8 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
+    int viewportWidth = 1;
+    int viewportHeight = 1;
 
 public:
     MainView(QWidget *parent = nullptr);
@@ -87,7 +94,8 @@ protected:
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
     void moveModel(float x, float y);
-    QVector2D toNormalizedScreenCoordinates(float x, float y);
+    QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
+    QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 
     // Functions for keyboard input events
     void keyPressEvent(QKeyEvent *ev) override;

@@ -778,6 +778,16 @@ void MainWindow::on_pathCheckBox_toggled(bool checked){
 }
 
 /**
+ * @brief MainWindow::on_controlPointsCheckBox_toggled Updates the control points visibility.
+ * @param checked The new value of the checkbox.
+ */
+void MainWindow::on_controlPointsCheckBox_toggled(bool checked){
+    qDebug() << ":: on_controlPointsCheckBox_toggled";
+  ui->mainView->settings.showControlPoints = checked;
+  ui->mainView->update();
+}
+
+/**
  * @brief MainWindow::on_toolAxisCheckBox_toggled Updates the tool axis visibility.
  * @param checked The new value of the checkbox.
  */

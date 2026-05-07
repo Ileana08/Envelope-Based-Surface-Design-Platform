@@ -76,6 +76,7 @@ class MainWindow : public QMainWindow {
   void on_toolCheckBox_toggled(bool checked);
   void on_grazCurveCheckBox_toggled(bool checked);
   void on_pathCheckBox_toggled(bool checked);
+  void on_controlPointsCheckBox_toggled(bool checked);
   void on_toolAxisCheckBox_toggled(bool checked);
   void on_normalsCheckBox_toggled(bool checked);
   void on_sphereCheckBox_toggled(bool checked);
