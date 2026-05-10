@@ -73,8 +73,9 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
   qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
   QVector2D currentMousePos(ev->position());
 
-  if(controlPointPressed == true) {
-    ControlPoint* controlPoint = controlPoints[selectedControlPoint];
+  if(controlPointPressed == true && settings.selectedIdx >= 0) {
+    QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
+    ControlPoint* controlPoint = cps[selectedControlPoint];
     QVector3D position = controlPoint->getPosition();
 
     QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
@@ -84,9 +85,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
       QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
       controlPoint->setPosition(newWorldPos);
-      if (controlPointsRenderer) {
-        controlPointsRenderer->updateBuffers();
-      }
+      controlPointsRenderers[settings.selectedIdx]->updateBuffers();
     }
   }
   lastMousePos = currentMousePos;
@@ -102,9 +101,10 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
   QVector2D currentMousePos(ev->position());
 
-  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
-      for(int i=0; i<controlPoints.size(); i++){
-          QVector3D pos = controlPoints[i]->getPosition();
+  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton && settings.selectedIdx >= 0){
+      const QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
+      for(int i=0; i<cps.size(); i++){
+          QVector3D pos = cps[i]->getPosition();
           QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
           if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
               selectedControlPoint = i;
@@ -128,6 +128,14 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button released" << ev->button();
   selectedControlPoint = -1;
   controlPointPressed = false;
+
+  if (settings.selectedIdx >= 0 && envelopes[settings.selectedIdx]) {
+    controlPointsRenderers[settings.selectedIdx]->updateBuffers();
+    envelopes[settings.selectedIdx]->getToolMovement().getPath().updateVertexArr();
+    envelopes[settings.selectedIdx]->update();
+    moveRenderers[settings.selectedIdx]->updateBuffers();
+    envelopeRenderers[settings.selectedIdx]->updateBuffers();
+  }
 
   update();
 }

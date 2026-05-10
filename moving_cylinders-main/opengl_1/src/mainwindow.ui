@@ -84,7 +84,6 @@
              </property>
             </widget>
            </item>
-
            <item>
             <widget class="QCheckBox" name="toolAxisCheckBox">
              <property name="text">
@@ -611,7 +610,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="PathTab">
+         <!-- <widget class="QWidget" name="PathTab">
           <attribute name="title">
            <string>Path</string>
           </attribute>
@@ -818,7 +817,7 @@
             </spacer>
            </item>
           </layout>
-         </widget>
+         </widget> -->
         </widget>
        </item>
        <item>

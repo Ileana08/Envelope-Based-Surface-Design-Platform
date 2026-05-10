@@ -18,7 +18,7 @@ Envelope::Envelope(int index) :
  * @brief Envelope::Envelope Creates a new envelope with the given values.
  * @param tool Tool pointer.
  */
-Envelope::Envelope(int index, Tool *tool, const SimplePath &path) :
+Envelope::Envelope(int index, Tool *tool, const BezierPath &path) :
     index(index),
     adjEnvA0(nullptr),
     tool(tool),
@@ -34,7 +34,7 @@ Envelope::Envelope(int index, Tool *tool, const SimplePath &path) :
  * @param tool Tool pointer.
  * @param adjEnvelope Adjacent envelope.
  */
-Envelope::Envelope(int index, Tool *tool, const SimplePath &path, Envelope *adjEnvelope) :
+Envelope::Envelope(int index, Tool *tool, const BezierPath &path, Envelope *adjEnvelope) :
     index(index),
     tool(tool),
     toolMovement(path, tool)
@@ -134,7 +134,7 @@ void Envelope::computeEnvelope()
     QVector3D env[4];
     QVector3D norm[4];
     QVector3D col[4];
-    // SimplePath path = toolMovement->getPath();
+    // BezierPath path = toolMovement->getPath();
     // float aDelta = (tool->getA1()-tool->getA0())/sectorsA;
     // float a1 = tool->getA1()-aDelta;
     // float tDelta = (path.getT1()-path.getT0())/sectorsT;
@@ -223,7 +223,7 @@ void Envelope::computeToolCenters()
     QVector3D color = QVector3D(0,0,1);
 
     QVector3D v1, v2;
-    // SimplePath path = toolMovement.getPath();
+    // BezierPath path = toolMovement.getPath();
     // float aDelta = (tool->getA1()-tool->getA0())/sectorsA;
     // float a1 = tool->getA1()-aDelta;
     // float tDelta = (path.getT1()-path.getT0())/sectorsT;
@@ -255,7 +255,7 @@ void Envelope::computeGrazingCurves()
     QVector3D color = QVector3D(0,1,0);
 
     QVector3D v1, v2;
-    // SimplePath path = toolMovement->getPath();
+    // BezierPath path = toolMovement->getPath();
     // float aDelta = (tool->getA1()-tool->getA0())/sectorsA;
     // float a1 = tool->getA1()-aDelta;
     // float tDelta = (path.getT1()-path.getT0())/sectorsT;

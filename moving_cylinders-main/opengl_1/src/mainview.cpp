@@ -61,13 +61,18 @@ MainView::~MainView()
     }
     envelopeRenderers.clear();
     envelopeRenderers.squeeze();
-
-    delete controlPointsRenderer;
-    for (auto i : controlPoints){
+    for (auto i : controlPointsRenderers){
         delete i;
     }
-    controlPoints.clear();
-    controlPoints.squeeze();
+    controlPointsRenderers.clear();
+    controlPointsRenderers.squeeze();
+    for (const QVector<ControlPoint*> &cps : envelopeControlPoints){
+        for (ControlPoint *cp : cps) {
+            delete cp;
+        }
+    }
+    envelopeControlPoints.clear();
+    envelopeControlPoints.squeeze();
 
     makeCurrent();
 }
@@ -89,13 +94,18 @@ Envelope* MainView::addNewEnvelope() {
     drums[idx] = drum;
 
     // Path and envelope
-    SimplePath path = SimplePath(Polynomial(0,0,0,0),
-                                 Polynomial(0,0,0,0),
-                                 Polynomial(0,0,1,0));
+    QVector<ControlPoint*> controlPoints = {
+        new ControlPoint(QVector3D(0,0,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0/3,0,0), 0.05, 20),
+        new ControlPoint(QVector3D(2.0/3,1.0/3,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0,1.0,1.0), 0.05, 20)
+    };
+    envelopeControlPoints[idx] = controlPoints;
+    BezierPath path(controlPoints);
     Envelope *env = new Envelope(idx, cyl, path);
     env->initEnvelope();
-    envelopes[idx] = env;
-
+    envelopes[idx] = env;    
+    
     // Set related renderers
     toolRenderers[idx]->setTool(cyl);
     toolRenderers[idx]->setModelTransf(modelTransf);
@@ -108,6 +118,10 @@ Envelope* MainView::addNewEnvelope() {
     moveRenderers[idx]->setMovement(&env->getToolMovement());
     moveRenderers[idx]->setModelTransf(modelTransf);
     moveRenderers[idx]->setProjTransf(projTransf);
+
+    controlPointsRenderers[idx]->setControlPoints(env->getToolMovement().getPath().getControlPoints());
+    controlPointsRenderers[idx]->setModelTransf(modelTransf);
+    controlPointsRenderers[idx]->setProjTransf(projTransf);
 
     // Activate
     indicesUsed[idx] = true;
@@ -185,6 +199,8 @@ void MainView::initializeGL()
     toolRenderers.reserve(settings.NUM_ENVELOPES);
     envelopeRenderers.reserve(settings.NUM_ENVELOPES);
     moveRenderers.reserve(settings.NUM_ENVELOPES);
+    controlPointsRenderers.reserve(settings.NUM_ENVELOPES);
+    envelopeControlPoints.reserve(settings.NUM_ENVELOPES);
     envelopes.fill(nullptr, settings.NUM_ENVELOPES);
     cylinders.fill(nullptr, settings.NUM_ENVELOPES);
     drums.fill(nullptr, settings.NUM_ENVELOPES);
@@ -200,19 +216,14 @@ void MainView::initializeGL()
         MoveRenderer *moveRend = new MoveRenderer();
         moveRend->init(gl, &settings);
         moveRenderers.append(moveRend);
+
+        // Control points renderer
+        ControlPointsRenderer *cpRend = new ControlPointsRenderer();
+        cpRend->init(gl, &settings);
+        controlPointsRenderers.append(cpRend);
+        envelopeControlPoints.append(QVector<ControlPoint*>());
     }
 
-    controlPoints.append(new ControlPoint(QVector3D(0,0,0), 0.05f, 20));
-    controlPoints.append(new ControlPoint(QVector3D(1.0/3,0,0), 0.05f, 20));
-    controlPoints.append(new ControlPoint(QVector3D(2.0/3,1.0/3,0), 0.05f, 20));
-    controlPoints.append(new ControlPoint(QVector3D(1.0,1.0,1.0), 0.05f, 20));
-
-    ControlPointsRenderer *controlPointsRend = new ControlPointsRenderer();
-    controlPointsRend->init(gl, &settings);
-    controlPointsRend->setModelTransf(modelTransf);
-    controlPointsRend->setProjTransf(projTransf);
-    controlPointsRend->setControlPoints(controlPoints);
-    controlPointsRenderer = controlPointsRend;
     // Trigger buffer update
     updateBuffers();
     updateToolTransf();
@@ -232,8 +243,8 @@ void MainView::updateBuffers(){
         toolRenderers[i]->updateBuffers();
         envelopeRenderers[i]->updateBuffers();
         moveRenderers[i]->updateBuffers();
+        controlPointsRenderers[i]->updateBuffers();
     }
-    controlPointsRenderer->updateBuffers();
 }
 
 void MainView::updateUniforms() {
@@ -244,8 +255,8 @@ void MainView::updateUniforms() {
         toolRenderers[i]->updateUniforms();
         moveRenderers[i]->updateUniforms();
         envelopeRenderers[i]->updateUniforms();
+        controlPointsRenderers[i]->updateUniforms();
     }
-    controlPointsRenderer->updateUniforms();
 }
 
 
@@ -265,6 +276,7 @@ void MainView::paintGL()
             envelopes[i]->update();
             envelopeRenderers[i]->updateBuffers();
             moveRenderers[i]->updateBuffers();
+            controlPointsRenderers[i]->updateBuffers();
         }
         envelopeMeshUpdates.clear();
     }
@@ -301,7 +313,9 @@ void MainView::paintGL()
         toolRenderers[i]->paintGL();
         moveRenderers[i]->paintGL();
         envelopeRenderers[i]->paintGL();
-        controlPointsRenderer->paintGL();
+        if (!envelopes[i]->isPositContinuous()) {
+            controlPointsRenderers[i]->paintGL();
+        }
     }
 }
 
@@ -329,8 +343,8 @@ void MainView::resizeGL(int newWidth, int newHeight)
         toolRenderers[i]->setProjTransf(projTransf);
         envelopeRenderers[i]->setProjTransf(projTransf);
         moveRenderers[i]->setProjTransf(projTransf);
+        controlPointsRenderers[i]->setProjTransf(projTransf);
     }
-    controlPointsRenderer->setProjTransf(projTransf);
     updateAllUniforms = true;
 }
 
@@ -361,8 +375,8 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
         toolRenderers[i]->setModelTransf(modelTransf);
         envelopeRenderers[i]->setModelTransf(modelTransf);
         moveRenderers[i]->setModelTransf(modelTransf);
+        controlPointsRenderers[i]->setModelTransf(modelTransf);
     }
-    controlPointsRenderer->setModelTransf(modelTransf);
     updateToolTransf();
     updateAllUniforms = true;
     update();
@@ -392,8 +406,8 @@ void MainView::setScale(float scale)
         toolRenderers[i]->setModelTransf(modelTransf);
         envelopeRenderers[i]->setModelTransf(modelTransf);
         moveRenderers[i]->setModelTransf(modelTransf);
+        controlPointsRenderers[i]->setModelTransf(modelTransf);
     }
-    controlPointsRenderer->setModelTransf(modelTransf);
     updateToolTransf();
     updateAllUniforms = true;
     update();

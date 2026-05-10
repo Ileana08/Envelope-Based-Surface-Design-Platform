@@ -7,12 +7,12 @@
  */
 CylinderMovement::CylinderMovement() {}
 
-CylinderMovement::CylinderMovement(SimplePath path) :
+CylinderMovement::CylinderMovement(BezierPath path) :
     path(path)
 {}
 
 
-CylinderMovement::CylinderMovement(SimplePath path, const Tool *tool) :
+CylinderMovement::CylinderMovement(BezierPath path, const Tool *tool) :
     path(path),
     toolAxis(tool->getAxisVector())
 {}
@@ -25,7 +25,7 @@ CylinderMovement::CylinderMovement(SimplePath path, const Tool *tool) :
  * @param cylinder cylinder which experiences the movement
  * (this class can be generalized and constructors for other tools can be made)
  */
-CylinderMovement::CylinderMovement(SimplePath path, QVector3D axisDirection1, QVector3D axisDirection2, const Tool *tool) :
+CylinderMovement::CylinderMovement(BezierPath path, QVector3D axisDirection1, QVector3D axisDirection2, const Tool *tool) :
     path(path),
     axisT0(axisDirection1),
     axisT1(axisDirection2),

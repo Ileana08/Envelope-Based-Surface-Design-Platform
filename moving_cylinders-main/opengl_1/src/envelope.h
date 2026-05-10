@@ -37,8 +37,8 @@ class Envelope
 
 public:
     Envelope(int index);
-    Envelope(int index, Tool *tool, const SimplePath &path);
-    Envelope(int index, Tool *tool, const SimplePath &path, Envelope *adjEnvelope);
+    Envelope(int index, Tool *tool, const BezierPath &path);
+    Envelope(int index, Tool *tool, const BezierPath &path, Envelope *adjEnvelope);
 
     inline void updateRenderSettings(const Settings &settings) {
         reflectionLines=settings.reflectionLines;

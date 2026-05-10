@@ -29,6 +29,7 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
     tools/cylinder.h tools/cylinder.cpp
     envelope.h envelope.cpp
     movement/path.h
+    movement/BezierPath.h movement/BezierPath.cpp
     movement/simplepath.h movement/simplepath.cpp
     movement/polynomial.h movement/polynomial.cpp
     movement/cylindermovement.h movement/cylindermovement.cpp

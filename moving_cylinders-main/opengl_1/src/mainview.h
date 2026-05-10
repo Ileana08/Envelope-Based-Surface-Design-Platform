@@ -13,7 +13,7 @@
 #include "vertex.h"
 #include "tools/cylinder.h"
 #include "movement/cylindermovement.h"
-#include "movement/simplepath.h"
+#include "movement/BezierPath.h"
 #include "movement/controlpoint.h"
 #include "envelope.h"
 #include "settings.h"
@@ -52,8 +52,8 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<MoveRenderer*> moveRenderers;
 
     // Control points rendering
-    ControlPointsRenderer* controlPointsRenderer;
-    QVector<ControlPoint*> controlPoints;
+    QVector<ControlPointsRenderer*> controlPointsRenderers;
+    QVector<QVector<ControlPoint*>> envelopeControlPoints;
 
     // Mouse input for control points
     int selectedControlPoint = -1;
