@@ -126,17 +126,23 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
  */
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button released" << ev->button();
-  selectedControlPoint = -1;
-  controlPointPressed = false;
 
   if (settings.selectedIdx >= 0 && envelopes[settings.selectedIdx]) {
-    controlPointsRenderers[settings.selectedIdx]->updateBuffers();
     envelopes[settings.selectedIdx]->getToolMovement().getPath().updateVertexArr();
     envelopes[settings.selectedIdx]->update();
+    QSet<int> depEnvs = envelopes[settings.selectedIdx]->getAllDependents();
     moveRenderers[settings.selectedIdx]->updateBuffers();
     envelopeRenderers[settings.selectedIdx]->updateBuffers();
+    toolRenderers[settings.selectedIdx]->updateBuffers();
+    for(int idx : depEnvs) {
+      envelopes[idx]->getToolMovement().getPath().updateVertexArr();
+      envelopes[idx]->update();
+      moveRenderers[idx]->updateBuffers();
+      envelopeRenderers[idx]->updateBuffers();
+    }
   }
-
+  selectedControlPoint = -1;
+  controlPointPressed = false;
   update();
 }
 

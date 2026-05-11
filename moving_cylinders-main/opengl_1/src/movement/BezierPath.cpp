@@ -17,7 +17,7 @@ QVector3D BezierPath::getPathAt(float t)
     QVector3D p1 = controlPoints[1]->getPosition();
     QVector3D p2 = controlPoints[2]->getPosition();
     QVector3D p3 = controlPoints[3]->getPosition();
-    pt = pow(1-t, 3) * p0 + 3 * pow(1-t,2) * t * p1 + 3 * (1-t) * pow(t, 2) * p2 + pow(t, 3) * p3;
+    pt = (1-t) * (1-t) * (1-t) * p0 + 3 * (1-t) * (1-t) * t * p1 + 3 * (1-t) * t * t * p2 + t * t * t * p3;
     return pt;
 }
 
