@@ -139,8 +139,11 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
       envelopes[idx]->update();
       moveRenderers[idx]->updateBuffers();
       envelopeRenderers[idx]->updateBuffers();
+      toolRenderers[idx]->updateBuffers();
     }
   }
+  updateToolTransf();
+  updateAllUniforms = true;
   selectedControlPoint = -1;
   controlPointPressed = false;
   update();
