@@ -11,49 +11,60 @@
 class Tool
 {
 protected:
-    ToolType toolType;
-    float height = 2;
+  ToolType toolType;
+  float height = 2;
 
-    float PI = acos(-1.0f);
+  float PI = acos(-1.0f);
 
-    QVector3D posit;
+  QVector3D posit;
 
-    int sectors = 20;
-    QVector3D axisVector = QVector3D(0.0,0.0,1.0);
-    QVector3D perpVector = QVector3D(1.0,0.0,0.0); // a vector perpendicular to the axis
-    QVector<Vertex> vertexArr;
+  int sectors = 20;
+  QVector3D axisVector = QVector3D(0.0, 0.0, 1.0);
+  QVector3D perpVector = QVector3D(1.0, 0.0, 0.0); // a vector perpendicular to the axis
+
+  //TODO: Check if this vertexArr is actually meaningfully used
+  QVector<Vertex> vertexArr;
+
 public:
-    Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0,0,0)) {}
-    Tool(ToolType toolType, int sectors, float height, QVector3D position)
-        : toolType(toolType), vertexArr(), sectors(sectors), height(height), posit(position) {}
+  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0, 0, 0))
+  {
+  }
 
-    inline void setHeight(float height) {this->height=height;}
-    inline float getHeight(){ return height; }
+  Tool(ToolType toolType, int sectors, float height, QVector3D position)
+    : toolType(toolType), vertexArr(), sectors(sectors), height(height), posit(position)
+  {
+  }
 
-    inline void setSectors(int sectors) {this->sectors=sectors;}
-    inline int getSectors(){ return sectors; }
+  inline void setHeight(float height) { this->height = height; }
+  inline float getHeight() { return height; }
 
-    inline void setPosit(QVector3D position) {posit=position;}
-    inline QVector3D getPosition() {return posit; }
+  inline void setSectors(int sectors) { this->sectors = sectors; }
+  inline int getSectors() { return sectors; }
 
-
-    virtual float getRadiusAt(float a) = 0;
-    virtual float getRadiusDaAt(float a) = 0;
-    virtual float getSphereCenterHeightAt(float a)=0;
-    virtual float getSphereCenterHeightDaAt(float a)=0;
-    virtual float getSphereRadiusAt(float a)=0;
-    virtual float getSphereRadiusDaAt(float a)=0;
-
-    virtual Vertex getToolSurfaceAt(float a, float tRad)=0;
+  inline void setPosit(QVector3D position) { posit = position; }
+  inline QVector3D getPosition() { return posit; }
 
 
-    inline QVector3D getAxisVector() const {return axisVector.normalized(); }
-    inline QVector3D getVectorPerpToAxis() const {return perpVector; }
-    inline QVector<Vertex>& getVertexArr(){ return vertexArr; }
-    inline ToolType getType() { return toolType; }
+  //TODO: Rename these appropriately
+  //TODO: Also, you could refactor this so that you don't need to divide by the Bezier Normal y-component.
+  // right now vulnerable to vertical tangents.
+  virtual float getRadiusAt(float a) = 0;
+  virtual float getRadiusDaAt(float a) = 0;
+  virtual float getSphereCenterHeightAt(float a) =0;
+  virtual float getSphereCenterHeightDaAt(float a) =0;
+  virtual float getSphereRadiusAt(float a) =0;
+  virtual float getSphereRadiusDaAt(float a) =0;
 
-    inline void initTool() {computeTool();}
-    inline void update() {computeTool();}
-    void computeTool();
+  virtual Vertex getToolSurfaceAt(float a, float tRad) =0;
+
+
+  inline QVector3D getAxisVector() const { return axisVector.normalized(); }
+  inline QVector3D getVectorPerpToAxis() const { return perpVector; }
+  inline QVector<Vertex>& getVertexArr() { return vertexArr; }
+  inline ToolType getType() { return toolType; }
+
+  inline void initTool() { computeTool(); }
+  inline void update() { computeTool(); }
+  void computeTool();
 };
 #endif // TOOL_H

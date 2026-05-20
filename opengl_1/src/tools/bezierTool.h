@@ -1,0 +1,44 @@
+//
+// Created by david on 5/19/26.
+//
+
+#ifndef OPENGL_1_BEZIERTOOL_H
+#define OPENGL_1_BEZIERTOOL_H
+#include "CubicBezier2D.h"
+#include "tool.h"
+
+
+class bezierTool : public Tool
+{
+  CubicBezier2D bezier;
+  float innerRadius;
+
+public:
+  bezierTool();
+  bezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position);
+
+  inline void setInnerRadius(float innerRadius) { this->innerRadius = innerRadius; }
+  inline float getInnerRadius() { return innerRadius; }
+
+  float getCa(float a);
+  float getCaDa(float a);
+  float getCn(float a);
+  float getCnDa(float a);
+
+
+  float getRadiusAt(float a) override;
+  float getRadiusDaAt(float a) override;
+  float getSphereCenterHeightAt(float a) override;
+  float getSphereCenterHeightDaAt(float a) override;
+  float getSphereRadiusAt(float a) override;
+  float getSphereRadiusDaAt(float a) override;
+
+
+
+  QVector3D computeNormal(QVector3D axis, QVector3D sNormal, QVector3D pathTangent, float a);
+
+  Vertex getToolSurfaceAt(float a, float tRad) override;
+};
+
+
+#endif //OPENGL_1_BEZIERTOOL_H

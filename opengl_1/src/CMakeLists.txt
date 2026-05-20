@@ -44,6 +44,10 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
     mathutility.h mathutility.cpp
     tooltype.h
     tools/tool.cpp
+        tools/bezierTool.cpp
+        tools/bezierTool.h
+        CubicBezier2D.h
+        CubicBezier2D.cpp
 
 
 )
