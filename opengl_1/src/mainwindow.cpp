@@ -146,6 +146,7 @@ void MainWindow::updateUI(int prevIdx) {
 
         Cylinder* cyl = ui->mainView->cylinders[idx];
         Drum* drum = ui->mainView->drums[idx];
+        BezierTool* bezierTool = ui->mainView->bezierTools[idx];
         ui->radiusSpinBox->setValue(cyl->getRadius());
         ui->drumRadiusSpinBox->setValue(drum->getCurvatureRadius());
         ui->angleSpinBox->setValue(cyl->getAngle());
@@ -174,6 +175,7 @@ void MainWindow::updateUI(int prevIdx) {
         ui->constraintA1SelectBox->setCurrentIndex(0);
         ui->tanContCheckBox->setChecked(false);
     }
+    qDebug() << "done updating ui";
 }
 
 /***********************************************************/

@@ -10,10 +10,11 @@
 BezierTool::BezierTool()
   : Tool(ToolType::Tool_Bezier), innerRadius(0.0f)
 {
+  qDebug() << bezier.getP0() << bezier.getP1() << bezier.getP2() << bezier.getP3();
 }
 
 BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position)
-  : Tool(ToolType::Tool_Cylinder, sectors, height, position), innerRadius(innerRadius)
+  : Tool(ToolType::Tool_Bezier, sectors, height, position), innerRadius(innerRadius)
 {
 }
 
@@ -99,23 +100,25 @@ float BezierTool::getSphereRadiusDaAt(float a)
   return getCnDa(a);
 }
 
-QVector3D BezierTool::computeNormal(QVector3D axis, QVector3D sNormal, QVector3D pathTangent, float a)
-{
-  QVector2D bNormal = bezier.unitNormalAt(a);
-  bNormal.setX(bNormal.x() * height); //scale since bezier is normalized for height=1.0
-  bNormal.normalize();
-  QVector3D envelopeNormal = bNormal.x() * axis + bNormal.y() * sNormal;
-  return envelopeNormal.normalized();
-}
-
 Vertex BezierTool::getToolSurfaceAt(float a, float tRad)
 {
   float toolRad = getRadiusAt(a);
   QVector3D p(
     toolRad * cos(tRad),
     toolRad * sin(tRad),
-    a * height
+    bezier.at(a).x() * height
   );
   QVector3D c(1, 0, 0);
   return Vertex(p, c);
+}
+
+QVector2D BezierTool::getProfile(float a)
+{
+  return {bezier.at(a).x()*height, getRadiusAt(a)};
+}
+
+QVector2D BezierTool::getProfileNormal(float a)
+{
+  QVector2D normal = bezier.unitNormalAt(a);
+  return {normal.x(), normal.y()};
 }

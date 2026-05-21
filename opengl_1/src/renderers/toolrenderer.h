@@ -6,6 +6,7 @@
 #include "../tools/sphere.h"
 #include "../tools/cylinder.h"
 #include "../tools/drum.h"
+#include "tools/bezierTool.h"
 
 /**
  * @brief The ToolRenderer class is a renderer for the tool.
@@ -29,6 +30,7 @@ public:
     ToolRenderer(Tool *tool);
     ToolRenderer(Cylinder *cylinder);
     ToolRenderer(Drum *drum);
+    ToolRenderer(BezierTool *bezierTool);
     ~ToolRenderer();
 
     void initShaders() override;

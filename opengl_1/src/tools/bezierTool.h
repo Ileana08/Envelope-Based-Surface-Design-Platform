@@ -33,11 +33,10 @@ public:
   float getSphereRadiusAt(float a) override;
   float getSphereRadiusDaAt(float a) override;
 
-
-
-  QVector3D computeNormal(QVector3D axis, QVector3D sNormal, QVector3D pathTangent, float a);
-
   Vertex getToolSurfaceAt(float a, float tRad) override;
+
+  QVector2D getProfile(float a) override;
+  QVector2D getProfileNormal(float a) override;
 };
 
 

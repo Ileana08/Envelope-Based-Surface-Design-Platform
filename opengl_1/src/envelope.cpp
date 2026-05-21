@@ -154,11 +154,6 @@ void Envelope::computeEnvelope()
             env[2] = getEnvelopeAt(t+tDelta, a);
             env[3] = getEnvelopeAt(t+tDelta, a+aDelta);
 
-            qDebug() << "0: " << env[0];
-            qDebug() << "1: " << env[1];
-            qDebug() << "2: " << env[2];
-            qDebug() << "3: " << env[3];
-
             norm[0] = getNormalAt(t, a);
             norm[1] = getNormalAt(t, a+aDelta);
             norm[2] = getNormalAt(t+tDelta, a);
@@ -197,7 +192,12 @@ void Envelope::computeEnvelope()
 
 QVector3D Envelope::getEnvelopeAt(float t, float a)
 {
-    return getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
+    //old implementation
+    //QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
+    QVector2D profile = tool->getProfile(a);
+    QVector3D env = getPathAt(t) + profile.x()*getAxisAt(t) + profile.y()*getSurfaceNormalAt(t);
+    //qDebug() << "envs: " << env << env2;
+    return env;
 }
 
 QVector3D Envelope::getEnvelopeDtAt(float t, float a)
@@ -287,7 +287,8 @@ void Envelope::computeGrazingCurves()
 /**
  * @brief Envelope::computeNormals Computes the vertex array of the normals.
  */
-void Envelope::computeNormals(){
+void Envelope::computeNormals()
+{
     vertexArrNormals.clear();
 
     QVector3D c = QVector3D(0,1,0);
@@ -312,13 +313,21 @@ void Envelope::computeNormals(){
     }
 }
 
+QVector3D Envelope::getSurfaceNormalAt(float t)
+{
+    return QVector3D::crossProduct(getAxisAt(t), getPathDtAt(t)).normalized();
+}
+
 QVector3D Envelope::getNormalAt(float t, float a)
 {
+
     QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
-
+    //qDebug() << "sNormal: " << sNormal << "myNormal: " << getSurfaceNormalAt(t);
+    /*
     float ra = tool->getSphereRadiusDaAt(a);
+    //qDebug() << sa << st << sNormal << ra;
 
     float E = QVector3D::dotProduct(sa, sa);
     float F = QVector3D::dotProduct(sa, st);
@@ -332,10 +341,17 @@ QVector3D Envelope::getNormalAt(float t, float a)
     float beta = -m21 * ra;
 
     float sqrt_term = 1 - ra * ra * m11;
+
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrt(sqrt_term);
 
     QVector3D n = alpha * sa + beta * st + gamma * sNormal;
-    return n.normalized();
+    */
+
+    QVector2D profileNormal = tool->getProfileNormal(a);
+    QVector3D normal = profileNormal.x()*getAxisAt(t) + profileNormal.y()*sNormal;
+
+    //qDebug() << n << normal;
+    return normal.normalized();
 }
 
 QVector3D Envelope::getNormalDtAt(float t, float a)

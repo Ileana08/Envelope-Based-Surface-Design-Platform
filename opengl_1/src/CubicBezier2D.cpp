@@ -6,10 +6,10 @@
 
 CubicBezier2D::CubicBezier2D() :
 CubicBezier2D(
-    QVector2D(0.0f, 0.5f),
-    QVector2D(0.33f, 1.0f),
-    QVector2D(0.67f, 0.0f),
-    QVector2D(1.0f, 0.5f))
+    QVector2D(0.0f, 0.9f),
+    QVector2D(1.0f, 0.9f),
+    QVector2D(0.0f, 0.1f),
+    QVector2D(1.0f, 0.1f))
 {}
 
 CubicBezier2D::CubicBezier2D(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p3)

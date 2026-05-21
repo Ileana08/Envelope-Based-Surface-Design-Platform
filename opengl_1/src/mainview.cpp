@@ -98,15 +98,24 @@ Envelope* MainView::addNewEnvelope() {
                                  Polynomial(0,0,0,0),
                                  Polynomial(0,0,1,0));
 
+    Tool *tool;
+    switch (defaultTool)
+    {
+    case ToolType::Tool_Cylinder: tool = cyl;          break;
+    case ToolType::Tool_Drum:     tool = drum;         break;
+    case ToolType::Tool_Bezier:   tool = bezierTool;   break;
+    default:                      tool = nullptr;      break;
+    }
+
     qDebug() << "addNewEnvelope setup envelope";
-    Envelope *env = new Envelope(idx, bezierTool, path);
+    Envelope *env = new Envelope(idx, tool, path);
     env->initEnvelope();
     envelopes[idx] = env;
 
     qDebug() << "addNewEnvelope setup tool renderer";
 
     // Set related renderers
-    toolRenderers[idx]->setTool(bezierTool);
+    toolRenderers[idx]->setTool(tool);
     toolRenderers[idx]->setModelTransf(modelTransf);
     toolRenderers[idx]->setProjTransf(projTransf);
 

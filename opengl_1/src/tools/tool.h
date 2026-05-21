@@ -25,7 +25,7 @@ protected:
   QVector<Vertex> vertexArr;
 
 public:
-  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(10), height(2), posit(QVector3D(0, 0, 0))
+  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0, 0, 0))
   {
   }
 
@@ -56,7 +56,8 @@ public:
 
   virtual Vertex getToolSurfaceAt(float a, float tRad) =0;
 
-
+  virtual QVector2D getProfile(float a)=0;
+  virtual QVector2D getProfileNormal(float a)=0;
   inline QVector3D getAxisVector() const { return axisVector.normalized(); }
   inline QVector3D getVectorPerpToAxis() const { return perpVector; }
   inline QVector<Vertex>& getVertexArr() { return vertexArr; }

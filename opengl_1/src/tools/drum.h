@@ -29,6 +29,9 @@ public:
 
     Vertex getToolSurfaceAt(float a, float tRad) override;
 
+    QVector2D getProfile(float a) override;
+    QVector2D getProfileNormal(float a) override;
+
 private:
     inline float D() {return rho-r;}
 

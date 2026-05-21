@@ -21,10 +21,20 @@ Cylinder::Cylinder(float baseRadius, float angle, float height, int sectors, QVe
 Vertex Cylinder::getToolSurfaceAt(float a, float tRad) {
     float toolRad = getRadiusAt(a);
     QVector3D p(
-        toolRad*cos(tRad),
-        toolRad*sin(tRad),
+        toolRad*cosf(tRad),
+        toolRad*sinf(tRad),
         a*height
         );
     QVector3D c(1,0,0);
     return Vertex(p,c);
+}
+
+QVector2D Cylinder::getProfile(float a)
+{
+    return {a*height, getRadiusAt(a)};
+}
+
+QVector2D Cylinder::getProfileNormal(float a)
+{
+    return {sinf(angle), cosf(angle)};
 }

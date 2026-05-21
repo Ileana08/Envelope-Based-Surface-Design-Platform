@@ -74,6 +74,17 @@ Vertex Drum::getToolSurfaceAt(float a, float tRad)
     return Vertex(p,c);
 }
 
+QVector2D Drum::getProfile(float a)
+{
+    return {a*height, getRadiusAt(a)};
+}
+
+QVector2D Drum::getProfileNormal(float a)
+{
+    float angle = getAngleAt(a);
+    return {sinf(angle), cosf(angle)};
+}
+
 float Drum::getAngleAt(float a)
 {
     a = a * 2 - 1;

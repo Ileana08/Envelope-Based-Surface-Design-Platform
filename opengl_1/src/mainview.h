@@ -43,6 +43,8 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     bool updateAllUniforms;
 
     // Tool rendering
+    ToolType defaultTool = ToolType::Tool_Bezier;
+
     QVector<ToolRenderer*> toolRenderers;
     QVector<Drum*> drums;
     QVector<Cylinder*> cylinders;
