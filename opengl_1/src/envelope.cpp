@@ -154,6 +154,11 @@ void Envelope::computeEnvelope()
             env[2] = getEnvelopeAt(t+tDelta, a);
             env[3] = getEnvelopeAt(t+tDelta, a+aDelta);
 
+            qDebug() << "0: " << env[0];
+            qDebug() << "1: " << env[1];
+            qDebug() << "2: " << env[2];
+            qDebug() << "3: " << env[3];
+
             norm[0] = getNormalAt(t, a);
             norm[1] = getNormalAt(t, a+aDelta);
             norm[2] = getNormalAt(t+tDelta, a);

@@ -22,11 +22,10 @@ protected:
   QVector3D axisVector = QVector3D(0.0, 0.0, 1.0);
   QVector3D perpVector = QVector3D(1.0, 0.0, 0.0); // a vector perpendicular to the axis
 
-  //TODO: Check if this vertexArr is actually meaningfully used
   QVector<Vertex> vertexArr;
 
 public:
-  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0, 0, 0))
+  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(10), height(2), posit(QVector3D(0, 0, 0))
   {
   }
 

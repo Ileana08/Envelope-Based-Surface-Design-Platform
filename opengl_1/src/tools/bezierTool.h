@@ -8,14 +8,14 @@
 #include "tool.h"
 
 
-class bezierTool : public Tool
+class BezierTool : public Tool
 {
   CubicBezier2D bezier;
   float innerRadius;
 
 public:
-  bezierTool();
-  bezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position);
+  BezierTool();
+  BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position);
 
   inline void setInnerRadius(float innerRadius) { this->innerRadius = innerRadius; }
   inline float getInnerRadius() { return innerRadius; }

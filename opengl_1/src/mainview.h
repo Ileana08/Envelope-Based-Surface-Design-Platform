@@ -12,6 +12,7 @@
 
 #include "vertex.h"
 #include "tools/cylinder.h"
+#include "tools/bezierTool.h"
 #include "movement/cylindermovement.h"
 #include "movement/simplepath.h"
 #include "envelope.h"
@@ -45,6 +46,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<ToolRenderer*> toolRenderers;
     QVector<Drum*> drums;
     QVector<Cylinder*> cylinders;
+    QVector<BezierTool*> bezierTools;
 
     // Path rendering
     QVector<MoveRenderer*> moveRenderers;

@@ -7,17 +7,17 @@
 #include <complex>
 #include <QMatrix2x2>
 
-bezierTool::bezierTool()
+BezierTool::BezierTool()
   : Tool(ToolType::Tool_Bezier), innerRadius(0.0f)
 {
 }
 
-bezierTool::bezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position)
+BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position)
   : Tool(ToolType::Tool_Cylinder, sectors, height, position), innerRadius(innerRadius)
 {
 }
 
-float bezierTool::getCa(float a)
+float BezierTool::getCa(float a)
 {
   QVector2D bezierAta = bezier.at(a);
   QVector2D bezierNormalAta = bezier.unitNormalAt(a);
@@ -33,7 +33,7 @@ float bezierTool::getCa(float a)
   return ca;
 }
 
-float bezierTool::getCaDa(float a)
+float BezierTool::getCaDa(float a)
 {
   QVector2D bezierAt = bezier.at(a);
   QVector2D dBezierAt = bezier.derivativeAt(a);
@@ -44,7 +44,7 @@ float bezierTool::getCaDa(float a)
     normal.y() * normal.x() / bezierAt.y();
 }
 
-float bezierTool::getCn(float a)
+float BezierTool::getCn(float a)
 {
   QVector2D bezierAta = bezier.at(a);
   QVector2D bezierNormalAta = bezier.unitNormalAt(a);
@@ -60,7 +60,7 @@ float bezierTool::getCn(float a)
   return cn;
 }
 
-float bezierTool::getCnDa(float a)
+float BezierTool::getCnDa(float a)
 {
   QVector2D bezierAt = bezier.at(a);
   QVector2D dBezierAt = bezier.derivativeAt(a);
@@ -69,37 +69,37 @@ float bezierTool::getCnDa(float a)
   return (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y());
 }
 
-float bezierTool::getRadiusAt(float a)
+float BezierTool::getRadiusAt(float a)
 {
   return innerRadius + bezier.at(a).y();
 }
 
-float bezierTool::getRadiusDaAt(float a)
+float BezierTool::getRadiusDaAt(float a)
 {
   return bezier.derivativeAt(a).y();
 }
 
-float bezierTool::getSphereCenterHeightAt(float a)
+float BezierTool::getSphereCenterHeightAt(float a)
 {
   return getCa(a);
 }
 
-float bezierTool::getSphereCenterHeightDaAt(float a)
+float BezierTool::getSphereCenterHeightDaAt(float a)
 {
   return getCaDa(a);
 }
 
-float bezierTool::getSphereRadiusAt(float a)
+float BezierTool::getSphereRadiusAt(float a)
 {
   return getCn(a);
 }
 
-float bezierTool::getSphereRadiusDaAt(float a)
+float BezierTool::getSphereRadiusDaAt(float a)
 {
   return getCnDa(a);
 }
 
-QVector3D bezierTool::computeNormal(QVector3D axis, QVector3D sNormal, QVector3D pathTangent, float a)
+QVector3D BezierTool::computeNormal(QVector3D axis, QVector3D sNormal, QVector3D pathTangent, float a)
 {
   QVector2D bNormal = bezier.unitNormalAt(a);
   bNormal.setX(bNormal.x() * height); //scale since bezier is normalized for height=1.0
@@ -108,7 +108,7 @@ QVector3D bezierTool::computeNormal(QVector3D axis, QVector3D sNormal, QVector3D
   return envelopeNormal.normalized();
 }
 
-Vertex bezierTool::getToolSurfaceAt(float a, float tRad)
+Vertex BezierTool::getToolSurfaceAt(float a, float tRad)
 {
   float toolRad = getRadiusAt(a);
   QVector3D p(

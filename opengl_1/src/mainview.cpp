@@ -45,6 +45,11 @@ MainView::~MainView()
     }
     cylinders.clear();
     cylinders.squeeze();
+    for (auto i : bezierTools){
+        delete i;
+    }
+    bezierTools.clear();
+    bezierTools.squeeze();
     for (auto i : moveRenderers){
         delete i;
     }
@@ -72,6 +77,7 @@ Envelope* MainView::addNewEnvelope() {
     int idx = envelopes.indexOf(nullptr);
     if (idx == -1) return nullptr;
 
+    qDebug() << "addNewEnvelope setup tools";
     // Tools
     Cylinder *cyl = new Cylinder();
     cyl->initTool();
@@ -79,23 +85,38 @@ Envelope* MainView::addNewEnvelope() {
     Drum *drum = new Drum();
     drum->initTool();
     drums[idx] = drum;
+    qDebug() << "addNewEnvelope setup bezier";
+    BezierTool *bezierTool = new BezierTool();
+    qDebug() << "addNewEnvelope initTool";
+    bezierTool->initTool();
+    bezierTools[idx] = bezierTool;
+
+    qDebug() << "addNewEnvelope setup path";
 
     // Path and envelope
     SimplePath path = SimplePath(Polynomial(0,0,0,0),
                                  Polynomial(0,0,0,0),
                                  Polynomial(0,0,1,0));
-    Envelope *env = new Envelope(idx, cyl, path);
+
+    qDebug() << "addNewEnvelope setup envelope";
+    Envelope *env = new Envelope(idx, bezierTool, path);
     env->initEnvelope();
     envelopes[idx] = env;
 
+    qDebug() << "addNewEnvelope setup tool renderer";
+
     // Set related renderers
-    toolRenderers[idx]->setTool(cyl);
+    toolRenderers[idx]->setTool(bezierTool);
     toolRenderers[idx]->setModelTransf(modelTransf);
     toolRenderers[idx]->setProjTransf(projTransf);
+
+    qDebug() << "addNewEnvelope envelope renderer";
 
     envelopeRenderers[idx]->setEnvelope(env);
     envelopeRenderers[idx]->setModelTransf(modelTransf);
     envelopeRenderers[idx]->setProjTransf(projTransf);
+
+    qDebug() << "addNewEnvelope setup movement renderer";
 
     moveRenderers[idx]->setMovement(&env->getToolMovement());
     moveRenderers[idx]->setModelTransf(modelTransf);
@@ -180,6 +201,7 @@ void MainView::initializeGL()
     envelopes.fill(nullptr, settings.NUM_ENVELOPES);
     cylinders.fill(nullptr, settings.NUM_ENVELOPES);
     drums.fill(nullptr, settings.NUM_ENVELOPES);
+    bezierTools.fill(nullptr, settings.NUM_ENVELOPES);
     for (size_t i = 0; i < settings.NUM_ENVELOPES; i++) {
         ToolRenderer *toolRend = new ToolRenderer();
         toolRend->init(gl, &settings);
@@ -254,6 +276,7 @@ void MainView::paintGL()
             int i = indices.takeFirst();
             cylinders[i]->update();
             drums[i]->update();
+            bezierTools[i]->update();
             toolRenderers[i]->updateBuffers();
         }
         toolMeshUpdates.clear();
