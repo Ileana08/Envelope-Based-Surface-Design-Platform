@@ -193,10 +193,20 @@ void Envelope::computeEnvelope()
 QVector3D Envelope::getEnvelopeAt(float t, float a)
 {
     //old implementation
-    //QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
+
     QVector2D profile = tool->getProfile(a);
     QVector3D env = getPathAt(t) + profile.x()*getAxisAt(t) + profile.y()*getSurfaceNormalAt(t);
-    //qDebug() << "envs: " << env << env2;
+    //qDebug() << getSurfaceNormalAt(t) << getAxisAt(t);
+    //qDebug() << "path: " << getPathAt(t) << "Sphere center" << tool->getSphereCenterHeightAt(a) << "radius:" << tool->getRadiusAt(a);
+    //qDebug() << "profile x: " << profile.x() << " y: " << profile.y();
+    //qDebug() << "envs: " << QVector3D::dotProduct(env, getAxisAt(t)) << QVector3D::dotProduct(env, getSurfaceNormalAt(t)) << env2;
+    if (a < 1e-05f || a - 1 > -1e-05f)
+    {
+        QVector3D env2 = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
+        qDebug() << "new: " << env << " old: " << env2; //should be ~0
+        qDebug() << "env - evn2: " << env - env2; //should be ~0
+
+    }
     return env;
 }
 
@@ -320,12 +330,13 @@ QVector3D Envelope::getSurfaceNormalAt(float t)
 
 QVector3D Envelope::getNormalAt(float t, float a)
 {
-
+    /*
+     * Old implementation
     QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
     //qDebug() << "sNormal: " << sNormal << "myNormal: " << getSurfaceNormalAt(t);
-    /*
+
     float ra = tool->getSphereRadiusDaAt(a);
     //qDebug() << sa << st << sNormal << ra;
 
@@ -345,12 +356,11 @@ QVector3D Envelope::getNormalAt(float t, float a)
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrt(sqrt_term);
 
     QVector3D n = alpha * sa + beta * st + gamma * sNormal;
+
     */
-
     QVector2D profileNormal = tool->getProfileNormal(a);
-    QVector3D normal = profileNormal.x()*getAxisAt(t) + profileNormal.y()*sNormal;
+    QVector3D normal = profileNormal.x()*getAxisAt(t) + profileNormal.y()*getSurfaceNormalAt(t);
 
-    //qDebug() << n << normal;
     return normal.normalized();
 }
 

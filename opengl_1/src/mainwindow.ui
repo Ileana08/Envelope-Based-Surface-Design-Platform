@@ -485,6 +485,11 @@
                     <string>Drum</string>
                    </property>
                   </item>
+                  <item>
+                   <property name="text">
+                    <string>Bezier</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                </layout>

@@ -20,7 +20,7 @@ BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, in
 
 float BezierTool::getCa(float a)
 {
-  QVector2D bezierAta = bezier.at(a);
+  QVector2D bezierAta = getProfile(a); //stretch bezier to fit height and inner radius
   QVector2D bezierNormalAta = bezier.unitNormalAt(a);
   float ca = 0;
   if (bezierNormalAta.y() > 1e-9f)
@@ -36,7 +36,7 @@ float BezierTool::getCa(float a)
 
 float BezierTool::getCaDa(float a)
 {
-  QVector2D bezierAt = bezier.at(a);
+  QVector2D bezierAt = getProfile(a);
   QVector2D dBezierAt = bezier.derivativeAt(a);
   QVector2D normal = bezier.unitNormalAt(a);
   QVector2D dNormal = bezier.dNormalAt(a);
@@ -47,7 +47,7 @@ float BezierTool::getCaDa(float a)
 
 float BezierTool::getCn(float a)
 {
-  QVector2D bezierAta = bezier.at(a);
+  QVector2D bezierAta = getProfile(a);
   QVector2D bezierNormalAta = bezier.unitNormalAt(a);
   float cn = 0;
   if (bezierNormalAta.y() > 1e-9f)
@@ -63,10 +63,10 @@ float BezierTool::getCn(float a)
 
 float BezierTool::getCnDa(float a)
 {
-  QVector2D bezierAt = bezier.at(a);
-  QVector2D dBezierAt = bezier.derivativeAt(a);
-  QVector2D normal = bezier.unitNormalAt(a);
-  QVector2D dNormal = bezier.dNormalAt(a);
+  QVector2D bezierAt = getProfile(a);
+  QVector2D dBezierAt = getProfileDa(a);
+  QVector2D normal = getProfileNormal(a);
+  QVector2D dNormal = getProfileNormalDa(a);
   return (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y());
 }
 
@@ -117,8 +117,20 @@ QVector2D BezierTool::getProfile(float a)
   return {bezier.at(a).x()*height, getRadiusAt(a)};
 }
 
+QVector2D BezierTool::getProfileDa(float a)
+{
+  QVector2D baseProfileDa = bezier.derivativeAt(a);
+  return QVector2D(baseProfileDa.x() * height, baseProfileDa.y()).normalized();
+}
+
 QVector2D BezierTool::getProfileNormal(float a)
 {
-  QVector2D normal = bezier.unitNormalAt(a);
-  return {normal.x(), normal.y()};
+  QVector2D baseNormal = bezier.unitNormalAt(a);
+  return QVector2D(baseNormal.x()/height, baseNormal.y()).normalized();
+}
+
+QVector2D BezierTool::getProfileNormalDa(float a)
+{
+  QVector2D baseNormalDa = bezier.dNormalAt(a);
+  return QVector2D(baseNormalDa.x()/height, baseNormalDa.y()).normalized();
 }

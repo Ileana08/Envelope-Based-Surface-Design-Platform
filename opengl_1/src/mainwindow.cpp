@@ -394,6 +394,7 @@ void MainWindow::on_radiusSpinBox_valueChanged(double value) {
     if (idx == -1) return;
     ui->mainView->cylinders[idx]->setRadius(value);
     ui->mainView->drums[idx]->setRadius(value);
+    ui->mainView->bezierTools[idx]->setInnerRadius(value);
 
     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
     ui->mainView->toolMeshUpdates += depEnvs;
@@ -446,6 +447,8 @@ void MainWindow::on_heightSpinBox_valueChanged(double value) {
     if (idx == -1) return;
     ui->mainView->cylinders[idx]->setHeight(value);
     ui->mainView->drums[idx]->setHeight(value);
+    ui->mainView->bezierTools[idx]->setHeight(value);
+
 
     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
     ui->mainView->toolMeshUpdates += depEnvs;
@@ -464,28 +467,26 @@ void MainWindow::on_toolBox_currentIndexChanged(int index){
     if (idx == -1) return;
 
     qDebug() << "tool index" << index;
+    Tool *tool = nullptr;
     switch (index) {
-    case 0:
+    case ToolType::Tool_Cylinder:
         ui->angleSpinBox->setEnabled(true);
         ui->drumRadiusSpinBox->setEnabled(false);
+        tool = ui->mainView->cylinders[idx];
         break;
-    case 1:
+    case ToolType::Tool_Drum:
         ui->angleSpinBox->setEnabled(false);
         ui->drumRadiusSpinBox->setEnabled(true);
+        tool = ui->mainView->drums[idx];
+        break;
+    case ToolType::Tool_Bezier:
+        ui->angleSpinBox->setEnabled(false);
+        ui->drumRadiusSpinBox->setEnabled(false);
+        tool = ui->mainView->bezierTools[idx];
         break;
     default:
         ui->angleSpinBox->setEnabled(false);
         ui->drumRadiusSpinBox->setEnabled(false);
-        break;
-    }
-
-    Tool *tool = nullptr;
-    switch(index) {
-    case 0:
-        tool = ui->mainView->cylinders[idx];
-        break;
-    case 1:
-        tool = ui->mainView->drums[idx];
         break;
     }
 

@@ -36,5 +36,5 @@ QVector2D Cylinder::getProfile(float a)
 
 QVector2D Cylinder::getProfileNormal(float a)
 {
-    return {sinf(angle), cosf(angle)};
+    return {-sinf(angle), cosf(angle)};
 }

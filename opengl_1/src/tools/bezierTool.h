@@ -36,7 +36,9 @@ public:
   Vertex getToolSurfaceAt(float a, float tRad) override;
 
   QVector2D getProfile(float a) override;
+  QVector2D getProfileDa(float a);
   QVector2D getProfileNormal(float a) override;
+  QVector2D getProfileNormalDa(float a);
 };
 
 
