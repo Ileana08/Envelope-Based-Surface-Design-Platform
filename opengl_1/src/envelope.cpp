@@ -192,21 +192,14 @@ void Envelope::computeEnvelope()
 
 QVector3D Envelope::getEnvelopeAt(float t, float a)
 {
-    //old implementation
+    /* Old implementation
+    QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
+    */
 
     QVector2D profile = tool->getProfile(a);
     QVector3D env = getPathAt(t) + profile.x()*getAxisAt(t) + profile.y()*getSurfaceNormalAt(t);
-    //qDebug() << getSurfaceNormalAt(t) << getAxisAt(t);
-    //qDebug() << "path: " << getPathAt(t) << "Sphere center" << tool->getSphereCenterHeightAt(a) << "radius:" << tool->getRadiusAt(a);
-    //qDebug() << "profile x: " << profile.x() << " y: " << profile.y();
-    //qDebug() << "envs: " << QVector3D::dotProduct(env, getAxisAt(t)) << QVector3D::dotProduct(env, getSurfaceNormalAt(t)) << env2;
-    if (a < 1e-05f || a - 1 > -1e-05f)
-    {
-        QVector3D env2 = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
-        qDebug() << "new: " << env << " old: " << env2; //should be ~0
-        qDebug() << "env - evn2: " << env - env2; //should be ~0
 
-    }
+
     return env;
 }
 
@@ -612,6 +605,11 @@ QVector3D Envelope::getPathAt(float t)
 {
     if (isTanContinuous())
     {
+        qDebug() << "---- t = " << t << " ----";
+        qDebug() << "adjenv " << adjEnvA0->getEnvelopeAt(t, 1);
+        qDebug() << "normal " << tool->getSphereRadiusAt(0) * adjEnvA0->getNormalAt(t, 1);
+        qDebug() << "axis " << tool->getSphereCenterHeightAt(0) * getAxisAt(t) << getAxisAt(t);
+        qDebug() << "full " << adjEnvA0->getEnvelopeAt(t, 1) - tool->getSphereRadiusAt(0) * adjEnvA0->getNormalAt(t, 1) - tool->getSphereCenterHeightAt(0) * getAxisAt(t);
         return adjEnvA0->getEnvelopeAt(t, 1) - tool->getSphereRadiusAt(0) * adjEnvA0->getNormalAt(t, 1) - tool->getSphereCenterHeightAt(0) * getAxisAt(t);
     }
     else if (isPositContinuous())
@@ -810,7 +808,7 @@ QVector3D Envelope::getAxisAt(float t)
         QVector3D x0_t_hat = x0_t.normalized();
         QVector3D x1_t_hat = x1_t.normalized();
 
-        // The following method only works when Delta X can be made with a cylinder of hight and radius of 1, where x1 lies on the bottom ring of the cylinder and x2 on the top ring.
+        // The following method only works when Delta X can be made with a cylinder of height and radius of 1, where x1 lies on the bottom ring of the cylinder and x2 on the top ring.
 
         // Separately find the parts of the axis parallel and perpendicular to Delta X
         // By utilizing Delta X dot A = 1 we can calculate the angle between Delta X and A

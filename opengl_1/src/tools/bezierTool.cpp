@@ -21,7 +21,7 @@ BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, in
 float BezierTool::getCa(float a)
 {
   QVector2D bezierAta = getProfile(a); //stretch bezier to fit height and inner radius
-  QVector2D bezierNormalAta = bezier.unitNormalAt(a);
+  QVector2D bezierNormalAta = getProfileNormal(a);
   float ca = 0;
   if (bezierNormalAta.y() > 1e-9f)
   {
@@ -37,20 +37,29 @@ float BezierTool::getCa(float a)
 float BezierTool::getCaDa(float a)
 {
   QVector2D bezierAt = getProfile(a);
-  QVector2D dBezierAt = bezier.derivativeAt(a);
-  QVector2D normal = bezier.unitNormalAt(a);
-  QVector2D dNormal = bezier.dNormalAt(a);
+  QVector2D dBezierAt = getProfileDa(a);
+  QVector2D normal = getProfileNormal(a);
+  QVector2D dNormal = getProfileNormalDa(a);
 
-  return dBezierAt.x() + (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y()) -
+  float caDa = 0;
+  if (abs(normal.y()) > 1e-9f && abs(bezierAt.y() > 1e-9f))
+  {
+    caDa = dBezierAt.x() + (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y()) -
     normal.y() * normal.x() / bezierAt.y();
+  }
+  else
+  {
+    qDebug() << "CnDa divide by zero";
+  }
+  return caDa;
 }
 
 float BezierTool::getCn(float a)
 {
   QVector2D bezierAta = getProfile(a);
-  QVector2D bezierNormalAta = bezier.unitNormalAt(a);
+  QVector2D bezierNormalAta = getProfileNormalDa(a);
   float cn = 0;
-  if (bezierNormalAta.y() > 1e-9f)
+  if (abs(bezierNormalAta.y()) > 1e-9f)
   {
     cn = bezierAta.y() / bezierNormalAta.y();
   }
@@ -67,7 +76,16 @@ float BezierTool::getCnDa(float a)
   QVector2D dBezierAt = getProfileDa(a);
   QVector2D normal = getProfileNormal(a);
   QVector2D dNormal = getProfileNormalDa(a);
-  return (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y());
+  float cnDa = 0;
+  if (abs(normal.y()) > 1e-9f)
+  {
+    cnDa = (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y());
+  }
+  else
+  {
+    qDebug() << "CnDa divide by zero";
+  }
+  return cnDa;
 }
 
 float BezierTool::getRadiusAt(float a)
@@ -77,7 +95,7 @@ float BezierTool::getRadiusAt(float a)
 
 float BezierTool::getRadiusDaAt(float a)
 {
-  return bezier.derivativeAt(a).y();
+  return getProfileDa(a).y();
 }
 
 float BezierTool::getSphereCenterHeightAt(float a)
@@ -111,6 +129,8 @@ Vertex BezierTool::getToolSurfaceAt(float a, float tRad)
   QVector3D c(1, 0, 0);
   return Vertex(p, c);
 }
+
+// Profile and its normal
 
 QVector2D BezierTool::getProfile(float a)
 {
