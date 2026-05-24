@@ -25,8 +25,9 @@ Vertex ControlPoint::getSphereSurfaceAt(float angle, float rotation)
         position.y() + radius*cos(rotation)*sin(angle),
         position.z() + radius*sin(rotation)
     );
-    QVector3D c(1,1,1);
-    return Vertex(p,c);
+
+    QVector3D n = (p - position).normalized();
+    return Vertex(p,n);
 }
 
 void ControlPoint::computeSphere() {

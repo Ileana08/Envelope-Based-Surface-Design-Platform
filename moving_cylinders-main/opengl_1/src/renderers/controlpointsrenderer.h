@@ -11,6 +11,10 @@ class ControlPointsRenderer : public Renderer
     GLuint vaoControlPoints;
     GLuint vboControlPoints;
 
+    QVector<Vertex> controlLines;
+    GLuint vaoControlLines;
+    GLuint vboControlLines;
+
     QOpenGLShaderProgram shader;
 
 public:
