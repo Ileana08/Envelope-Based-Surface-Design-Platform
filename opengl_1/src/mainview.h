@@ -17,6 +17,7 @@
 #include "movement/simplepath.h"
 #include "envelope.h"
 #include "settings.h"
+#include "renderers/controlpointsrenderer.h"
 #include "renderers/toolrenderer.h"
 #include "renderers/enveloperenderer.h"
 #include "renderers/moverenderer.h"
@@ -57,6 +58,14 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<Envelope*> envelopes;
     QVector<EnvelopeRenderer*> envelopeRenderers;
 
+    // Control points rendering
+    QVector<ControlPointsRenderer*> controlPointsRenderers;
+    QVector<QVector<ControlPoint*>> envelopeControlPoints;
+
+    // Mouse input for control points
+    int selectedControlPoint = -1;
+    bool controlPointPressed = false;
+
     // Transformation matrices for the model
     float scalingFactor = 1.0f;
     QMatrix4x4 modelScaling;
@@ -72,7 +81,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     bool isSingleDragging = false;
     bool isDoubleDragging = false;
-    QPoint lastMousePos;
+    QVector2D lastMousePos;
+
+    int viewportWidth = 1;
+    int viewportHeight = 1;
 
 public:
     MainView(QWidget *parent = nullptr);
@@ -93,7 +105,8 @@ protected:
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
     void moveModel(float x, float y);
-    QVector2D toNormalizedScreenCoordinates(float x, float y);
+    QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
+    QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 
     // Functions for keyboard input events
     void keyPressEvent(QKeyEvent *ev) override;

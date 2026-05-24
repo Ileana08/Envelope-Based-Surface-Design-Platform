@@ -63,8 +63,9 @@ void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
 
   if (ev->button() == Qt::LeftButton)
   {
+    QVector2D currentMousePosition(ev->position());
     isDoubleDragging = true;
-    lastMousePos = ev->pos();
+    lastMousePos = currentMousePosition;
     update();
   }
 }
@@ -77,9 +78,25 @@ void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
 void MainView::mouseMoveEvent(QMouseEvent *ev) {
   qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
 
-  if (isSingleDragging)
+  QVector2D currentMousePos(ev->position());
+
+  if(controlPointPressed == true && settings.selectedIdx >= 0) {
+    QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
+    ControlPoint* controlPoint = cps[selectedControlPoint];
+    QVector3D position = controlPoint->getPosition();
+
+    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
+    if (clipCoordinates.w() != 0.0f) {
+      float ndcZ = clipCoordinates.z() / clipCoordinates.w();
+      QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
+      QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
+      QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
+      controlPoint->setPosition(newWorldPos);
+      updateAllUniforms = true;
+    }
+  } else if (isSingleDragging)
   {
-    QPoint delta = ev->pos() - lastMousePos;
+    QVector2D delta = currentMousePos - lastMousePos;
     float sensitivity = settings.rotSensitivity;
     QQuaternion deltaRot = QQuaternion::fromEulerAngles(
         delta.y() * sensitivity,  // pitch
@@ -90,12 +107,12 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     updateAllUniforms = true;
   } else if (isDoubleDragging)
   {
-    QPoint delta = ev->pos() - lastMousePos;
+    QVector2D delta = currentMousePos - lastMousePos;
     float sensitivity = settings.panSensitivity;
     modelTranslation.translate(delta.x() * sensitivity, -delta.y() * sensitivity, 0.0f);
-    updateAllUniforms = true;
+    controlPointsRenderers[settings.selectedIdx]->updateBuffers();
   }
-  lastMousePos = ev->pos();
+  lastMousePos = currentMousePos;
 
   update();
 }
@@ -107,10 +124,23 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
 void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
 
-  if (ev->button() == Qt::LeftButton)
+  QVector2D currentMousePos(ev->position());
+  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton && settings.selectedIdx >= 0){
+    const QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
+    for(int i=0; i<cps.size(); i++){
+      QVector3D pos = cps[i]->getPosition();
+      QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
+      if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
+        selectedControlPoint = i;
+        controlPointPressed = true;
+        lastMousePos = currentMousePos;
+        break;
+      }
+    }
+  } else if (ev->button() == Qt::LeftButton)
   {
     isSingleDragging = true;
-    lastMousePos = ev->pos();
+    lastMousePos = currentMousePos;
   }
 
   update();
@@ -125,15 +155,35 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button released" << ev->button();
 
-  if (isSingleDragging && ev->button() == Qt::LeftButton)
+  QVector2D currentMousePos(ev->position());
+
+  if (settings.selectedIdx >= 0 && envelopes[settings.selectedIdx]) {
+    envelopes[settings.selectedIdx]->getToolMovement().getPath().updateVertexArr();
+    envelopes[settings.selectedIdx]->update();
+    QSet<int> depEnvs = envelopes[settings.selectedIdx]->getAllDependents();
+    moveRenderers[settings.selectedIdx]->updateBuffers();
+    envelopeRenderers[settings.selectedIdx]->updateBuffers();
+    toolRenderers[settings.selectedIdx]->updateBuffers();
+    for(int idx : depEnvs) {
+      envelopes[idx]->getToolMovement().getPath().updateVertexArr();
+      envelopes[idx]->update();
+      moveRenderers[idx]->updateBuffers();
+      envelopeRenderers[idx]->updateBuffers();
+      toolRenderers[idx]->updateBuffers();
+    }
+    updateToolTransf();
+    updateAllUniforms = true;
+    selectedControlPoint = -1;
+    controlPointPressed = false;
+  } else if (isSingleDragging && ev->button() == Qt::LeftButton)
   {
     isSingleDragging = false;
-    lastMousePos = ev->pos();
+    lastMousePos = currentMousePos;
     update();
   } else if (isDoubleDragging && ev->button() == Qt::LeftButton)
   {
     isDoubleDragging = false;
-    lastMousePos = ev->pos();
+    lastMousePos = currentMousePos;
     update();
   }
 }

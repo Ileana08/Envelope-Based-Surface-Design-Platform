@@ -78,6 +78,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="controlPointsCheckBox">
+             <property name="text">
+              <string>Control points</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="toolAxisCheckBox">
              <property name="text">
               <string>Tool axis</string>
@@ -608,7 +615,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="PathTab">
+         <!-- <widget class="QWidget" name="PathTab">
           <attribute name="title">
            <string>Path</string>
           </attribute>
@@ -815,7 +822,7 @@
             </spacer>
            </item>
           </layout>
-         </widget>
+         </widget> -->
         </widget>
        </item>
        <item>

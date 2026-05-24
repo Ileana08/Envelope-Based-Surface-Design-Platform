@@ -18,7 +18,7 @@ Envelope::Envelope(int index) :
  * @brief Envelope::Envelope Creates a new envelope with the given values.
  * @param tool Tool pointer.
  */
-Envelope::Envelope(int index, Tool *tool, const SimplePath &path) :
+Envelope::Envelope(int index, Tool *tool, const BezierPath &path) :
     index(index),
     adjEnvA0(nullptr),
     tool(tool),
@@ -34,7 +34,7 @@ Envelope::Envelope(int index, Tool *tool, const SimplePath &path) :
  * @param tool Tool pointer.
  * @param adjEnvelope Adjacent envelope.
  */
-Envelope::Envelope(int index, Tool *tool, const SimplePath &path, Envelope *adjEnvelope) :
+Envelope::Envelope(int index, Tool *tool, const BezierPath &path, Envelope *adjEnvelope) :
     index(index),
     tool(tool),
     toolMovement(path, tool)

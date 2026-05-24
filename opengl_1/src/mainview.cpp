@@ -65,6 +65,13 @@ MainView::~MainView()
     }
     envelopeRenderers.clear();
     envelopeRenderers.squeeze();
+    for (const QVector<ControlPoint*> &cps : envelopeControlPoints){
+        for (ControlPoint *cp : cps) {
+            delete cp;
+        }
+    }
+    envelopeControlPoints.clear();
+    envelopeControlPoints.squeeze();
 
     makeCurrent();
 }
@@ -94,9 +101,14 @@ Envelope* MainView::addNewEnvelope() {
     qDebug() << "addNewEnvelope setup path";
 
     // Path and envelope
-    SimplePath path = SimplePath(Polynomial(0,0,0,0),
-                                 Polynomial(0,0,0,0),
-                                 Polynomial(0,0,1,0));
+    QVector<ControlPoint*> controlPoints = {
+        new ControlPoint(QVector3D(0,0,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0/3,0,0), 0.05, 20),
+        new ControlPoint(QVector3D(2.0/3,1.0/3,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0,1.0,1.0), 0.05, 20)
+    };
+    envelopeControlPoints[idx] = controlPoints;
+    BezierPath path(controlPoints);
 
     Tool *tool;
     switch (defaultTool)
@@ -130,6 +142,12 @@ Envelope* MainView::addNewEnvelope() {
     moveRenderers[idx]->setMovement(&env->getToolMovement());
     moveRenderers[idx]->setModelTransf(modelTransf);
     moveRenderers[idx]->setProjTransf(projTransf);
+
+    qDebug() << "addNewEnvelope setup control point renderer";
+
+    controlPointsRenderers[idx]->setControlPoints(env->getToolMovement().getPath().getControlPoints());
+    controlPointsRenderers[idx]->setModelTransf(modelTransf);
+    controlPointsRenderers[idx]->setProjTransf(projTransf);
 
     // Activate
     indicesUsed[idx] = true;
@@ -207,6 +225,8 @@ void MainView::initializeGL()
     toolRenderers.reserve(settings.NUM_ENVELOPES);
     envelopeRenderers.reserve(settings.NUM_ENVELOPES);
     moveRenderers.reserve(settings.NUM_ENVELOPES);
+    controlPointsRenderers.reserve(settings.NUM_ENVELOPES);
+    envelopeControlPoints.reserve(settings.NUM_ENVELOPES);
     envelopes.fill(nullptr, settings.NUM_ENVELOPES);
     cylinders.fill(nullptr, settings.NUM_ENVELOPES);
     drums.fill(nullptr, settings.NUM_ENVELOPES);
@@ -223,6 +243,12 @@ void MainView::initializeGL()
         MoveRenderer *moveRend = new MoveRenderer();
         moveRend->init(gl, &settings);
         moveRenderers.append(moveRend);
+
+        // Control points renderer
+        ControlPointsRenderer *cpRend = new ControlPointsRenderer();
+        cpRend->init(gl, &settings);
+        controlPointsRenderers.append(cpRend);
+        envelopeControlPoints.append(QVector<ControlPoint*>());
     }
 
     // Trigger buffer update
@@ -244,6 +270,7 @@ void MainView::updateBuffers(){
         toolRenderers[i]->updateBuffers();
         envelopeRenderers[i]->updateBuffers();
         moveRenderers[i]->updateBuffers();
+        controlPointsRenderers[i]->updateBuffers();
     }
 }
 
@@ -255,6 +282,7 @@ void MainView::updateUniforms() {
         toolRenderers[i]->updateUniforms();
         moveRenderers[i]->updateUniforms();
         envelopeRenderers[i]->updateUniforms();
+        controlPointsRenderers[i]->updateUniforms();
     }
 }
 
@@ -275,6 +303,7 @@ void MainView::paintGL()
             envelopes[i]->update();
             envelopeRenderers[i]->updateBuffers();
             moveRenderers[i]->updateBuffers();
+            controlPointsRenderers[i]->updateBuffers();
         }
         envelopeMeshUpdates.clear();
     }
@@ -321,6 +350,8 @@ void MainView::paintGL()
             envelopeRenderers[i]->setNormalTransf(normalTransf);
             moveRenderers[i]->setModelTransf(modelTransf);
             moveRenderers[i]->setNormalTransf(normalTransf);
+            controlPointsRenderers[i]->setModelTransf(modelTransf);
+            controlPointsRenderers[i]->setNormalTransf(normalTransf);
         }
         updateToolTransf();
 
@@ -333,6 +364,9 @@ void MainView::paintGL()
         toolRenderers[i]->paintGL();
         moveRenderers[i]->paintGL();
         envelopeRenderers[i]->paintGL();
+        if (!envelopes[i]->isPositContinuous()) {
+            controlPointsRenderers[i]->paintGL();
+        }
     }
 }
 
@@ -348,6 +382,9 @@ void MainView::resizeGL(int newWidth, int newHeight)
     // Get the aspect ratio of the new screen size
     float aspectRatio = newWidth / ((float)newHeight);
 
+    viewportWidth = newWidth;
+    viewportHeight = newHeight;
+
     // Set the viewport to the new size
     projTransf.setToIdentity();
     projTransf.perspective(60.0f, aspectRatio, 0.2f, 20.0f);
@@ -357,6 +394,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
         toolRenderers[i]->setProjTransf(projTransf);
         envelopeRenderers[i]->setProjTransf(projTransf);
         moveRenderers[i]->setProjTransf(projTransf);
+        controlPointsRenderers[i]->setProjTransf(projTransf);
     }
     updateAllUniforms = true;
 }
@@ -410,6 +448,23 @@ void MainView::updateToolTransf(){
         if (!envelopes[i]->isActive()) continue;
         toolRenderers[i]->setToolTransf(envelopes[i]->getToolTransformAt(settings.t()));
     }
+}
+
+QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {
+    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(Position, 1.0f);
+    QVector3D normalizedDeviceCoord = clipCoordinates.toVector3D() / clipCoordinates.w();
+    float screenX = normalizedDeviceCoord.x() * 0.5f * viewportWidth + 0.5f * viewportWidth;
+    // Invert y coordinates because in the screen coordinates y goes down
+    float screenY = viewportHeight - normalizedDeviceCoord.y() * 0.5f * viewportHeight - 0.5f* viewportHeight;
+    return QVector2D(screenX, screenY);
+}
+QVector3D MainView::toNormalizedWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
+    float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
+    float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
+    QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);
+    QVector4D worldCoordinates4D = modelTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
+    return worldCoordinates;
 }
 
 /**

@@ -9,9 +9,11 @@
 #include <QOpenGLDebugLogger>
 #include <QMatrix4x4>
 
+#include "BezierPath.h"
+
 class CylinderMovement
 {
-    SimplePath path;
+    BezierPath path;
 
     QVector3D toolAxis; // Internal axis of tool model. Used for rotating tool into proper place
 
@@ -20,11 +22,11 @@ class CylinderMovement
 
 public:
     CylinderMovement();
-    CylinderMovement(SimplePath path);
-    CylinderMovement(SimplePath path, const Tool *tool);
-    CylinderMovement(SimplePath path, QVector3D axisDirection1, QVector3D axisDirection2, const Tool *tool);
+    CylinderMovement(BezierPath path);
+    CylinderMovement(BezierPath path, const Tool *tool);
+    CylinderMovement(BezierPath path, QVector3D axisDirection1, QVector3D axisDirection2, const Tool *tool);
 
-    inline SimplePath& getPath() {return path;}
+    inline BezierPath& getPath() {return path;}
     bool setAxisDirections(QVector3D axisDirection1, QVector3D axisDirection2);
     inline QVector<Vertex>& getPathVertexArr() { return path.getVertexArr(); }
 

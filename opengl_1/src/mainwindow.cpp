@@ -155,6 +155,7 @@ void MainWindow::updateUI(int prevIdx) {
         ui->toolBox->setCurrentIndex(toolTypeIdx);
 
         // Path Settings
+        /* Simple path implementation -- Old
         ui->SettingsTabMenu->setTabEnabled(3, !env->isPositContinuous());
         SimplePath &path = env->getToolMovement().getPath();
         ui->spinBox_a_x->setValue(path.getX().getA());
@@ -169,6 +170,7 @@ void MainWindow::updateUI(int prevIdx) {
         ui->spinBox_b_z->setValue(path.getZ().getB());
         ui->spinBox_c_z->setValue(path.getZ().getC());
         ui->spinBox_d_z->setValue(path.getZ().getD());
+        */
     } else {
         // if no envelope is selected, clear the constraint boxes
         ui->constraintA0SelectBox->setCurrentIndex(0);
@@ -505,234 +507,234 @@ void MainWindow::on_toolBox_currentIndexChanged(int index){
 /************************ Path Menu ************************/
 /***********************************************************/
 
-/**
- * @brief MainWindow::on_spinBox_a_x_valueChanged Updates the a coefficient of the x(t) polynomial.
- * @param value new a coefficient.
- */
-void MainWindow::on_spinBox_a_x_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_a_x_valueChanged";
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-
-  Envelope *env = ui->mainView->envelopes[idx];
-  env->getToolMovement().getPath().getX().setA(value);
-
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_b_x_valueChanged Updates the b coefficient of the x(t) polynomial.
- * @param value new b coefficient.
- */
-void MainWindow::on_spinBox_b_x_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_b_x_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getX().setB(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_c_x_valueChanged Updates the c coefficient of the x(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_c_x_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_c_x_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getX().setC(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_d_x_valueChanged Updates the d coefficient of the x(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_d_x_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_d_x_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getX().setD(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_a_y_valueChanged Updates the a coefficient of the y(t) polynomial.
- * @param value new a coefficient.
- */
-void MainWindow::on_spinBox_a_y_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_a_y_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getY().setA(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_b_y_valueChanged Updates the b coefficient of the y(t) polynomial.
- * @param value new b coefficient.
- */
-void MainWindow::on_spinBox_b_y_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_b_y_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getY().setB(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_c_y_valueChanged Updates the c coefficient of the y(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_c_y_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_c_y_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getY().setC(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_d_y_valueChanged Updates the d coefficient of the y(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_d_y_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_d_y_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getY().setD(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-
-/**
- * @brief MainWindow::on_spinBox_a_z_valueChanged Updates the a coefficient of the z(t) polynomial.
- * @param value new a coefficient.
- */
-void MainWindow::on_spinBox_a_z_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_a_z_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getZ().setA(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_b_z_valueChanged Updates the b coefficient of the z(t) polynomial.
- * @param value new b coefficient.
- */
-void MainWindow::on_spinBox_b_z_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_b_z_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getZ().setB(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_c_z_valueChanged Updates the c coefficient of the z(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_c_z_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_c_z_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getZ().setC(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_spinBox_d_z_valueChanged Updates the d coefficient of the z(t) polynomial.
- * @param value new c coefficient.
- */
-void MainWindow::on_spinBox_d_z_valueChanged(int value) {
-    qDebug() << ":: on_spinBox_d_z_valueChanged";
-    int idx = ui->mainView->settings.selectedIdx;
-    if (idx == -1) return;
-
-    Envelope *env = ui->mainView->envelopes[idx];
-    env->getToolMovement().getPath().getZ().setD(value);
-
-    QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-    ui->mainView->toolMeshUpdates += depEnvs;
-    ui->mainView->envelopeMeshUpdates += depEnvs;
-    ui->mainView->toolTransfUpdates += depEnvs;
-    ui->mainView->update();
-}
+// /** Old Path Widgets
+//  * @brief MainWindow::on_spinBox_a_x_valueChanged Updates the a coefficient of the x(t) polynomial.
+//  * @param value new a coefficient.
+//  */
+// void MainWindow::on_spinBox_a_x_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_a_x_valueChanged";
+//   int idx = ui->mainView->settings.selectedIdx;
+//   if (idx == -1) return;
+//
+//   Envelope *env = ui->mainView->envelopes[idx];
+//   env->getToolMovement().getPath().getX().setA(value);
+//
+//   QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//   ui->mainView->toolMeshUpdates += depEnvs;
+//   ui->mainView->envelopeMeshUpdates += depEnvs;
+//   ui->mainView->toolTransfUpdates += depEnvs;
+//   ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_b_x_valueChanged Updates the b coefficient of the x(t) polynomial.
+//  * @param value new b coefficient.
+//  */
+// void MainWindow::on_spinBox_b_x_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_b_x_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getX().setB(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_c_x_valueChanged Updates the c coefficient of the x(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_c_x_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_c_x_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getX().setC(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_d_x_valueChanged Updates the d coefficient of the x(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_d_x_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_d_x_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getX().setD(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_a_y_valueChanged Updates the a coefficient of the y(t) polynomial.
+//  * @param value new a coefficient.
+//  */
+// void MainWindow::on_spinBox_a_y_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_a_y_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getY().setA(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_b_y_valueChanged Updates the b coefficient of the y(t) polynomial.
+//  * @param value new b coefficient.
+//  */
+// void MainWindow::on_spinBox_b_y_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_b_y_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getY().setB(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_c_y_valueChanged Updates the c coefficient of the y(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_c_y_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_c_y_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getY().setC(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_d_y_valueChanged Updates the d coefficient of the y(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_d_y_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_d_y_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getY().setD(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+//
+// /**
+//  * @brief MainWindow::on_spinBox_a_z_valueChanged Updates the a coefficient of the z(t) polynomial.
+//  * @param value new a coefficient.
+//  */
+// void MainWindow::on_spinBox_a_z_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_a_z_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getZ().setA(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_b_z_valueChanged Updates the b coefficient of the z(t) polynomial.
+//  * @param value new b coefficient.
+//  */
+// void MainWindow::on_spinBox_b_z_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_b_z_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getZ().setB(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_c_z_valueChanged Updates the c coefficient of the z(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_c_z_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_c_z_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getZ().setC(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
+//
+// /**
+//  * @brief MainWindow::on_spinBox_d_z_valueChanged Updates the d coefficient of the z(t) polynomial.
+//  * @param value new c coefficient.
+//  */
+// void MainWindow::on_spinBox_d_z_valueChanged(int value) {
+//     qDebug() << ":: on_spinBox_d_z_valueChanged";
+//     int idx = ui->mainView->settings.selectedIdx;
+//     if (idx == -1) return;
+//
+//     Envelope *env = ui->mainView->envelopes[idx];
+//     env->getToolMovement().getPath().getZ().setD(value);
+//
+//     QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//     ui->mainView->toolMeshUpdates += depEnvs;
+//     ui->mainView->envelopeMeshUpdates += depEnvs;
+//     ui->mainView->toolTransfUpdates += depEnvs;
+//     ui->mainView->update();
+// }
 
 
 
@@ -778,6 +780,16 @@ void MainWindow::on_pathCheckBox_toggled(bool checked){
     qDebug() << ":: on_pathCheckBox_toggled";
   ui->mainView->settings.showPath = checked;
   ui->mainView->update();
+}
+
+/**
+ * @brief MainWindow::on_controlPointsCheckBox_toggled Updates the control points visibility.
+ * @param checked The new value of the checkbox.
+ */
+void MainWindow::on_controlPointsCheckBox_toggled(bool checked){
+    qDebug() << ":: on_controlPointsCheckBox_toggled";
+    ui->mainView->settings.showControlPoints = checked;
+    ui->mainView->update();
 }
 
 /**
@@ -890,7 +902,7 @@ void MainWindow::on_timeSectorsSpinBox_valueChanged(int value) {
         if (!ui->mainView->indicesUsed[i]) continue;
         ui->mainView->envelopes[i]->setSectorsT(value);
         ui->mainView->envelopes[i]->update();
-        SimplePath &path = ui->mainView->envelopes[i]->getToolMovement().getPath();
+        BezierPath &path = ui->mainView->envelopes[i]->getToolMovement().getPath();
         path.setSectors(value);
     }
 
@@ -912,7 +924,7 @@ void MainWindow::on_timeSectorsSpinBox_valueChanged(int value) {
 void MainWindow::on_TimeSlider_sliderMoved(int value) {
     qDebug() << ":: on_TimeSlider_sliderMoved";
   CylinderMovement &move = ui->mainView->envelopes[0]->getToolMovement();
-  SimplePath &path = move.getPath();
+  BezierPath &path = move.getPath();
   ui->mainView->settings.timeIdx = value;
 
   ui->mainView->updateToolTransf();
