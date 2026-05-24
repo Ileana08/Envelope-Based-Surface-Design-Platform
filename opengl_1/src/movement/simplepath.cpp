@@ -41,7 +41,7 @@ void SimplePath::updateVertexArr()
 
     for(int i=0; i<=sectors; ++i){
         float t = (float) i / sectors;
-        vertexArr.append(Vertex(getPathAt(t), color));
+        vertexArr.append(Vertex(getPathAt(t), color, color));
     }
 }
 

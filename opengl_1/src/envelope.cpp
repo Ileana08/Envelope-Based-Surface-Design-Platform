@@ -173,10 +173,10 @@ void Envelope::computeEnvelope()
                 }
             }
 
-            Vertex v1{env[0], col[0]};
-            Vertex v2{env[1], col[1]};
-            Vertex v3{env[2], col[2]};
-            Vertex v4{env[3], col[3]};
+            Vertex v1{env[0], norm[0], col[0]};
+            Vertex v2{env[1], norm[1], col[1]};
+            Vertex v3{env[2], norm[2], col[2]};
+            Vertex v4{env[3], norm[3], col[3]};
 
             // Add vertices to array
             vertexArr.append(v1);
@@ -246,10 +246,10 @@ void Envelope::computeToolCenters()
         v2 = getPathAt(t) + tool->getHeight() * getAxisAt(t);
 
         // Add vertices to array
-        vertexArrCenters.append(Vertex(v1, color));
-        vertexArrCenters.append(Vertex(v2, color));
+        vertexArrCenters.append(Vertex(v1, color, color));
+        vertexArrCenters.append(Vertex(v2, color, color));
 
-        pathArr.append(Vertex(v1, color));
+        pathArr.append(Vertex(v1, color, color));
     }
 }
 
@@ -281,8 +281,8 @@ void Envelope::computeGrazingCurves()
             v2 = getEnvelopeAt(t, a+aDelta);
 
             // Add vertices to array
-            vertexArrGrazingCurve.append(Vertex(v1, color));
-            vertexArrGrazingCurve.append(Vertex(v2, color));
+            vertexArrGrazingCurve.append(Vertex(v1, color, color));
+            vertexArrGrazingCurve.append(Vertex(v2, color, color));
         }
     }
 }
@@ -311,8 +311,8 @@ void Envelope::computeNormals()
             v1 = getEnvelopeAt(t, a);
 
             // Add vertices to array
-            normals.append(Vertex(p1,c));
-            normals.append(Vertex(v1,c));
+            normals.append(Vertex(p1, c, c));
+            normals.append(Vertex(v1, c, c));
         }
         vertexArrNormals.append(normals);
     }

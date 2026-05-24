@@ -118,18 +118,6 @@ float BezierTool::getSphereRadiusDaAt(float a)
   return getCnDa(a);
 }
 
-Vertex BezierTool::getToolSurfaceAt(float a, float tRad)
-{
-  float toolRad = getRadiusAt(a);
-  QVector3D p(
-    toolRad * cos(tRad),
-    toolRad * sin(tRad),
-    bezier.at(a).x() * height
-  );
-  QVector3D c(1, 0, 0);
-  return Vertex(p, c);
-}
-
 // Profile and its normal
 
 QVector2D BezierTool::getProfile(float a)

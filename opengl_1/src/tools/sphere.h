@@ -26,6 +26,8 @@ public:
     inline void generateVertexArr(int numSlices, int numStacks) {
         vertexArr.clear();
         QVector3D v1, v2, v3, v4;
+        QVector3D n1, n2, n3, n4;
+        QVector3D c1, c2, c3, c4;
         for (int i = 0; i < numSlices; i++)
         {
             for (int j = 0; j < numStacks; j++)
@@ -42,18 +44,28 @@ public:
                 v4 = QVector3D(radius * cos(2 * PI * i / numSlices) * sin(PI * (j + 1) / numStacks),
                                 radius * sin(2 * PI * i / numSlices) * sin(PI * (j + 1) / numStacks),
                                 radius * cos(PI * (j + 1) / numStacks));
+
+                n1 = v1.normalized();
+                n2 = v2.normalized();
+                n3 = v3.normalized();
+                n4 = v4.normalized();
+
+                c1 = QVector3D(0, 1, 0);
+                c2 = QVector3D(0, 1, 0);
+                c3 = QVector3D(0, 1, 0);
+                c4 = QVector3D(0, 1, 0);
                 
                 v1 += position;
                 v2 += position;
                 v3 += position;
                 v4 += position;
-                
-                vertexArr.push_back(Vertex(v1, QVector3D(0, 1, 0)));
-                vertexArr.push_back(Vertex(v2, QVector3D(0, 1, 0)));
-                vertexArr.push_back(Vertex(v3, QVector3D(0, 1, 0)));
-                vertexArr.push_back(Vertex(v3, QVector3D(0, 1, 0)));
-                vertexArr.push_back(Vertex(v4, QVector3D(0, 1, 0)));
-                vertexArr.push_back(Vertex(v1, QVector3D(0, 1, 0)));
+
+                vertexArr.push_back(Vertex(v1, n1, c1));
+                vertexArr.push_back(Vertex(v2, n2, c2));
+                vertexArr.push_back(Vertex(v3, n3, c3));
+                vertexArr.push_back(Vertex(v3, n3, c3));
+                vertexArr.push_back(Vertex(v4, n4, c4));
+                vertexArr.push_back(Vertex(v1, n1, c1));
             }
         }
         

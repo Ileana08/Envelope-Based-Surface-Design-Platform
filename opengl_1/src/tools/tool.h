@@ -54,7 +54,8 @@ public:
   virtual float getSphereRadiusAt(float a) =0;
   virtual float getSphereRadiusDaAt(float a) =0;
 
-  virtual Vertex getToolSurfaceAt(float a, float tRad) =0;
+  QVector3D getToolSurfaceAt(float a, float tRad);
+  QVector3D getToolNormalAt(float a, float tRad);
 
   virtual QVector2D getProfile(float a)=0;
   virtual QVector2D getProfileNormal(float a)=0;

@@ -62,18 +62,6 @@ float Drum::getSphereRadiusDaAt(float a)
     return -D() * tan(theta) / cos(theta) * theta_a;
 }
 
-Vertex Drum::getToolSurfaceAt(float a, float tRad)
-{
-    float toolRad = getRadiusAt(a);
-    QVector3D p(
-        toolRad * cos(tRad),
-        toolRad * sin(tRad),
-        (a * 2 - 1) * height / 2 + height / 2
-        );
-    QVector3D c(0,1,0);
-    return Vertex(p,c);
-}
-
 QVector2D Drum::getProfile(float a)
 {
     return {a*height, getRadiusAt(a)};
