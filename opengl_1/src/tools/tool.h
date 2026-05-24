@@ -58,6 +58,7 @@ public:
 
   virtual QVector2D getProfile(float a)=0;
   virtual QVector2D getProfileNormal(float a)=0;
+  inline QVector2D getProfileAxis() const {return {1.0f, 0.0f}; }
   inline QVector3D getAxisVector() const { return axisVector.normalized(); }
   inline QVector3D getVectorPerpToAxis() const { return perpVector; }
   inline QVector<Vertex>& getVertexArr() { return vertexArr; }

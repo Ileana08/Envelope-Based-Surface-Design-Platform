@@ -29,7 +29,7 @@ float BezierTool::getCa(float a)
   }
   else
   {
-    qDebug() << "Ca divide by zero";
+    qDebug() << "Ca divide by zero a = " << a;
   }
   return ca;
 }
@@ -49,7 +49,7 @@ float BezierTool::getCaDa(float a)
   }
   else
   {
-    qDebug() << "CnDa divide by zero";
+    qDebug() << "CaDa divide by zero a = " << a;
   }
   return caDa;
 }
@@ -65,7 +65,7 @@ float BezierTool::getCn(float a)
   }
   else
   {
-    qDebug() << "Cn divide by zero";
+    qDebug() << "Cn divide by zero a = " << a;
   }
   return cn;
 }
@@ -83,7 +83,7 @@ float BezierTool::getCnDa(float a)
   }
   else
   {
-    qDebug() << "CnDa divide by zero";
+    qDebug() << "CnDa divide by zero a = " << a;
   }
   return cnDa;
 }
