@@ -58,6 +58,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<EnvelopeRenderer*> envelopeRenderers;
 
     // Transformation matrices for the model
+    float scalingFactor = 1.0f;
     QMatrix4x4 modelScaling;
     QMatrix4x4 modelRotation;
     QMatrix4x4 modelTranslation;
@@ -65,6 +66,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
+
+    bool isSingleDragging = false;
+    bool isDoubleDragging = false;
+    QPoint lastMousePos;
 
 public:
     MainView(QWidget *parent = nullptr);

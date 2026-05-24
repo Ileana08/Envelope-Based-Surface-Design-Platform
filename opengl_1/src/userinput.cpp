@@ -61,7 +61,12 @@ void MainView::keyReleaseEvent(QKeyEvent *ev) {
 void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
   qDebug() << "Mouse double clicked:" << ev->button();
 
-  update();
+  if (ev->button() == Qt::LeftButton)
+  {
+    isDoubleDragging = true;
+    lastMousePos = ev->pos();
+    update();
+  }
 }
 
 /**
@@ -72,6 +77,26 @@ void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
 void MainView::mouseMoveEvent(QMouseEvent *ev) {
   qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
 
+  if (isSingleDragging)
+  {
+    QPoint delta = ev->pos() - lastMousePos;
+    float sensitivity = settings.rotSensitivity;
+    QQuaternion deltaRot = QQuaternion::fromEulerAngles(
+        delta.y() * sensitivity,  // pitch
+        delta.x() * sensitivity,  // yaw
+        0.0f
+    );
+    modelRotation = QMatrix4x4(deltaRot.toRotationMatrix()) * modelRotation;
+    updateAllUniforms = true;
+  } else if (isDoubleDragging)
+  {
+    QPoint delta = ev->pos() - lastMousePos;
+    float sensitivity = settings.panSensitivity;
+    modelTranslation.translate(delta.x() * sensitivity, -delta.y() * sensitivity, 0.0f);
+    updateAllUniforms = true;
+  }
+  lastMousePos = ev->pos();
+
   update();
 }
 
@@ -81,6 +106,12 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
  */
 void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
+
+  if (ev->button() == Qt::LeftButton)
+  {
+    isSingleDragging = true;
+    lastMousePos = ev->pos();
+  }
 
   update();
   // Do not remove the line below, clicking must focus on this widget!
@@ -94,7 +125,17 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button released" << ev->button();
 
-  update();
+  if (isSingleDragging && ev->button() == Qt::LeftButton)
+  {
+    isSingleDragging = false;
+    lastMousePos = ev->pos();
+    update();
+  } else if (isDoubleDragging && ev->button() == Qt::LeftButton)
+  {
+    isDoubleDragging = false;
+    lastMousePos = ev->pos();
+    update();
+  }
 }
 
 /**
@@ -105,6 +146,12 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
 void MainView::wheelEvent(QWheelEvent *ev) {
   // Implement something
   qDebug() << "Mouse wheel:" << ev->angleDelta();
+  QPoint delta = ev->angleDelta();
+  float scroll = delta.y();
+  float scale = powf(1.1f, -settings.scaleSensitivity * scroll);
+  scalingFactor = qBound(0.1f, scalingFactor*scale, 20.0f);
+
+  updateAllUniforms = true;
 
   update();
 }

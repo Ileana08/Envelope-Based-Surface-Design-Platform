@@ -25,6 +25,9 @@ typedef struct Settings {
     int timeIdx = 0;
     int aSectors = 20;
     int tSectors = 50;
+    float rotSensitivity = 0.1f;
+    float panSensitivity = 0.005f;
+    float scaleSensitivity = 0.1f;
 
     const size_t NUM_ENVELOPES = 4;
 

@@ -303,6 +303,23 @@ void MainView::paintGL()
 
     if (updateAllUniforms) {
         updateUniforms();
+
+        // Reset the scale matrix
+        modelScaling.setToIdentity();
+        // Make the new scale matrix
+        modelScaling.scale(scalingFactor);
+
+        modelTransf = modelTranslation * modelScaling * modelRotation;
+
+        for (int i = 0; i < indicesUsed.size(); i++) {
+            if (!indicesUsed[i]) continue;
+            if (!envelopes[i]->isActive()) continue;
+            toolRenderers[i]->setModelTransf(modelTransf);
+            envelopeRenderers[i]->setModelTransf(modelTransf);
+            moveRenderers[i]->setModelTransf(modelTransf);
+        }
+        updateToolTransf();
+
         updateAllUniforms = false;
     }
 
@@ -360,15 +377,6 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
     modelRotation.rotate(rotateZ, 0, 0, 1); // rotate around z axis
 
     // Update the model transformation matrix
-    modelTransf = modelTranslation * modelScaling * modelRotation;
-
-    for (int i = 0; i < indicesUsed.size(); i++) {
-        if (!indicesUsed[i]) continue;
-        toolRenderers[i]->setModelTransf(modelTransf);
-        envelopeRenderers[i]->setModelTransf(modelTransf);
-        moveRenderers[i]->setModelTransf(modelTransf);
-    }
-    updateToolTransf();
     updateAllUniforms = true;
     update();
 }
@@ -383,22 +391,8 @@ void MainView::setScale(float scale)
 {
     qDebug() << "Scale changed to " << scale;
 
-    // Reset the scale matrix
-    modelScaling.setToIdentity();
+    scalingFactor = scale;
 
-    // Make the new scale matrix
-    modelScaling.scale(scale);
-
-    // Update the model transformation matrix
-    modelTransf = modelTranslation * modelScaling * modelRotation;
-
-    for (int i = 0; i < indicesUsed.size(); i++) {
-        if (!indicesUsed[i]) continue;
-        toolRenderers[i]->setModelTransf(modelTransf);
-        envelopeRenderers[i]->setModelTransf(modelTransf);
-        moveRenderers[i]->setModelTransf(modelTransf);
-    }
-    updateToolTransf();
     updateAllUniforms = true;
     update();
 }
