@@ -19,10 +19,12 @@ public:
     void init(QOpenGLFunctions_4_1_Core *f, Settings *s);
 
     inline void setModelTransf(QMatrix4x4 modelTransf) { this->modelTransform = modelTransf; }
+    inline void setNormalTransf(QMatrix3x3 normalTransform) { this->normalTransform = normalTransform; }
     inline void setProjTransf(QMatrix4x4 projTransf) { this->projTransform = projTransf; }
 
 protected:
     QMatrix4x4 modelTransform, projTransform;
+    QMatrix3x3 normalTransform;
 
     virtual void initShaders() = 0;
     virtual void initBuffers() = 0;

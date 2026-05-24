@@ -105,7 +105,12 @@ void ToolRenderer::updateUniforms()
 {
     shader.bind();
     shader.setUniformValue("modelTransform", modelTransform * toolTransform);
+    shader.setUniformValue("normalTransform", normalTransform);
     shader.setUniformValue("projTransform", projTransform);
+
+    shader.setUniformValue("lightPos", settings->lightPos);
+    shader.setUniformValue("lightCol", settings->lightColor);
+
     shader.release();
 }
 

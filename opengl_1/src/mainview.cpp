@@ -310,13 +310,17 @@ void MainView::paintGL()
         modelScaling.scale(scalingFactor);
 
         modelTransf = modelTranslation * modelScaling * modelRotation;
+        normalTransf = modelTransf.normalMatrix();
 
         for (int i = 0; i < indicesUsed.size(); i++) {
             if (!indicesUsed[i]) continue;
             if (!envelopes[i]->isActive()) continue;
             toolRenderers[i]->setModelTransf(modelTransf);
+            toolRenderers[i]->setNormalTransf(normalTransf);
             envelopeRenderers[i]->setModelTransf(modelTransf);
+            envelopeRenderers[i]->setNormalTransf(normalTransf);
             moveRenderers[i]->setModelTransf(modelTransf);
+            moveRenderers[i]->setNormalTransf(normalTransf);
         }
         updateToolTransf();
 

@@ -64,6 +64,9 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QMatrix4x4 modelTranslation;
     QMatrix4x4 modelTransf;
 
+    // Transformation matrix for the normal
+    QMatrix3x3 normalTransf;
+
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
 

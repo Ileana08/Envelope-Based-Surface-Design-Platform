@@ -73,7 +73,12 @@ void MoveRenderer::updateUniforms()
 {
     shader.bind();
     shader.setUniformValue("modelTransform", modelTransform);
+    shader.setUniformValue("normalTransform", normalTransform);
     shader.setUniformValue("projTransform", projTransform);
+
+    shader.setUniformValue("lightPos", settings->lightPos);
+    shader.setUniformValue("lightCol", settings->lightColor);
+
     shader.release();
 }
 

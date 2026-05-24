@@ -29,6 +29,10 @@ typedef struct Settings {
     float panSensitivity = 0.005f;
     float scaleSensitivity = 0.1f;
 
+    //shader settings
+    QVector3D lightPos = QVector3D(0.0f, 0.0f, 0.0f);
+    QVector3D lightColor = QVector3D(1.0f, 1.0f, 1.0f);
+
     const size_t NUM_ENVELOPES = 4;
 
     inline float a() const { return (float) aIdx / aSectors; }

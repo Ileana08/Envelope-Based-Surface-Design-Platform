@@ -10,7 +10,6 @@
 BezierTool::BezierTool()
   : Tool(ToolType::Tool_Bezier), innerRadius(0.0f)
 {
-  qDebug() << bezier.getP0() << bezier.getP1() << bezier.getP2() << bezier.getP3();
 }
 
 BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position)

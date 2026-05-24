@@ -19,8 +19,8 @@ void Tool::computeTool() {
 
             n1 = getToolNormalAt(s0, t0*2*PI);
             n2 = getToolNormalAt(s1, t0*2*PI);
-            n3 = getToolNormalAt(s0, t0*2*PI);
-            n4 = getToolNormalAt(s1, t0*2*PI);
+            n3 = getToolNormalAt(s0, t1*2*PI);
+            n4 = getToolNormalAt(s1, t1*2*PI);
 
             c1 = QVector3D(0.8f, 0.0f, 0.0f);
             c2 = QVector3D(0.8f, 0.0f, 0.0f);
