@@ -1,4 +1,4 @@
-# Moving Cylinders
+# Envelope Continuity in moving milling tools
 This project is an exploration of envelope surfaces, which are of great importance in the CNC industry.
 
 Computer numerically controlled machining has been the leading subtractive manufacturing technique for decades. 
