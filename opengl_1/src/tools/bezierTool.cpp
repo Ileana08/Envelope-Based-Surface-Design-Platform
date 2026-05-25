@@ -41,10 +41,10 @@ float BezierTool::getCaDa(float a)
   QVector2D dNormal = getProfileNormalDa(a);
 
   float caDa = 0;
-  if (abs(normal.y()) > 1e-9f && abs(bezierAt.y() > 1e-9f))
+  if (abs(normal.y()) > 1e-9f && abs(bezierAt.y()) > 1e-9f)
   {
-    caDa = dBezierAt.x() + (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y()) -
-    normal.y() * normal.x() / bezierAt.y();
+    caDa = dBezierAt.x() + normal.x() * (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y()) -
+    (bezierAt.y() / normal.y())*dNormal.x() ;
   }
   else
   {
@@ -56,7 +56,7 @@ float BezierTool::getCaDa(float a)
 float BezierTool::getCn(float a)
 {
   QVector2D bezierAta = getProfile(a);
-  QVector2D bezierNormalAta = getProfileNormalDa(a);
+  QVector2D bezierNormalAta = getProfileNormal(a);
   float cn = 0;
   if (abs(bezierNormalAta.y()) > 1e-9f)
   {
@@ -79,6 +79,7 @@ float BezierTool::getCnDa(float a)
   if (abs(normal.y()) > 1e-9f)
   {
     cnDa = (normal.y() * dBezierAt.y() - bezierAt.y() * dNormal.y()) / (normal.y() * normal.y());
+    qDebug() << dNormal.y();
   }
   else
   {
@@ -127,7 +128,7 @@ QVector2D BezierTool::getProfile(float a)
 QVector2D BezierTool::getProfileDa(float a)
 {
   QVector2D baseProfileDa = bezier.derivativeAt(a);
-  return QVector2D(baseProfileDa.x() * height, baseProfileDa.y()).normalized();
+  return QVector2D(baseProfileDa.x() * height, baseProfileDa.y());
 }
 
 QVector2D BezierTool::getProfileNormal(float a)
@@ -139,5 +140,6 @@ QVector2D BezierTool::getProfileNormal(float a)
 QVector2D BezierTool::getProfileNormalDa(float a)
 {
   QVector2D baseNormalDa = bezier.dNormalAt(a);
-  return QVector2D(baseNormalDa.x()/height, baseNormalDa.y()).normalized();
+  qDebug() << "baseNormal" << baseNormalDa;
+  return QVector2D(baseNormalDa.x()/height, baseNormalDa.y());
 }

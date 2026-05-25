@@ -74,7 +74,7 @@ public:
     void computeGrazingCurves();
 
     void computeNormals();
-    QVector3D getSurfaceNormalAt(float t);
+    QVector3D getSurfaceNormalAt(float t, float a);
     QVector3D getNormalAt(float t, float a);
     QVector3D getNormalDtAt(float t, float a);
     QVector3D getNormalDt2At(float t, float a);

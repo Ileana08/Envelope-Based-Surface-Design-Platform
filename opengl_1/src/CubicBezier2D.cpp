@@ -6,10 +6,10 @@
 
 CubicBezier2D::CubicBezier2D() :
 CubicBezier2D(
-    QVector2D(0.0f, 0.9f),
-    QVector2D(1.0f, 0.9f),
-    QVector2D(0.0f, 0.1f),
-    QVector2D(1.0f, 0.9f))
+    QVector2D(0.0f, 0.2f),
+    QVector2D(0.33f, 0.4f),
+    QVector2D(0.67f, 0.6f),
+    QVector2D(1.0f, 0.8f))
 {}
 
 CubicBezier2D::CubicBezier2D(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p3)
@@ -52,7 +52,6 @@ QVector2D CubicBezier2D::dNormalAt(float t)
     float len = sqrt(len2);
 
     QVector2D aperp(-a.y(), a.x());
-    aperp.normalize();
 
     QVector2D dNdt = aperp/len - unitNormalAt(t) * (QVector2D::dotProduct(v, a) / len2);
 

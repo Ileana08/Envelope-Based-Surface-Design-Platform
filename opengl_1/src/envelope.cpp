@@ -154,6 +154,7 @@ void Envelope::computeEnvelope()
         }
         */
 
+
         for (int aIdx = 0; aIdx < sectorsA; aIdx++)
         {
 
@@ -204,12 +205,13 @@ void Envelope::computeEnvelope()
 
 QVector3D Envelope::getEnvelopeAt(float t, float a)
 {
-    /* Old implementation
-    QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * getNormalAt(t, a);
-    */
+    /* Old implementation */
+    QVector3D normal = getNormalAt(t, a);
+    QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * normal;
+
 
     QVector2D profile = tool->getProfile(a);
-    QVector3D env = getPathAt(t) + profile.x()*getAxisAt(t) + profile.y()*getSurfaceNormalAt(t);
+    //QVector3D env = getPathAt(t) + profile.x()*getAxisAt(t) + profile.y()*getSurfaceNormalAt(t, a);
 
 
     return env;
@@ -321,6 +323,17 @@ void Envelope::computeNormals()
             //TODO: This causes dividebyzero in getSphereCenterHeight if the normal is parallel to the axis. Doesn't break anything as of now.
             p1 = getPathAt(t) + tool->getSphereCenterHeightAt(a)*getAxisAt(t);
             v1 = getEnvelopeAt(t, a);
+            /* cool but probably wrong
+            if (tool->getProfile(t).y() < 1e-05f)
+            {
+                //parallel to axis, do not draw
+                v1 = p1;
+            } else
+            {
+                //negative radius, draw inverse
+                v1 = getPathAt(t) + tool->getProfile(a).x() * getAxisAt(t) + tool->getProfile(a).y() * getSurfaceNormalAt(t, a);
+            }
+             */
 
             // Add vertices to array
             normals.append(Vertex(p1, c, c));
@@ -330,19 +343,20 @@ void Envelope::computeNormals()
     }
 }
 
-QVector3D Envelope::getSurfaceNormalAt(float t)
+QVector3D Envelope::getSurfaceNormalAt(float t, float a)
 {
-    return QVector3D::crossProduct(getAxisAt(t), getPathDtAt(t)).normalized();
+    return QVector3D::crossProduct(getAxisAt(t), getPathDtAt(t)  + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t)).normalized();
 }
 
 QVector3D Envelope::getNormalAt(float t, float a)
 {
-    /*
-     * Old implementation
+
+    /* Old implementation */
     QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
-    //qDebug() << "sNormal: " << sNormal << "myNormal: " << getSurfaceNormalAt(t);
+
+
 
     float ra = tool->getSphereRadiusDaAt(a);
     //qDebug() << sa << st << sNormal << ra;
@@ -360,13 +374,30 @@ QVector3D Envelope::getNormalAt(float t, float a)
 
     float sqrt_term = 1 - ra * ra * m11;
 
-    float gamma = (EG_FF > 0 ? 1 : -1) * sqrt(sqrt_term);
+    float gamma = (EG_FF > 0 ? 1 : -1) * sqrtf(sqrt_term);
 
-    QVector3D n = alpha * sa + beta * st + gamma * sNormal;
+    // qDebug() << "------ normal calc for t =" << t << "a =" << a;
+    // qDebug() << "sphch" << tool->getSphereCenterHeightAt(a);
+    // qDebug() << "sphchda" << tool->getSphereCenterHeightDaAt(a);
+    // qDebug() << "sa_l" << alpha*sa.length();
+    // qDebug() << "st_l" << beta*st.length();
+    // qDebug() << "gamma_l" << gamma*sNormal.length();
+    // qDebug() << "sa" << sa;
+    // qDebug() << "st" << st;
+    // qDebug() << "sNormal" << sNormal;
+    // qDebug() << "ra" << ra;
+    // qDebug() << "EG_FF" << EG_FF;
+    // qDebug() << "m11" << m11;
+    // qDebug() << "m21" << m11;
+    // qDebug() << "alpha" << alpha;
+    // qDebug() << "beta" << beta;
+    // qDebug() << "sqrt_term" << sqrt_term;
+    // qDebug() << "gamma" << gamma;
 
-    */
+
+    QVector3D normal = alpha * sa + beta * st + gamma * sNormal;
+
     QVector2D profileNormal = tool->getProfileNormal(a);
-    QVector3D normal = profileNormal.x()*getAxisAt(t) + profileNormal.y()*getSurfaceNormalAt(t);
 
     return normal.normalized();
 }
