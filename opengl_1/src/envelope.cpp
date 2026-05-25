@@ -141,13 +141,25 @@ void Envelope::computeEnvelope()
     // float t1 = path.getT1()-tDelta;
     for (int tIdx = 0; tIdx < sectorsT; tIdx++)
     {
+        float tDelta = 1.0f/sectorsT;
+        float t = (float) tIdx / sectorsT;
+        /*
+        if (adjEnvA0 != nullptr && tool != nullptr)
+        {
+            qDebug() << tool->getToolType();
+            qDebug() << "A*n" << QVector3D::dotProduct(getAxisAt(t), adjEnvA0->getNormalAt(t, 0)) << "Ra" << -tool->getSphereRadiusDaAt(0);
+            qDebug() << "CA" << tool->getSphereCenterHeightDaAt(0);
+            qDebug() << "A*n" << QVector3D::dotProduct(getAxisAt(t), adjEnvA0->getNormalAt(t, 1));
+            qDebug() << "CA*A*n" << tool->getSphereCenterHeightDaAt(0) * QVector3D::dotProduct(getAxisAt(t), adjEnvA0->getNormalAt(t, 1)) << "Ra" << -tool->getSphereRadiusDaAt(0);
+        }
+        */
+
         for (int aIdx = 0; aIdx < sectorsA; aIdx++)
         {
-            float tDelta = 1.0f/sectorsT;
-            float aDelta = 1.0f/sectorsA;
 
-            float t = (float) tIdx / sectorsT;
+            float aDelta = 1.0f/sectorsA;
             float a = (float) aIdx / sectorsA;
+
 
             env[0] = getEnvelopeAt(t, a);
             env[1] = getEnvelopeAt(t, a+aDelta);
@@ -775,9 +787,11 @@ QQuaternion Envelope::calcAxisRotationAt(float t)
     if (!isTanContinuous()) return QQuaternion();
     // First rotate the axis of the previous envelope to its normal.
     // This is to establish a frame of reference for all its derivatives.
+
     QVector3D adjNormal = adjEnvA0->getNormalAt(t, 1);
     QVector3D adjAxis = adjEnvA0->getAxisAt(t);
     QQuaternion rotationFrame = QQuaternion::rotationTo(adjAxis, adjNormal);
+
 
     float axisToNormalAngle = qRadiansToDegrees(acosf(QVector2D::dotProduct(tool->getProfileNormal(0.0f), tool->getProfileAxis())));
     QVector3D rotationAxis = QVector3D::crossProduct(adjNormal, adjAxis);
@@ -792,6 +806,8 @@ QQuaternion Envelope::calcAxisRotationAt(float t)
     // Lastly rotate w.r.t. the last freedom: around the normal of the previous envelope.
     double angle = adjAxisAngle1 + (adjAxisAngle2-adjAxisAngle1)*t;
     QQuaternion rotationFree = QQuaternion::fromAxisAndAngle(adjNormal, angle);
+
+
 
     return rotationFree * rotationTangent * rotationFrame;
 }
@@ -851,6 +867,7 @@ QVector3D Envelope::getAxisAt(float t)
     {
         // Rotate the normal of the adjacent envelope around the cross product with the axis of the adjacent envelope
         axis = calcAxisRotationAt(t) * adjEnvA0->getAxisAt(t);
+
     }
     else
     {

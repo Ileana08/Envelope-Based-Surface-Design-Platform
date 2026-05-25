@@ -104,8 +104,8 @@ Envelope* MainView::addNewEnvelope() {
     QVector<ControlPoint*> controlPoints = {
         new ControlPoint(QVector3D(0,0,0), 0.05, 20),
         new ControlPoint(QVector3D(1.0/3,0,0), 0.05, 20),
-        new ControlPoint(QVector3D(2.0/3,1.0/3,0), 0.05, 20),
-        new ControlPoint(QVector3D(1.0,1.0,1.0), 0.05, 20)
+        new ControlPoint(QVector3D(2.0/3,0,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0,0,0), 0.05, 20)
     };
     envelopeControlPoints[idx] = controlPoints;
     BezierPath path(controlPoints);

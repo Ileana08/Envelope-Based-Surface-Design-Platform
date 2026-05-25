@@ -34,6 +34,8 @@ public:
   {
   }
 
+  inline ToolType getToolType() { return toolType; }
+
   inline void setHeight(float height) { this->height = height; }
   inline float getHeight() { return height; }
 
