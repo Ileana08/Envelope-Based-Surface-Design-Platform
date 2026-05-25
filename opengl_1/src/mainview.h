@@ -64,6 +64,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Mouse input for control points
     int selectedControlPoint = -1;
+    int selectedEnvelope = -1;
     bool controlPointPressed = false;
 
     // Transformation matrices for the model

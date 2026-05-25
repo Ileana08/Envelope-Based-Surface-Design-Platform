@@ -80,8 +80,8 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
 
   QVector2D currentMousePos(ev->position());
 
-  if(controlPointPressed == true && settings.selectedIdx >= 0) {
-    QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
+  if(controlPointPressed == true) {
+    QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
     ControlPoint* controlPoint = cps[selectedControlPoint];
     QVector3D position = controlPoint->getPosition();
 
@@ -92,7 +92,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
       QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
       controlPoint->setPosition(newWorldPos);
-      controlPointsRenderers[settings.selectedIdx]->updateBuffers();
+      controlPointsRenderers[selectedEnvelope]->updateBuffers();
     }
   } else if (isSingleDragging)
   {
@@ -125,15 +125,21 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
 
   QVector2D currentMousePos(ev->position());
-  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton && settings.selectedIdx >= 0){
-    const QVector<ControlPoint*>& cps = envelopeControlPoints[settings.selectedIdx];
-    for(int i=0; i<cps.size(); i++){
-      QVector3D pos = cps[i]->getPosition();
-      QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
-      if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
-        selectedControlPoint = i;
-        controlPointPressed = true;
-        lastMousePos = currentMousePos;
+  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
+    for(int e = 0; e<envelopes.size(); e++) {
+      const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
+      for(int i=0; i<cps.size(); i++){
+        QVector3D pos = cps[i]->getPosition();
+        QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
+        if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
+          selectedControlPoint = i;
+          selectedEnvelope = e;
+          controlPointPressed = true;
+          lastMousePos = currentMousePos;
+          break;
+        }
+      }
+      if (controlPointPressed) {
         break;
       }
     }
@@ -159,13 +165,13 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
 
   QVector2D currentMousePos(ev->position());
 
-  if (controlPointPressed == true && settings.selectedIdx >= 0 && envelopes[settings.selectedIdx]) {
-    envelopes[settings.selectedIdx]->getToolMovement().getPath().updateVertexArr();
-    envelopes[settings.selectedIdx]->update();
-    QSet<int> depEnvs = envelopes[settings.selectedIdx]->getAllDependents();
-    moveRenderers[settings.selectedIdx]->updateBuffers();
-    envelopeRenderers[settings.selectedIdx]->updateBuffers();
-    toolRenderers[settings.selectedIdx]->updateBuffers();
+  if (controlPointPressed == true) {
+    envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
+    envelopes[selectedEnvelope]->update();
+    QSet<int> depEnvs = envelopes[selectedEnvelope]->getAllDependents();
+    moveRenderers[selectedEnvelope]->updateBuffers();
+    envelopeRenderers[selectedEnvelope]->updateBuffers();
+    toolRenderers[selectedEnvelope]->updateBuffers();
     for(int idx : depEnvs) {
       envelopes[idx]->getToolMovement().getPath().updateVertexArr();
       envelopes[idx]->update();
@@ -176,6 +182,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
     updateToolTransf();
     updateAllUniforms = true;
     selectedControlPoint = -1;
+    selectedEnvelope = -1;
     controlPointPressed = false;
     update();
   } else if (isSingleDragging && ev->button() == Qt::LeftButton)
