@@ -376,15 +376,16 @@ QVector3D Envelope::getNormalAt(float t, float a)
 
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrtf(sqrt_term);
 
-    // qDebug() << "------ normal calc for t =" << t << "a =" << a;
+    // qDebug() << "------" << tool->getToolType() << " normal calc for t =" << t << "a =" << a;
+    // qDebug() << "sNormal" << sNormal;
+    // qDebug() << "sa" << sa;
+    // qDebug() << "st" << st;
     // qDebug() << "sphch" << tool->getSphereCenterHeightAt(a);
     // qDebug() << "sphchda" << tool->getSphereCenterHeightDaAt(a);
     // qDebug() << "sa_l" << alpha*sa.length();
     // qDebug() << "st_l" << beta*st.length();
     // qDebug() << "gamma_l" << gamma*sNormal.length();
-    // qDebug() << "sa" << sa;
-    // qDebug() << "st" << st;
-    // qDebug() << "sNormal" << sNormal;
+
     // qDebug() << "ra" << ra;
     // qDebug() << "EG_FF" << EG_FF;
     // qDebug() << "m11" << m11;
