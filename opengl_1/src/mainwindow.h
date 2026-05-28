@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QErrorMessage>
 #include <QComboBox>
+
+#include "CubicBezier2D.h"
 #include "envelope.h"
 
 namespace Ui {
@@ -34,8 +36,9 @@ class MainWindow : public QMainWindow {
 
   void updateUI();
   void updateUI(int prevIdx);
+  void updateControlPointBoxes(CubicBezier2D bezier);
 
- private slots:
+private slots:
   // Envelope Menu
   void on_envelopeSelectBox_currentIndexChanged(int index);
   void on_envelopeActiveCheckBox_toggled(bool checked);
@@ -56,6 +59,8 @@ class MainWindow : public QMainWindow {
   void on_angleSpinBox_valueChanged(double value);
   void on_heightSpinBox_valueChanged(double value);
   void on_toolBox_currentIndexChanged(int index);
+
+  void on_controlPointChanged();
 
   // Path menu
   /* Old Path parameters

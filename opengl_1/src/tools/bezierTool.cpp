@@ -17,6 +17,11 @@ BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, in
 {
 }
 
+void BezierTool::setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p3)
+{
+  bezier.setPoints(p0, p1, p2, p3);
+}
+
 float BezierTool::getCa(float a)
 {
   QVector2D bezierAta = getProfile(a); //stretch bezier to fit height and inner radius
