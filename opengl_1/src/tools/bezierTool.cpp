@@ -145,6 +145,5 @@ QVector2D BezierTool::getProfileNormal(float a)
 QVector2D BezierTool::getProfileNormalDa(float a)
 {
   QVector2D baseNormalDa = bezier.dNormalAt(a);
-  qDebug() << "baseNormal" << baseNormalDa;
   return QVector2D(baseNormalDa.x()/height, baseNormalDa.y());
 }

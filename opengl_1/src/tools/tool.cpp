@@ -50,11 +50,15 @@ QVector3D Tool::getToolSurfaceAt(float a, float tRad) {
         a*height
         );
     */
-    return getProfile(a).x() * getAxisVector() + getProfile(a).y() * planeAxis;
+    QVector3D p = getProfile(a).x() * getAxisVector() + getProfile(a).y() * planeAxis;
+    return p;
+    //return getProfile(a).x() * getAxisVector() + getProfile(a).y() * planeAxis;
 }
 
 QVector3D Tool::getToolNormalAt(float a, float tRad)
 {
-    QVector3D planeAxis(tRad*cosf(tRad), tRad*sinf(tRad), 0);
-    return getProfileNormal(a).x() * getAxisVector() + getProfileNormal(a).y() * planeAxis;
+    QVector3D planeAxis(cosf(tRad), sinf(tRad), 0);
+    QVector3D normal = (getProfileNormal(a).x() * getAxisVector() + getProfileNormal(a).y() * planeAxis).normalized();
+
+    return normal;
 }
