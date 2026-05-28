@@ -2,13 +2,14 @@
 // Created by david on 5/4/26.
 //
 
+#include <QOpenGLDebugLogger>
 #include "CubicBezier2D.h"
 
 CubicBezier2D::CubicBezier2D() :
 CubicBezier2D(
     QVector2D(0.0f, 0.5f),
-    QVector2D(0.33f, 0.5f),
-    QVector2D(0.67f, 0.5f),
+    QVector2D(1.0f/3, 0.5f),
+    QVector2D(2.0f/3, 0.5f),
     QVector2D(1.0f, 0.5f))
 {}
 
