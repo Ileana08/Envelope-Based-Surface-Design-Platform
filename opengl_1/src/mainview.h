@@ -109,6 +109,8 @@ protected:
     QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
     QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 
+    QList<int> getTopoSortEnvelopes();
+
     // Functions for keyboard input events
     void keyPressEvent(QKeyEvent *ev) override;
     void keyReleaseEvent(QKeyEvent *ev) override;
