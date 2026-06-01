@@ -67,6 +67,9 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     int selectedEnvelope = -1;
     bool controlPointPressed = false;
 
+    // Mouse input for envelopes
+    bool envelopPressed = false;
+
     // Transformation matrices for the model
     float scalingFactor = 1.0f;
     QMatrix4x4 modelScaling;
@@ -105,7 +108,7 @@ protected:
     void updateUniforms();
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
-    void moveModel(float x, float y);
+    void moveModel(float x, float y, float z);
     QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
     QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 

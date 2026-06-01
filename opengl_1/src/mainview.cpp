@@ -450,6 +450,18 @@ void MainView::updateToolTransf(){
     }
 }
 
+/**
+ * @brief MainView::moveModel Translates the model with the given x, y, and z values.
+ * @param x How much to translate in the x direction.
+ * @param y How much to translate in the y direction.
+ * @param z How much to translate in the z direction.
+ */
+void MainView::moveModel(float x, float y, float z) {
+    modelTranslation.translate(x, y, z);
+    updateAllUniforms = true;
+    update();
+}
+
 QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {
     QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(Position, 1.0f);
     QVector3D normalizedDeviceCoord = clipCoordinates.toVector3D() / clipCoordinates.w();
