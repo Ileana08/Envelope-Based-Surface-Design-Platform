@@ -49,9 +49,15 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
         CubicBezier2D.h
         CubicBezier2D.cpp
         movement/BezierPath.h
+        movement/controlpoint.h
         movement/controlpoint.cpp
+        renderers/controlpointsrenderer.h
         renderers/controlpointsrenderer.cpp
         movement/BezierPath.cpp
+        movement/orientationcontrolpoint.h 
+        movement/orientationcontrolpoint.cpp
+        renderers/orientationcpsrenderer.h 
+        renderers/orientationcpsrenderer.cpp
 
 
 )

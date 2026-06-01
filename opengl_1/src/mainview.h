@@ -15,9 +15,11 @@
 #include "tools/bezierTool.h"
 #include "movement/cylindermovement.h"
 #include "movement/simplepath.h"
+#include "movement/orientationcontrolpoint.h"
 #include "envelope.h"
 #include "settings.h"
 #include "renderers/controlpointsrenderer.h"
+#include "renderers/orientationcpsrenderer.h"
 #include "renderers/toolrenderer.h"
 #include "renderers/enveloperenderer.h"
 #include "renderers/moverenderer.h"
@@ -61,6 +63,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     // Control points rendering
     QVector<ControlPointsRenderer*> controlPointsRenderers;
     QVector<QVector<ControlPoint*>> envelopeControlPoints;
+
+    // Orientation control points rendering
+    QVector<QVector<OrientationControlPoint*>> envelopeOrientationCPs;
+    QVector<OrientationCPsRenderer*> orientationCPsRenderers;
 
     // Mouse input for control points
     int selectedControlPoint = -1;

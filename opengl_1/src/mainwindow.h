@@ -84,6 +84,7 @@ private slots:
   void on_grazCurveCheckBox_toggled(bool checked);
   void on_pathCheckBox_toggled(bool checked);
   void on_controlPointsCheckBox_toggled(bool checked);
+  void on_orientationCPsCheckBox_toggled(bool checked);
   void on_toolAxisCheckBox_toggled(bool checked);
   void on_normalsCheckBox_toggled(bool checked);
   void on_sphereCheckBox_toggled(bool checked);
