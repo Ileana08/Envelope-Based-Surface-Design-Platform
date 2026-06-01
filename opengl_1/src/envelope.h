@@ -5,6 +5,8 @@
 #include "movement/cylindermovement.h"
 #include <QMatrix2x2>
 #include <QQuaternion>
+
+#include "mathutility.h"
 #include "settings.h"
 
 class Envelope
@@ -29,6 +31,15 @@ class Envelope
     QVector<Vertex> vertexArrGrazingCurve;
     QVector<QVector<Vertex>> vertexArrNormals;
 
+    QVector<QVector3D> a0EnvelopeCache;
+    QVector<QVector3D> a1EnvelopeCache;
+
+    QVector<QVector3D> pathCache;
+    QVector<QVector3D> pathDtCache;
+
+    QVector<QVector3D> axisCache;
+    QVector<QVector3D> axisDtCache;
+
     // Render settings for reflection lines
     bool reflectionLines=false;
     float reflFreq=20;
@@ -50,6 +61,7 @@ public:
     inline void setSectorsT(int n) { sectorsT = n; }
 
     inline int getIndex() const { return index; }
+    inline QList<Envelope*> getDependentEnvelopes() const { return dependentEnvelopes; }
     inline Envelope *getAdjA0Envelope() { return adjEnvA0; }
     void setAdjacentA0Envelope(Envelope *env);
     inline Envelope *getAdjA1Envelope() { return adjEnvA1; }
@@ -59,39 +71,42 @@ public:
     void deregisterDependent(Envelope *dependent);
     bool checkDependencies();
     QSet<int> getAllDependents();
+    inline bool isIndependent() const {return adjEnvA0 == nullptr && adjEnvA1 == nullptr;}
 
     void initEnvelope();
     void update();
 
+    void updateCaches();
+
     void computeEnvelope();
-    QVector3D getEnvelopeAt(float t, float a);
-    QVector3D getEnvelopeDtAt(float t, float a);
-    QVector3D getEnvelopeDt2At(float t, float a);
-    QVector3D getEnvelopeDt3At(float t, float a);
+    QVector3D calcEnvelopeAt(float t, float a);
+    QVector3D calcEnvelopeDtAt(float t, float a);
+    QVector3D calcEnvelopeDt2At(float t, float a);
+    QVector3D calcEnvelopeDt3At(float t, float a);
 
     void computeToolCenters();
 
     void computeGrazingCurves();
 
     void computeNormals();
-    QVector3D getSurfaceNormalAt(float t, float a);
-    QVector3D getNormalAt(float t, float a);
-    QVector3D getNormalDtAt(float t, float a);
-    QVector3D getNormalDt2At(float t, float a);
-    QVector3D getNormalDt3At(float t, float a);
+    QVector3D calcSurfaceNormalAt(float t, float a);
+    QVector3D calcNormalAt(float t, float a);
+    QVector3D calcNormalDtAt(float t, float a);
+    QVector3D calcNormalDt2At(float t, float a);
+    QVector3D calcNormalDt3At(float t, float a);
 
-    QVector3D getPathAt(float t);
-    QVector3D getPathDtAt(float t);
-    QVector3D getPathDt2At(float t);
-    QVector3D getPathDt3At(float t);
-    QVector3D getPathDt4At(float t);
+    QVector3D calcPathAt(float t);
+    QVector3D calcPathDtAt(float t);
+    QVector3D calcPathDt2At(float t);
+    QVector3D calcPathDt3At(float t);
+    QVector3D calcPathDt4At(float t);
 
     QQuaternion calcAxisRotationAt(float t);
-    QVector3D getAxisAt(float t);
-    QVector3D getAxisDtAt(float t);
-    QVector3D getAxisDt2At(float t);
-    QVector3D getAxisDt3At(float t);
-    QVector3D getAxisDt4At(float t);
+    QVector3D calcAxisAt(float t);
+    QVector3D calcAxisDtAt(float t);
+    QVector3D calcAxisDt2At(float t);
+    QVector3D calcAxisDt3At(float t);
+    QVector3D calcAxisDt4At(float t);
 
 
 
@@ -104,6 +119,13 @@ public:
     inline bool isTanContinuous() { return !isAxisConstrained() && isPositContinuous() && tanContToAdj; }
     inline bool isAxisConstrained() {return isPositContinuous() && adjEnvA1 != nullptr; }
 
+    // These methods get the "cached" values, instead of recalculating them.
+    inline QVector3D getA0EnvelopeAt(float t) {return MathUtility::interpolateArray(a0EnvelopeCache, t);}
+    inline QVector3D getA1EnvelopeAt(float t) {return MathUtility::interpolateArray(a1EnvelopeCache, t);}
+    inline QVector3D getPathAt(float t) {return MathUtility::interpolateArray(pathCache, t);}
+    inline QVector3D getPathDtAt(float t) {return MathUtility::interpolateArray(pathDtCache, t);}
+    inline QVector3D getAxisAt(float t) {return MathUtility::interpolateArray(axisCache, t);}
+    inline QVector3D getAxisDtAt(float t) {return MathUtility::interpolateArray(axisDtCache, t);}
 
     inline bool setAxes(QVector3D axisA0, QVector3D axisA1) { return toolMovement.setAxisDirections(axisA0, axisA1); }
     inline void setAdjacentAxisAngles(double angle1, double angle2) { adjAxisAngle1 = angle1; adjAxisAngle2 = angle2; }

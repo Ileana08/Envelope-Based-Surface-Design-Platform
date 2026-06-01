@@ -81,7 +81,6 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
   QVector2D currentMousePos(ev->position());
 
   if(controlPointPressed == true) {
-    // movement of the control point accordingly to the mouse
     QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
     ControlPoint* controlPoint = cps[selectedControlPoint];
     QVector3D position = controlPoint->getPosition();
@@ -95,18 +94,8 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       controlPoint->setPosition(newWorldPos);
       controlPointsRenderers[selectedEnvelope]->updateBuffers();
     }
-  } else if(envelopPressed == true){
-    // move the envelope accordingly to the mouse
-    QVector3D position = envelopes[selectedEnvelope]->getVertexArr()[0].getPosition();
-    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
-    if (clipCoordinates.w() != 0.0f) {
-      float ndcZ = clipCoordinates.z() / clipCoordinates.w();
-      QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
-      QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
-      QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);  
-      moveModel(newWorldPos.x() - position.x(), newWorldPos.y() - position.y(), newWorldPos.z() - position.z());
-    }
-  } else if (isSingleDragging) {
+  } else if (isSingleDragging)
+  {
     QVector2D delta = currentMousePos - lastMousePos;
     float sensitivity = settings.rotSensitivity;
     QQuaternion deltaRot = QQuaternion::fromEulerAngles(
@@ -136,14 +125,13 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   qDebug() << "Mouse button pressed:" << ev->button();
 
   QVector2D currentMousePos(ev->position());
-  // if control points are shown and one of them is selected
-  if(settings.showControlPoints==true && !envelopPressed && ev->button() == Qt::LeftButton){
+  if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
     for(int e = 0; e<envelopes.size(); e++) {
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       for(int i=0; i<cps.size(); i++){
         QVector3D pos = cps[i]->getPosition();
         QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
-        if((currentMousePos - controlPointScreenPos).length() <= 10.0f){
+        if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
           selectedControlPoint = i;
           selectedEnvelope = e;
           controlPointPressed = true;
@@ -152,34 +140,6 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
         }
       }
       if (controlPointPressed) {
-        break;
-      }
-    }
-  }
-
-  // if envelopes are shown and one of them is selected
-  if(!controlPointPressed && ev->button() == Qt::LeftButton){
-    for(int e = 0; e < envelopes.size(); e++) {
-      if (!indicesUsed[e]) continue;
-      if (!envelopes[e]->isActive()) continue;
-      Envelope *env = envelopes[e];
-      // add vertices of envelope to check if one of them is selected
-      QVector<Vertex> vertices = QVector<Vertex>();
-      if (settings.showEnvelope) {vertices = env->getVertexArr();}
-      // if (settings.showTool) {vertices += env->getTool()->getVertexArr();}
-      if (!settings.showEnvelope) continue;
-      for(int i=0; i<vertices.size(); i++) {
-        QVector3D pos = vertices[i].getPosition();
-        QVector2D envelopeScreenPos = toNormalizedScreenCoordinates(pos); 
-        // check if envelope is selected
-        if((currentMousePos - envelopeScreenPos).length() <= 10.0f) {
-          selectedEnvelope = e;
-          envelopPressed = true;
-          lastMousePos = currentMousePos;
-          break;
-        }
-      }
-      if (envelopPressed) {
         break;
       }
     }
@@ -206,33 +166,29 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   QVector2D currentMousePos(ev->position());
 
   if (controlPointPressed == true) {
-    // update everything based on the new position of the control point
     envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
-    envelopes[selectedEnvelope]->getTool()->update();
-    moveRenderers[selectedEnvelope]->updateBuffers();
-    envelopes[selectedEnvelope]->update();
-    envelopeRenderers[selectedEnvelope]->updateBuffers();
-    toolRenderers[selectedEnvelope]->updateBuffers();
+    //envelopes[selectedEnvelope]->update();
     QSet<int> depEnvs = envelopes[selectedEnvelope]->getAllDependents();
-    for(int idx : depEnvs) {
-      envelopes[idx]->getToolMovement().getPath().updateVertexArr();
-      moveRenderers[idx]->updateBuffers();
-      envelopes[idx]->update();
-      envelopeRenderers[idx]->updateBuffers();
-      toolRenderers[idx]->updateBuffers();
-    }
+    //moveRenderers[selectedEnvelope]->updateBuffers();
+    //envelopeRenderers[selectedEnvelope]->updateBuffers();
+    //toolRenderers[selectedEnvelope]->updateBuffers();
+    // for(int idx : depEnvs) {
+    //   envelopes[idx]->getToolMovement().getPath().updateVertexArr();
+    //   envelopes[idx]->update();
+    //   moveRenderers[idx]->updateBuffers();
+    //   envelopeRenderers[idx]->updateBuffers();
+    //   toolRenderers[idx]->updateBuffers();
+    // }
     updateToolTransf();
+    envelopeMeshUpdates += depEnvs;
+    toolMeshUpdates += depEnvs;
+    toolTransfUpdates += depEnvs;
     updateAllUniforms = true;
-    // the mouse selection of the control point is released
+    update();
+
     selectedControlPoint = -1;
     selectedEnvelope = -1;
     controlPointPressed = false;
-    update();
-  } else if(envelopPressed == true){ 
-    // the mouse selection of the envelope is released
-    selectedEnvelope = -1;
-    envelopPressed = false;
-    update();
   } else if (isSingleDragging && ev->button() == Qt::LeftButton)
   {
     isSingleDragging = false;

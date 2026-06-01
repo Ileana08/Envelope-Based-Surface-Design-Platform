@@ -22,12 +22,6 @@ public:
   inline CubicBezier2D getBezier() { return bezier; }
   void setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p3);
 
-  float getCa(float a);
-  float getCaDa(float a);
-  float getCn(float a);
-  float getCnDa(float a);
-
-
   float getRadiusAt(float a) override;
   float getRadiusDaAt(float a) override;
   float getSphereCenterHeightAt(float a) override;

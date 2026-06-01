@@ -1,6 +1,26 @@
 #include "mathutility.h"
 
+#include <QList>
+
 MathUtility::MathUtility() {}
+
+QVector3D MathUtility::interpolateArray(const QVector<QVector3D>& arr, float factor)
+{
+    if (arr.isEmpty()) return {};
+
+    float scaledIdx = factor * (arr.size() - 1);
+
+    float rounded = std::round(scaledIdx);
+    if (std::abs(rounded - scaledIdx) < 1e-4f)
+    {
+        return arr[rounded];
+    }
+    int lowerIdx = static_cast<int>(scaledIdx);
+    int upperIdx = qMin(lowerIdx + 1, arr.size() - 1);
+    float t = scaledIdx - lowerIdx;
+
+    return (1-t)*arr[lowerIdx] + t*arr[upperIdx];
+}
 
 /**
  * @brief normalVectorDerivative Calculates the derivative of a normalized vector.

@@ -22,8 +22,19 @@ void BezierTool::setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p
   bezier.setPoints(p0, p1, p2, p3);
 }
 
-float BezierTool::getCa(float a)
+float BezierTool::getRadiusAt(float a)
 {
+  return innerRadius + bezier.at(a).y();
+}
+
+float BezierTool::getRadiusDaAt(float a)
+{
+  return getProfileDa(a).y();
+}
+
+float BezierTool::getSphereCenterHeightAt(float a)
+{
+  // Ca corresponds to the sphere center height.
   QVector2D bezierAta = getProfile(a); //stretch bezier to fit height and inner radius
   QVector2D bezierNormalAta = getProfileNormal(a);
   float ca = 0;
@@ -38,8 +49,9 @@ float BezierTool::getCa(float a)
   return ca;
 }
 
-float BezierTool::getCaDa(float a)
+float BezierTool::getSphereCenterHeightDaAt(float a)
 {
+  // CaDa corresponds to the sphere center height derivative wrt a.
   QVector2D bezierAt = getProfile(a);
   QVector2D dBezierAt = getProfileDa(a);
   QVector2D normal = getProfileNormal(a);
@@ -58,8 +70,9 @@ float BezierTool::getCaDa(float a)
   return caDa;
 }
 
-float BezierTool::getCn(float a)
+float BezierTool::getSphereRadiusAt(float a)
 {
+  // Cn corresponds to the sphere radius.
   QVector2D bezierAta = getProfile(a);
   QVector2D bezierNormalAta = getProfileNormal(a);
   float cn = 0;
@@ -74,14 +87,16 @@ float BezierTool::getCn(float a)
   return cn;
 }
 
-float BezierTool::getCnDa(float a)
+float BezierTool::getSphereRadiusDaAt(float a)
 {
+  // CaDa corresponds to the sphere radius derivative wrt a.
   QVector2D bezierAt = getProfile(a);
   QVector2D dBezierAt = getProfileDa(a);
   QVector2D normal = getProfileNormal(a);
-  QVector2D dNormal = getProfileNormalDa(a);
-  float ca = getCa(a);
-  float caDa = getCaDa(a);
+
+  float ca = getSphereCenterHeightAt(a);
+  float caDa = getSphereCenterHeightDaAt(a);
+  float cn = getSphereRadiusAt(a);
   float cnDa = 0;
   if (abs(normal.y()) > 1e-9f)
   {
@@ -92,43 +107,13 @@ float BezierTool::getCnDa(float a)
     QVector2D d(bezierAt.x() - ca, bezierAt.y());
     QVector2D dDa(dBezierAt.x() - caDa, dBezierAt.y());
 
-    cnDa = QVector2D::dotProduct(d, dDa) / getCn(a);
+    cnDa = QVector2D::dotProduct(d, dDa) / cn;
   }
   else
   {
     qDebug() << "CnDa divide by zero a = " << a;
   }
   return cnDa;
-}
-
-float BezierTool::getRadiusAt(float a)
-{
-  return innerRadius + bezier.at(a).y();
-}
-
-float BezierTool::getRadiusDaAt(float a)
-{
-  return getProfileDa(a).y();
-}
-
-float BezierTool::getSphereCenterHeightAt(float a)
-{
-  return getCa(a);
-}
-
-float BezierTool::getSphereCenterHeightDaAt(float a)
-{
-  return getCaDa(a);
-}
-
-float BezierTool::getSphereRadiusAt(float a)
-{
-  return getCn(a);
-}
-
-float BezierTool::getSphereRadiusDaAt(float a)
-{
-  return getCnDa(a);
 }
 
 // Profile and its normal

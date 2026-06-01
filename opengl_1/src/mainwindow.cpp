@@ -984,6 +984,9 @@ void MainWindow::on_axisSectorsSpinBox_valueChanged(int value)
 
     ui->mainView->drums[i]->setSectors(value);
     ui->mainView->drums[i]->update();
+
+    ui->mainView->bezierTools[i]->setSectors(value);
+    ui->mainView->bezierTools[i]->update();
   }
 
   ui->mainView->updateBuffers();
@@ -1031,6 +1034,7 @@ void MainWindow::on_TimeSlider_sliderMoved(int value)
   BezierPath& path = move.getPath();
   ui->mainView->settings.timeIdx = value;
 
+  ui->mainView->updateBuffers();
   ui->mainView->updateToolTransf();
   ui->mainView->updateAllUniforms = true;
   ui->mainView->update();

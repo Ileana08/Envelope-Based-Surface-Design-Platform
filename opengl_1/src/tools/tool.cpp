@@ -1,6 +1,7 @@
 #include "tool.h"
 
 void Tool::computeTool() {
+    qDebug() << "Computing tool" << toolType;
     vertexArr.clear();
     QVector3D v1,v2,v3,v4;
     QVector3D n1,n2,n3,n4;

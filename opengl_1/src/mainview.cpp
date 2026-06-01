@@ -92,9 +92,7 @@ Envelope* MainView::addNewEnvelope() {
     Drum *drum = new Drum();
     drum->initTool();
     drums[idx] = drum;
-    qDebug() << "addNewEnvelope setup bezier";
     BezierTool *bezierTool = new BezierTool();
-    qDebug() << "addNewEnvelope initTool";
     bezierTool->initTool();
     bezierTools[idx] = bezierTool;
 
@@ -296,6 +294,44 @@ void MainView::paintGL()
     // Clear the screen before rendering
     gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    QList topoSort = getTopoSortEnvelopes();
+    qDebug() << "topoSort" << topoSort;
+    qDebug() << "envelopeMeshUpdates" << envelopeMeshUpdates;
+    qDebug() << "toolMeshUpdates" << toolMeshUpdates;
+    qDebug() << "toolTransfUpdates" << toolTransfUpdates;
+
+    while (!topoSort.isEmpty())
+    {
+        int idx = topoSort.takeFirst();
+        if (envelopeMeshUpdates.contains(idx))
+        {
+            envelopes[idx]->update();
+            envelopeRenderers[idx]->updateBuffers();
+            moveRenderers[idx]->updateBuffers();
+            controlPointsRenderers[idx]->updateBuffers();
+        }
+
+        if (toolMeshUpdates.contains(idx))
+        {
+            cylinders[idx]->update();
+            drums[idx]->update();
+            bezierTools[idx]->update();
+            toolRenderers[idx]->updateBuffers();
+        }
+
+        if (toolTransfUpdates.contains(idx))
+        {
+            toolRenderers[idx]->setToolTransf(envelopes[idx]->getToolTransformAt(settings.t()));
+            toolRenderers[idx]->updateUniforms();
+        }
+
+    }
+    envelopeMeshUpdates.clear();
+    toolMeshUpdates.clear();
+    toolMeshUpdates.clear();
+
+    /*
     if (!envelopeMeshUpdates.isEmpty()) {
         QList<int> indices = envelopeMeshUpdates.values();
         while (!indices.isEmpty()) {
@@ -307,6 +343,8 @@ void MainView::paintGL()
         }
         envelopeMeshUpdates.clear();
     }
+
+
 
     if (!toolMeshUpdates.isEmpty()) {
         QList<int> indices = toolMeshUpdates.values();
@@ -329,6 +367,7 @@ void MainView::paintGL()
         }
         toolTransfUpdates.clear();
     }
+    */
 
     if (updateAllUniforms) {
         updateUniforms();
@@ -477,6 +516,49 @@ QVector3D MainView::toNormalizedWorldCoordinates(const QVector2D &screenPosition
     QVector4D worldCoordinates4D = modelTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
     QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
     return worldCoordinates;
+}
+
+QList<int> MainView::getTopoSortEnvelopes() {
+    QList<int> independentNodes;
+    QList<int> updateQueue;
+
+    //first add all independent nodes to the list.
+    for (Envelope* env : envelopes)
+    {
+        if (env == nullptr) continue;
+        if (env->isIndependent())
+        {
+            independentNodes.append(env->getIndex());
+        }
+
+    }
+
+    while (!independentNodes.isEmpty())
+    {
+        int n = independentNodes.takeFirst();
+        updateQueue.append(n);
+
+        for (Envelope* depEnv : envelopes[n]->getDependentEnvelopes())
+        {
+            bool resolved = true;
+            Envelope* a0adj = depEnv->getAdjA0Envelope();
+            Envelope* a1adj = depEnv->getAdjA1Envelope();
+            if (a0adj != nullptr && !updateQueue.contains(a0adj->getIndex()))
+            {
+                resolved = false;
+            }
+            if (a1adj != nullptr && !updateQueue.contains(a1adj->getIndex()))
+            {
+                resolved = false;
+            }
+            if (resolved)
+            {
+                independentNodes.append(depEnv->getIndex());
+            }
+        }
+    }
+
+    return updateQueue;
 }
 
 /**
