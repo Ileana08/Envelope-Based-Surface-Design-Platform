@@ -58,6 +58,7 @@ void Envelope::initEnvelope()
 }
 
 void Envelope::update() {
+    qDebug() << "Updating envelope index =" << getIndex();
     updateCaches();
     computeEnvelope();
     computeToolCenters();
@@ -172,6 +173,7 @@ void Envelope::setAdjacentA1Envelope(Envelope *env){
 void Envelope::computeEnvelope()
 {
     vertexArr.clear();
+    float epsilon = 1e-2f;
 
     QVector3D env[4];
     QVector3D norm[4];
@@ -192,16 +194,15 @@ void Envelope::computeEnvelope()
             float aDelta = 1.0f/sectorsA;
             float a = (float) aIdx / sectorsA;
 
-
-            env[0] = calcEnvelopeAt(t, a);
-            env[1] = calcEnvelopeAt(t, a+aDelta);
-            env[2] = calcEnvelopeAt(t+tDelta, a);
-            env[3] = calcEnvelopeAt(t+tDelta, a+aDelta);
-
             norm[0] = calcNormalAt(t, a);
             norm[1] = calcNormalAt(t, a+aDelta);
             norm[2] = calcNormalAt(t+tDelta, a);
             norm[3] = calcNormalAt(t+tDelta, a+aDelta);
+
+            env[0] = calcEnvelopeAt(t, a) + norm[0] * epsilon;
+            env[1] = calcEnvelopeAt(t, a+aDelta) + norm[1] * epsilon;
+            env[2] = calcEnvelopeAt(t+tDelta, a) + norm[2] * epsilon;
+            env[3] = calcEnvelopeAt(t+tDelta, a+aDelta) + norm[3] * epsilon;
 
             for (int i = 0; i < 4; i++) {
                 if (reflectionLines){
@@ -237,7 +238,7 @@ void Envelope::computeEnvelope()
 
 QVector3D Envelope::calcEnvelopeAt(float t, float a)
 {
-
+    //we add a small extra factor so we don't get any overlap with the tool mesh.
     QVector3D normal = calcNormalAt(t, a);
     QVector3D env = getPathAt(t) + tool->getSphereCenterHeightAt(a) * getAxisAt(t) + tool->getSphereRadiusAt(a) * normal;
 

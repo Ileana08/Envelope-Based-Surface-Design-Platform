@@ -92,9 +92,7 @@ Envelope* MainView::addNewEnvelope() {
     Drum *drum = new Drum();
     drum->initTool();
     drums[idx] = drum;
-    qDebug() << "addNewEnvelope setup bezier";
     BezierTool *bezierTool = new BezierTool();
-    qDebug() << "addNewEnvelope initTool";
     bezierTool->initTool();
     bezierTools[idx] = bezierTool;
 
@@ -298,6 +296,11 @@ void MainView::paintGL()
 
 
     QList topoSort = getTopoSortEnvelopes();
+    qDebug() << "topoSort" << topoSort;
+    qDebug() << "envelopeMeshUpdates" << envelopeMeshUpdates;
+    qDebug() << "toolMeshUpdates" << toolMeshUpdates;
+    qDebug() << "toolTransfUpdates" << toolTransfUpdates;
+
     while (!topoSort.isEmpty())
     {
         int idx = topoSort.takeFirst();
@@ -308,7 +311,7 @@ void MainView::paintGL()
             moveRenderers[idx]->updateBuffers();
             controlPointsRenderers[idx]->updateBuffers();
         }
-        envelopeMeshUpdates.clear();
+
         if (toolMeshUpdates.contains(idx))
         {
             cylinders[idx]->update();
@@ -316,14 +319,17 @@ void MainView::paintGL()
             bezierTools[idx]->update();
             toolRenderers[idx]->updateBuffers();
         }
-        toolMeshUpdates.clear();
+
         if (toolTransfUpdates.contains(idx))
         {
             toolRenderers[idx]->setToolTransf(envelopes[idx]->getToolTransformAt(settings.t()));
             toolRenderers[idx]->updateUniforms();
         }
-        toolMeshUpdates.clear();
+
     }
+    envelopeMeshUpdates.clear();
+    toolMeshUpdates.clear();
+    toolMeshUpdates.clear();
 
     /*
     if (!envelopeMeshUpdates.isEmpty()) {

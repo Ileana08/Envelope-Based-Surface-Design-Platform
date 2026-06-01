@@ -984,6 +984,9 @@ void MainWindow::on_axisSectorsSpinBox_valueChanged(int value)
 
     ui->mainView->drums[i]->setSectors(value);
     ui->mainView->drums[i]->update();
+
+    ui->mainView->bezierTools[i]->setSectors(value);
+    ui->mainView->bezierTools[i]->update();
   }
 
   ui->mainView->updateBuffers();

@@ -167,24 +167,28 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
 
   if (controlPointPressed == true) {
     envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
-    envelopes[selectedEnvelope]->update();
+    //envelopes[selectedEnvelope]->update();
     QSet<int> depEnvs = envelopes[selectedEnvelope]->getAllDependents();
-    moveRenderers[selectedEnvelope]->updateBuffers();
-    envelopeRenderers[selectedEnvelope]->updateBuffers();
-    toolRenderers[selectedEnvelope]->updateBuffers();
-    for(int idx : depEnvs) {
-      envelopes[idx]->getToolMovement().getPath().updateVertexArr();
-      envelopes[idx]->update();
-      moveRenderers[idx]->updateBuffers();
-      envelopeRenderers[idx]->updateBuffers();
-      toolRenderers[idx]->updateBuffers();
-    }
+    //moveRenderers[selectedEnvelope]->updateBuffers();
+    //envelopeRenderers[selectedEnvelope]->updateBuffers();
+    //toolRenderers[selectedEnvelope]->updateBuffers();
+    // for(int idx : depEnvs) {
+    //   envelopes[idx]->getToolMovement().getPath().updateVertexArr();
+    //   envelopes[idx]->update();
+    //   moveRenderers[idx]->updateBuffers();
+    //   envelopeRenderers[idx]->updateBuffers();
+    //   toolRenderers[idx]->updateBuffers();
+    // }
     updateToolTransf();
+    envelopeMeshUpdates += depEnvs;
+    toolMeshUpdates += depEnvs;
+    toolTransfUpdates += depEnvs;
     updateAllUniforms = true;
+    update();
+
     selectedControlPoint = -1;
     selectedEnvelope = -1;
     controlPointPressed = false;
-    update();
   } else if (isSingleDragging && ev->button() == Qt::LeftButton)
   {
     isSingleDragging = false;
