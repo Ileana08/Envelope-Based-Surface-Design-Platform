@@ -34,7 +34,7 @@ typedef struct Settings {
     QVector3D lightPos = QVector3D(0.0f, 0.0f, 0.0f);
     QVector3D lightColor = QVector3D(1.0f, 1.0f, 1.0f);
 
-    const size_t NUM_ENVELOPES = 4;
+    const size_t NUM_ENVELOPES = 16;
 
     inline float a() const { return (float) aIdx / aSectors; }
     inline float t() const { return (float) timeIdx / tSectors; }

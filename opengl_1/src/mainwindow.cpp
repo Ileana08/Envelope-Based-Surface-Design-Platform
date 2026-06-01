@@ -108,6 +108,20 @@ void MainWindow::updateUI()
 
 void MainWindow::updateUI(int prevIdx)
 {
+  QSignalBlocker b1(ui->envelopeActiveCheckBox);
+  QSignalBlocker b2(ui->constraintA0SelectBox);
+  QSignalBlocker b3(ui->constraintA1SelectBox);
+  QSignalBlocker b4(ui->tanContCheckBox);
+  QSignalBlocker b5(ui->orientVector_1);
+  QSignalBlocker b6(ui->orientVector_2);
+  QSignalBlocker b7(ui->angleOrient_1_SpinBox);
+  QSignalBlocker b8(ui->angleOrient_2_SpinBox);
+  QSignalBlocker b9(ui->radiusSpinBox);
+  QSignalBlocker b10(ui->drumRadiusSpinBox);
+  QSignalBlocker b11(ui->angleSpinBox);
+  QSignalBlocker b12(ui->heightSpinBox);
+  QSignalBlocker b13(ui->toolBox);
+
   int idx = ui->mainView->settings.selectedIdx;
   // if (idx == prevIdx) {
   //     qDebug() << ":: ERROR -- UI update for unchanged selection";
@@ -175,24 +189,6 @@ void MainWindow::updateUI(int prevIdx)
 
     int toolTypeIdx = (int)env->getTool()->getType();
     ui->toolBox->setCurrentIndex(toolTypeIdx);
-
-    // Path Settings
-    /* Simple path implementation -- Old
-    ui->SettingsTabMenu->setTabEnabled(3, !env->isPositContinuous());
-    SimplePath &path = env->getToolMovement().getPath();
-    ui->spinBox_a_x->setValue(path.getX().getA());
-    ui->spinBox_b_x->setValue(path.getX().getB());
-    ui->spinBox_c_x->setValue(path.getX().getC());
-    ui->spinBox_d_x->setValue(path.getX().getD());
-    ui->spinBox_a_y->setValue(path.getY().getA());
-    ui->spinBox_b_y->setValue(path.getY().getB());
-    ui->spinBox_c_y->setValue(path.getY().getC());
-    ui->spinBox_d_y->setValue(path.getY().getD());
-    ui->spinBox_a_z->setValue(path.getZ().getA());
-    ui->spinBox_b_z->setValue(path.getZ().getB());
-    ui->spinBox_c_z->setValue(path.getZ().getC());
-    ui->spinBox_d_z->setValue(path.getZ().getD());
-    */
   }
   else
   {
