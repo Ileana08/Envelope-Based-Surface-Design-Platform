@@ -1034,6 +1034,7 @@ void MainWindow::on_TimeSlider_sliderMoved(int value)
   BezierPath& path = move.getPath();
   ui->mainView->settings.timeIdx = value;
 
+  ui->mainView->updateBuffers();
   ui->mainView->updateToolTransf();
   ui->mainView->updateAllUniforms = true;
   ui->mainView->update();
