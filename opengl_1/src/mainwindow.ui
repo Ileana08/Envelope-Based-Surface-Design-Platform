@@ -85,6 +85,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="orientationCPsCheckBox">
+             <property name="text">
+              <string>Orientation points</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="toolAxisCheckBox">
              <property name="text">
               <string>Tool axis</string>

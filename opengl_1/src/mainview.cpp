@@ -73,6 +73,14 @@ MainView::~MainView()
     envelopeControlPoints.clear();
     envelopeControlPoints.squeeze();
 
+    for (const QVector<OrientationControlPoint*> &cps : envelopeOrientationCPs){
+        for (OrientationControlPoint *cp : cps) {
+            delete cp;
+        }
+    }
+    envelopeOrientationCPs.clear();
+    envelopeOrientationCPs.squeeze();
+
     makeCurrent();
 }
 
@@ -107,6 +115,14 @@ Envelope* MainView::addNewEnvelope() {
     };
     envelopeControlPoints[idx] = controlPoints;
     BezierPath path(controlPoints);
+
+    QVector<OrientationControlPoint*> orientationCPs = {
+        new OrientationControlPoint(QVector3D(0,2,0), 0.05, 20, envelopeControlPoints[idx][0]),
+        new OrientationControlPoint(QVector3D(1.0/3,2,0), 0.05, 20, envelopeControlPoints[idx][1]),
+        new OrientationControlPoint(QVector3D(2.0/3,2,0), 0.05, 20, envelopeControlPoints[idx][2]),
+        new OrientationControlPoint(QVector3D(1.0,2,0), 0.05, 20, envelopeControlPoints[idx][3])
+    };
+    envelopeOrientationCPs[idx] = orientationCPs;
 
     Tool *tool;
     switch (defaultTool)
@@ -146,6 +162,12 @@ Envelope* MainView::addNewEnvelope() {
     controlPointsRenderers[idx]->setControlPoints(env->getToolMovement().getPath().getControlPoints());
     controlPointsRenderers[idx]->setModelTransf(modelTransf);
     controlPointsRenderers[idx]->setProjTransf(projTransf);
+
+    qDebug() << "addNewEnvelope setup orientation control point renderer";
+
+    orientationCPsRenderers[idx]->setOrientationControlPoints(envelopeOrientationCPs[idx]);
+    orientationCPsRenderers[idx]->setModelTransf(modelTransf);
+    orientationCPsRenderers[idx]->setProjTransf(projTransf);
 
     // Activate
     indicesUsed[idx] = true;
@@ -225,6 +247,8 @@ void MainView::initializeGL()
     moveRenderers.reserve(settings.NUM_ENVELOPES);
     controlPointsRenderers.reserve(settings.NUM_ENVELOPES);
     envelopeControlPoints.reserve(settings.NUM_ENVELOPES);
+    orientationCPsRenderers.reserve(settings.NUM_ENVELOPES);
+    envelopeOrientationCPs.reserve(settings.NUM_ENVELOPES);
     envelopes.fill(nullptr, settings.NUM_ENVELOPES);
     cylinders.fill(nullptr, settings.NUM_ENVELOPES);
     drums.fill(nullptr, settings.NUM_ENVELOPES);
@@ -247,6 +271,12 @@ void MainView::initializeGL()
         cpRend->init(gl, &settings);
         controlPointsRenderers.append(cpRend);
         envelopeControlPoints.append(QVector<ControlPoint*>());
+
+        // Orientation control points renderer
+        OrientationCPsRenderer *orientationCPsRend = new OrientationCPsRenderer();
+        orientationCPsRend->init(gl, &settings);
+        orientationCPsRenderers.append(orientationCPsRend);
+        envelopeOrientationCPs.append(QVector<OrientationControlPoint*>());
     }
 
     // Trigger buffer update
@@ -269,6 +299,7 @@ void MainView::updateBuffers(){
         envelopeRenderers[i]->updateBuffers();
         moveRenderers[i]->updateBuffers();
         controlPointsRenderers[i]->updateBuffers();
+        orientationCPsRenderers[i]->updateBuffers();
     }
 }
 
@@ -281,6 +312,7 @@ void MainView::updateUniforms() {
         moveRenderers[i]->updateUniforms();
         envelopeRenderers[i]->updateUniforms();
         controlPointsRenderers[i]->updateUniforms();
+        orientationCPsRenderers[i]->updateUniforms();
     }
 }
 
@@ -310,6 +342,7 @@ void MainView::paintGL()
             envelopeRenderers[idx]->updateBuffers();
             moveRenderers[idx]->updateBuffers();
             controlPointsRenderers[idx]->updateBuffers();
+            orientationCPsRenderers[idx]->updateBuffers();
         }
 
         if (toolMeshUpdates.contains(idx))
@@ -391,6 +424,8 @@ void MainView::paintGL()
             moveRenderers[i]->setNormalTransf(normalTransf);
             controlPointsRenderers[i]->setModelTransf(modelTransf);
             controlPointsRenderers[i]->setNormalTransf(normalTransf);
+            orientationCPsRenderers[i]->setModelTransf(modelTransf);
+            orientationCPsRenderers[i]->setNormalTransf(normalTransf);
         }
         updateToolTransf();
 
@@ -405,6 +440,7 @@ void MainView::paintGL()
         envelopeRenderers[i]->paintGL();
         if (!envelopes[i]->isPositContinuous()) {
             controlPointsRenderers[i]->paintGL();
+            orientationCPsRenderers[i]->paintGL();
         }
     }
 }
@@ -434,6 +470,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
         envelopeRenderers[i]->setProjTransf(projTransf);
         moveRenderers[i]->setProjTransf(projTransf);
         controlPointsRenderers[i]->setProjTransf(projTransf);
+        orientationCPsRenderers[i]->setProjTransf(projTransf);
     }
     updateAllUniforms = true;
 }

@@ -1,24 +1,24 @@
-#include "controlpoint.h"
+#include "orientationcontrolpoint.h"
 
-ControlPoint::ControlPoint():
+OrientationControlPoint::OrientationControlPoint():
     position(QVector3D(0.0,0.0,0.0)), 
     radius(0.2), 
     sectors(20),
-    vertexArr()
+    controlPoint(nullptr)
 {
-    computeControlPoint();
+    computeOrientationPoint();
 }
 
-ControlPoint::ControlPoint(QVector3D position, float radius , int sectors) : 
+OrientationControlPoint::OrientationControlPoint(QVector3D position, float radius , int sectors, ControlPoint* controlPoint) : 
     position(position), 
     radius(radius), 
     sectors(sectors),
-    vertexArr()
+    controlPoint(controlPoint)
 {
-    computeControlPoint();
+    computeOrientationPoint();
 }
 
-Vertex ControlPoint::getSurfaceAt(float angle, float rotation)
+Vertex OrientationControlPoint::getSurfaceAt(float angle, float rotation)
 {
     QVector3D p(
         position.x() + radius*cos(rotation)*cos(angle),
@@ -27,10 +27,10 @@ Vertex ControlPoint::getSurfaceAt(float angle, float rotation)
     );
 
     QVector3D n = (p - position).normalized();
-    return Vertex(p, n, QVector3D(0.0f, 1.0f, 0.0f));
+    return Vertex(p, n, QVector3D(0.0f, 1.0f, 1.0f));
 }
 
-void ControlPoint::computeControlPoint() {
+void OrientationControlPoint::computeOrientationPoint() {
     vertexArr.clear();
 
     Vertex v1, v2, v3, v4;

@@ -21,14 +21,14 @@ class ControlPoint
 
         inline QVector3D getPosition() { return position; }
         inline float getRadius() { return radius; }
-        inline void setPosition(QVector3D position) { this->position = position; computeSphere(); }
-        inline void setRadius(float radius) { this->radius = radius; computeSphere(); }
+        inline void setPosition(QVector3D position) { this->position = position; computeControlPoint(); }
+        inline void setRadius(float radius) { this->radius = radius; computeControlPoint(); }
         inline void setSectors(int sectors) { this->sectors = sectors; }
         inline int getSectors(){ return sectors; }
         inline QVector<Vertex> getVertexArr() { return vertexArr; }
 
-        Vertex getSphereSurfaceAt(float angle, float rotation);
-        void computeSphere();
+        Vertex getSurfaceAt(float angle, float rotation);
+        void computeControlPoint();
 };
 
 #endif //CONTROLPOINT_H
