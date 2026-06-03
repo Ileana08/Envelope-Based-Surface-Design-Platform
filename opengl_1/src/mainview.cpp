@@ -328,14 +328,13 @@ void MainView::paintGL()
 
 
     QList topoSort = getTopoSortEnvelopes();
-    qDebug() << "topoSort" << topoSort;
-    qDebug() << "envelopeMeshUpdates" << envelopeMeshUpdates;
-    qDebug() << "toolMeshUpdates" << toolMeshUpdates;
-    qDebug() << "toolTransfUpdates" << toolTransfUpdates;
 
     while (!topoSort.isEmpty())
     {
         int idx = topoSort.takeFirst();
+        int adj0 = (envelopes[idx]->getAdjA0Envelope() != nullptr ? envelopes[idx]->getAdjA0Envelope()->getIndex() : -1);
+        int adj1 = (envelopes[idx]->getAdjA1Envelope() != nullptr ? envelopes[idx]->getAdjA1Envelope()->getIndex() : -1);
+
         if (envelopeMeshUpdates.contains(idx))
         {
             envelopes[idx]->update();
@@ -343,6 +342,10 @@ void MainView::paintGL()
             moveRenderers[idx]->updateBuffers();
             controlPointsRenderers[idx]->updateBuffers();
             orientationCPsRenderers[idx]->updateBuffers();
+
+            if (adj0 != -1) {envelopeMeshUpdates.insert(adj0);}
+            if (adj1 != -1) {envelopeMeshUpdates.insert(adj1);}
+
         }
 
         if (toolMeshUpdates.contains(idx))
@@ -351,56 +354,24 @@ void MainView::paintGL()
             drums[idx]->update();
             bezierTools[idx]->update();
             toolRenderers[idx]->updateBuffers();
+
+            if (adj0 != -1) {toolMeshUpdates.insert(adj0);}
+            if (adj1 != -1) {toolMeshUpdates.insert(adj1);}
         }
 
         if (toolTransfUpdates.contains(idx))
         {
             toolRenderers[idx]->setToolTransf(envelopes[idx]->getToolTransformAt(settings.t()));
             toolRenderers[idx]->updateUniforms();
+
+            if (adj0 != -1) {toolTransfUpdates.insert(adj0);}
+            if (adj1 != -1) {toolTransfUpdates.insert(adj1);}
         }
 
     }
     envelopeMeshUpdates.clear();
     toolMeshUpdates.clear();
     toolMeshUpdates.clear();
-
-    /*
-    if (!envelopeMeshUpdates.isEmpty()) {
-        QList<int> indices = envelopeMeshUpdates.values();
-        while (!indices.isEmpty()) {
-            int i = indices.takeFirst();
-            envelopes[i]->update();
-            envelopeRenderers[i]->updateBuffers();
-            moveRenderers[i]->updateBuffers();
-            controlPointsRenderers[i]->updateBuffers();
-        }
-        envelopeMeshUpdates.clear();
-    }
-
-
-
-    if (!toolMeshUpdates.isEmpty()) {
-        QList<int> indices = toolMeshUpdates.values();
-        while (!indices.isEmpty()) {
-            int i = indices.takeFirst();
-            cylinders[i]->update();
-            drums[i]->update();
-            bezierTools[i]->update();
-            toolRenderers[i]->updateBuffers();
-        }
-        toolMeshUpdates.clear();
-    }
-
-    if (!toolTransfUpdates.isEmpty()) {
-        QList<int> indices = toolTransfUpdates.values();
-        while (!indices.isEmpty()) {
-            int i = indices.takeFirst();
-            toolRenderers[i]->setToolTransf(envelopes[i]->getToolTransformAt(settings.t()));
-            toolRenderers[i]->updateUniforms();
-        }
-        toolTransfUpdates.clear();
-    }
-    */
 
     if (updateAllUniforms) {
         updateUniforms();
@@ -496,7 +467,6 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 
     // Update the model transformation matrix
     updateAllUniforms = true;
-    update();
 }
 
 /**
@@ -512,7 +482,6 @@ void MainView::setScale(float scale)
     scalingFactor = scale;
 
     updateAllUniforms = true;
-    update();
 }
 
 /**
@@ -524,18 +493,6 @@ void MainView::updateToolTransf(){
         if (!envelopes[i]->isActive()) continue;
         toolRenderers[i]->setToolTransf(envelopes[i]->getToolTransformAt(settings.t()));
     }
-}
-
-/**
- * @brief MainView::moveModel Translates the model with the given x, y, and z values.
- * @param x How much to translate in the x direction.
- * @param y How much to translate in the y direction.
- * @param z How much to translate in the z direction.
- */
-void MainView::moveModel(float x, float y, float z) {
-    modelTranslation.translate(x, y, z);
-    updateAllUniforms = true;
-    update();
 }
 
 QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {

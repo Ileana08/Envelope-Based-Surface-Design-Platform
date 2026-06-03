@@ -112,7 +112,6 @@ protected:
     void updateUniforms();
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
-    void moveModel(float x, float y, float z);
     QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
     QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 

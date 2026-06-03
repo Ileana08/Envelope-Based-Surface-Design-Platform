@@ -262,6 +262,10 @@ void MainWindow::on_constraintA0SelectBox_currentIndexChanged(int index)
     QSet<int> depEnvs = envelope->getAllDependents();
     ui->mainView->envelopeMeshUpdates += depEnvs;
     ui->mainView->toolTransfUpdates += depEnvs;
+
+    ui->mainView->envelopeMeshUpdates += idx;
+    ui->mainView->toolTransfUpdates += idx;
+
     ui->mainView->update();
   }
 
@@ -292,6 +296,8 @@ void MainWindow::on_constraintA1SelectBox_currentIndexChanged(int index)
     QSet<int> depEnvs = envelope->getAllDependents();
     ui->mainView->envelopeMeshUpdates += depEnvs;
     ui->mainView->toolTransfUpdates += depEnvs;
+    ui->mainView->envelopeMeshUpdates += idx;
+    ui->mainView->toolTransfUpdates += idx;
     ui->mainView->update();
   }
   ui->tanContCheckBox->setEnabled(adjEnv == nullptr);
@@ -315,6 +321,8 @@ void MainWindow::on_tanContCheckBox_toggled(bool checked)
   QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
   ui->mainView->envelopeMeshUpdates += depEnvs;
   ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 
   updateUI();
@@ -332,10 +340,13 @@ void MainWindow::on_newEnvelopeButton_clicked()
   int idx = env->getIndex();
   addEnvToSelectorMenus(env);
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->updateAllUniforms = true;
   ui->mainView->update();
 }
@@ -364,9 +375,11 @@ void MainWindow::on_orientVector_1_returnPressed()
     error.showMessage("The inputed vector is not a valid orientation 1 vector");
   }
 
-  QSet<int> depEnvs = env->getAllDependents();
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = env->getAllDependents();
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -390,9 +403,11 @@ void MainWindow::on_orientVector_2_returnPressed()
     error.showMessage("The inputed vector is not a valid orientation 2 vector");
   }
 
-  QSet<int> depEnvs = env->getAllDependents();
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = env->getAllDependents();
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -409,9 +424,11 @@ void MainWindow::on_angleOrient_1_SpinBox_valueChanged(double value)
   Envelope* env = ui->mainView->envelopes[idx];
   env->setAdjacentAxisAngles(value, ui->angleOrient_2_SpinBox->value());
 
-  QSet<int> depEnvs = env->getAllDependents();
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = env->getAllDependents();
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -428,9 +445,11 @@ void MainWindow::on_angleOrient_2_SpinBox_valueChanged(double value)
   Envelope* env = ui->mainView->envelopes[idx];
   env->setAdjacentAxisAngles(ui->angleOrient_1_SpinBox->value(), value);
 
-  QSet<int> depEnvs = env->getAllDependents();
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = env->getAllDependents();
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -448,10 +467,13 @@ void MainWindow::on_radiusSpinBox_valueChanged(double value)
   ui->mainView->drums[idx]->setRadius(value);
   ui->mainView->bezierTools[idx]->setInnerRadius(value);
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -466,10 +488,13 @@ void MainWindow::on_drumRadiusSpinBox_valueChanged(double value)
   if (idx == -1) return;
   ui->mainView->drums[idx]->setCurvatureRadius(value);
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -484,10 +509,13 @@ void MainWindow::on_angleSpinBox_valueChanged(double value)
   if (idx == -1) return;
   ui->mainView->cylinders[idx]->setAngle(value);
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -505,10 +533,13 @@ void MainWindow::on_heightSpinBox_valueChanged(double value)
   ui->mainView->bezierTools[idx]->setHeight(value);
 
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -554,10 +585,13 @@ void MainWindow::on_toolBox_currentIndexChanged(int index)
   ui->mainView->envelopes[idx]->setTool(tool);
   ui->mainView->toolRenderers[idx]->setTool(tool);
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -578,10 +612,13 @@ void MainWindow::on_controlPointChanged()
   qDebug() << "-| P2 " << p2;
   qDebug() << "-| P3 " << p3;
 
-  QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  ui->mainView->toolMeshUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += depEnvs;
-  ui->mainView->toolTransfUpdates += depEnvs;
+  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+  // ui->mainView->toolMeshUpdates += depEnvs;
+  // ui->mainView->envelopeMeshUpdates += depEnvs;
+  // ui->mainView->toolTransfUpdates += depEnvs;
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 }
 
@@ -873,6 +910,7 @@ void MainWindow::on_RotationDialZ_sliderMoved(int value)
   qDebug() << ":: on_RotationDialZ_sliderMoved";
   ui->mainView->setRotation(ui->RotationDialX->value(),
                             ui->RotationDialY->value(), value);
+  ui->mainView->update();
 }
 
 /**
@@ -883,6 +921,7 @@ void MainWindow::on_ResetScaleButton_clicked()
   qDebug() << ":: on_ResetScaleButton_clicked";
   ui->ScaleSlider->setValue(100);
   ui->mainView->setScale(1);
+  ui->mainView->update();
 }
 
 /**
@@ -893,6 +932,7 @@ void MainWindow::on_ScaleSlider_sliderMoved(int value)
 {
   qDebug() << ":: on_ScaleSlider_sliderMoved";
   ui->mainView->setScale(value / 100.0f);
+  ui->mainView->update();
 }
 
 /**
