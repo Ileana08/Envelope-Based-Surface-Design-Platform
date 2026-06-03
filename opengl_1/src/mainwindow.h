@@ -62,22 +62,6 @@ private slots:
 
   void on_controlPointChanged();
 
-  // Path menu
-  /* Old Path parameters
-  void on_spinBox_a_x_valueChanged(int value);
-  void on_spinBox_b_x_valueChanged(int value);
-  void on_spinBox_c_x_valueChanged(int value);
-  void on_spinBox_d_x_valueChanged(int value);
-  void on_spinBox_a_y_valueChanged(int value);
-  void on_spinBox_b_y_valueChanged(int value);
-  void on_spinBox_c_y_valueChanged(int value);
-  void on_spinBox_d_y_valueChanged(int value);
-  void on_spinBox_a_z_valueChanged(int value);
-  void on_spinBox_b_z_valueChanged(int value);
-  void on_spinBox_c_z_valueChanged(int value);
-  void on_spinBox_d_z_valueChanged(int value);
-  */
-
   // Render menu
   void on_envelopeCheckBox_toggled(bool checked);
   void on_toolCheckBox_toggled(bool checked);

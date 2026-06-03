@@ -68,14 +68,6 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<QVector<OrientationControlPoint*>> envelopeOrientationCPs;
     QVector<OrientationCPsRenderer*> orientationCPsRenderers;
 
-    // Mouse input for control points
-    int selectedControlPoint = -1;
-    int selectedEnvelope = -1;
-    bool controlPointPressed = false;
-
-    // Mouse input for envelopes
-    bool envelopPressed = false;
-
     // Transformation matrices for the model
     float scalingFactor = 1.0f;
     QMatrix4x4 modelScaling;
@@ -89,9 +81,15 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
 
+    // Mouse input for rotating and panning
     bool isSingleDragging = false;
     bool isDoubleDragging = false;
     QVector2D lastMousePos;
+
+    // Mouse input for control points
+    int selectedControlPoint = -1;
+    int selectedEnvelope = -1;
+    bool controlPointPressed = false;
 
     int viewportWidth = 1;
     int viewportHeight = 1;
