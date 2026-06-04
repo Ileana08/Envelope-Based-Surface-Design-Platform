@@ -14,6 +14,7 @@
 class CylinderMovement
 {
     BezierPath path;
+    BezierPath orientationPath;
 
     QVector3D toolAxis; // Internal axis of tool model. Used for rotating tool into proper place
 
@@ -32,8 +33,10 @@ public:
 
     inline QVector3D getAxisT0() const { return axisT0; }
     inline QVector3D getAxisT1() const { return axisT1; }
+    inline void setOrientationPath(BezierPath orientationPath) { this->orientationPath = orientationPath; }
 
     QVector3D getAxisAt(float time);
+    QVector3D getAxisAtCp(int idx);
     QVector3D getAxisDtAt(float time);
     QVector3D getAxisDt2At(float time);
     QVector3D getAxisDt3At(float time);

@@ -15,7 +15,6 @@
 #include "tools/bezierTool.h"
 #include "movement/cylindermovement.h"
 #include "movement/simplepath.h"
-#include "movement/orientationcontrolpoint.h"
 #include "envelope.h"
 #include "settings.h"
 #include "renderers/controlpointsrenderer.h"
@@ -65,7 +64,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     QVector<QVector<ControlPoint*>> envelopeControlPoints;
 
     // Orientation control points rendering
-    QVector<QVector<OrientationControlPoint*>> envelopeOrientationCPs;
+    QVector<QVector<ControlPoint*>> envelopeOrientationCPs;
     QVector<OrientationCPsRenderer*> orientationCPsRenderers;
 
     // Transformation matrices for the model
@@ -88,8 +87,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Mouse input for control points
     int selectedControlPoint = -1;
+    int selectedOrientationControlPoint = -1;
     int selectedEnvelope = -1;
     bool controlPointPressed = false;
+    bool orientationControlPointPressed = false;
 
     int viewportWidth = 1;
     int viewportHeight = 1;
