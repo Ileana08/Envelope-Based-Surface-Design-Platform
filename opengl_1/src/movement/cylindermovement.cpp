@@ -70,6 +70,19 @@ QVector3D CylinderMovement::getAxisAt(float time)
 }
 
 /**
+ * @brief CylinderMovement::getAxisAtCp returns the axis direction at a control point
+ * @param idx given control point index
+ * @return axis direction
+ */
+QVector3D CylinderMovement::getAxisAtCp(int idx)
+{
+    ControlPoint* cp = path.getControlPoints()[idx];
+    ControlPoint* ocp = orientationPath.getControlPoints()[idx];
+    QVector3D direction =  (cp->getPosition() - ocp->getPosition()).normalized();
+    return direction;
+}
+
+/**
  * @brief CylinderMovement::getAxisAt returns the derivative of the axis direction at time time
  * @param time time of interest
  * @return axis direction

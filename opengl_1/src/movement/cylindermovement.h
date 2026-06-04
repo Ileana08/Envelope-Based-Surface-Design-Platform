@@ -36,6 +36,7 @@ public:
     inline void setOrientationPath(BezierPath orientationPath) { this->orientationPath = orientationPath; }
 
     QVector3D getAxisAt(float time);
+    QVector3D getAxisAtCp(int idx);
     QVector3D getAxisDtAt(float time);
     QVector3D getAxisDt2At(float time);
     QVector3D getAxisDt3At(float time);
