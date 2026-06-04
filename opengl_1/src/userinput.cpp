@@ -95,6 +95,23 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       controlPoint->setPosition(newWorldPos);
       controlPointsRenderers[selectedEnvelope]->updateBuffers();
     }
+  } else if(orientationControlPointPressed == true) {
+    // movement of the orientation control point accordingly to the mouse
+    QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
+    ControlPoint* orientationControlPoint = orientationcps[selectedOrientationControlPoint];
+    QVector3D position = orientationControlPoint->getPosition();
+
+    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
+    if (clipCoordinates.w() != 0.0f) {
+      float ndcZ = clipCoordinates.z() / clipCoordinates.w();
+      QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
+      QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
+      QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
+      orientationControlPoint->setPosition(newWorldPos);
+      orientationcps[1]->setPosition(1/3.0f * (2 * orientationcps[0]->getPosition() + orientationcps[3]->getPosition()));
+      orientationcps[2]->setPosition(1/3.0f * (orientationcps[1]->getPosition() + 2 * orientationcps[3]->getPosition()));
+      orientationCPsRenderers[selectedEnvelope]->updateBuffers();
+    }
   } else if (isSingleDragging)
   {
     QVector2D delta = currentMousePos - lastMousePos;
@@ -147,6 +164,27 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
     }
   }
 
+  if(settings.showOrientationControlPoints==true && ev->button() == Qt::LeftButton){
+    for(int e = 0; e<envelopes.size(); e++) {
+      const QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[e];
+      for(int i=0; i<orientationcps.size(); i++){
+        if(i != 0 && i!=orientationcps.size()-1) continue;
+        QVector3D pos = orientationcps[i]->getPosition();
+        QVector2D orientationcpScreenPos = toNormalizedScreenCoordinates(pos);
+        if((currentMousePos - orientationcpScreenPos).length() <= 10.0f){
+          selectedOrientationControlPoint = i;
+          selectedEnvelope = e;
+          orientationControlPointPressed = true;
+          lastMousePos = currentMousePos;
+          break;
+        }
+      }
+      if (orientationControlPointPressed) {
+        break;
+      }
+    }
+  }
+
   if (ev->button() == Qt::LeftButton)
   {
     isSingleDragging = true;
@@ -167,7 +205,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
 
   QVector2D currentMousePos(ev->position());
 
-  if (controlPointPressed == true) {
+  if (controlPointPressed == true || orientationControlPointPressed == true) {
     // update everything based on the new position of the control 
     envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
     //envelopes[selectedEnvelope]->update();
@@ -190,8 +228,10 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
     update();
     // the mouse selection of the control point is released
     selectedControlPoint = -1;
+    selectedOrientationControlPoint = -1;
     selectedEnvelope = -1;
     controlPointPressed = false;
+    orientationControlPointPressed = false;
   } else if (isSingleDragging && ev->button() == Qt::LeftButton)
   {
     isSingleDragging = false;

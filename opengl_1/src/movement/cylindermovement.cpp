@@ -60,9 +60,13 @@ bool CylinderMovement::setAxisDirections(QVector3D axisDirection1, QVector3D axi
  */
 QVector3D CylinderMovement::getAxisAt(float time)
 {
-    QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    axis.normalize();
-    return axis;
+    QVector3D c = path.getPathAt(time);
+    QVector3D d = orientationPath.getPathAt(time);
+    QVector3D axis = d - c;
+    return axis.normalized();
+    // QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
+    // axis.normalize();
+    // return axis;
 }
 
 /**

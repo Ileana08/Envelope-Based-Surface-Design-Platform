@@ -73,8 +73,8 @@ MainView::~MainView()
     envelopeControlPoints.clear();
     envelopeControlPoints.squeeze();
 
-    for (const QVector<OrientationControlPoint*> &cps : envelopeOrientationCPs){
-        for (OrientationControlPoint *cp : cps) {
+    for (const QVector<ControlPoint*> &cps : envelopeOrientationCPs){
+        for (ControlPoint *cp : cps) {
             delete cp;
         }
     }
@@ -116,13 +116,14 @@ Envelope* MainView::addNewEnvelope() {
     envelopeControlPoints[idx] = controlPoints;
     BezierPath path(controlPoints);
 
-    QVector<OrientationControlPoint*> orientationCPs = {
-        new OrientationControlPoint(QVector3D(0,2,0), 0.05, 20, envelopeControlPoints[idx][0]),
-        new OrientationControlPoint(QVector3D(1.0/3,2,0), 0.05, 20, envelopeControlPoints[idx][1]),
-        new OrientationControlPoint(QVector3D(2.0/3,2,0), 0.05, 20, envelopeControlPoints[idx][2]),
-        new OrientationControlPoint(QVector3D(1.0,2,0), 0.05, 20, envelopeControlPoints[idx][3])
+    QVector<ControlPoint*> orientationCPs = {
+        new ControlPoint(QVector3D(0,2,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0/3,2,0), 0.05, 20),
+        new ControlPoint(QVector3D(2.0/3,2,0), 0.05, 20),
+        new ControlPoint(QVector3D(1.0,2,0), 0.05, 20)
     };
     envelopeOrientationCPs[idx] = orientationCPs;
+    BezierPath orientationPath(orientationCPs);
 
     Tool *tool;
     switch (defaultTool)
@@ -135,6 +136,7 @@ Envelope* MainView::addNewEnvelope() {
 
     qDebug() << "addNewEnvelope setup envelope";
     Envelope *env = new Envelope(idx, tool, path);
+    env->getToolMovement().setOrientationPath(orientationPath);
     env->initEnvelope();
     envelopes[idx] = env;
 
@@ -166,6 +168,7 @@ Envelope* MainView::addNewEnvelope() {
     qDebug() << "addNewEnvelope setup orientation control point renderer";
 
     orientationCPsRenderers[idx]->setOrientationControlPoints(envelopeOrientationCPs[idx]);
+    orientationCPsRenderers[idx]->setControlPoints(envelopeControlPoints[idx]);
     orientationCPsRenderers[idx]->setModelTransf(modelTransf);
     orientationCPsRenderers[idx]->setProjTransf(projTransf);
 
@@ -276,7 +279,7 @@ void MainView::initializeGL()
         OrientationCPsRenderer *orientationCPsRend = new OrientationCPsRenderer();
         orientationCPsRend->init(gl, &settings);
         orientationCPsRenderers.append(orientationCPsRend);
-        envelopeOrientationCPs.append(QVector<OrientationControlPoint*>());
+        envelopeOrientationCPs.append(QVector<ControlPoint*>());
     }
 
     // Trigger buffer update
