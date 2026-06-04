@@ -83,12 +83,12 @@ private slots:
   void on_aSlider_sliderMoved(int value);
 
   void on_ResetRotationButton_clicked();
-  void on_RotationDialX_sliderMoved(int value);
-  void on_RotationDialY_sliderMoved(int value);
-  void on_RotationDialZ_sliderMoved(int value);
+  // void on_RotationDialX_sliderMoved(int value);
+  // void on_RotationDialY_sliderMoved(int value);
+  // void on_RotationDialZ_sliderMoved(int value);
 
   void on_ResetScaleButton_clicked();
-  void on_ScaleSlider_sliderMoved(int value);
+  // void on_ScaleSlider_sliderMoved(int value);
 };
 
 #endif  // MAINWINDOW_H

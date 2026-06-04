@@ -870,17 +870,16 @@ void MainWindow::on_aSlider_sliderMoved(int value)
 void MainWindow::on_ResetRotationButton_clicked()
 {
   qDebug() << ":: on_ResetRotationButton_clicked";
-  ui->RotationDialX->setValue(0);
-  ui->RotationDialY->setValue(0);
-  ui->RotationDialZ->setValue(0);
   ui->mainView->setRotation(0, 0, 0);
+  ui->mainView->update();
 }
 
+/*
 /**
  * @brief MainWindow::on_RotationDialX_sliderMoved Updates the number of degrees
  * of rotation in the x direction.
  * @param value Unused.
- */
+
 void MainWindow::on_RotationDialX_sliderMoved(int value)
 {
   qDebug() << ":: on_RotationDialX_sliderMoved";
@@ -892,7 +891,7 @@ void MainWindow::on_RotationDialX_sliderMoved(int value)
  * @brief MainWindow::on_RotationDialY_sliderMoved Updates the number of degrees
  * of rotation in the y direction.
  * @param value Unused.
- */
+
 void MainWindow::on_RotationDialY_sliderMoved(int value)
 {
   qDebug() << ":: on_RotationDialY_sliderMoved";
@@ -904,7 +903,7 @@ void MainWindow::on_RotationDialY_sliderMoved(int value)
  * @brief MainWindow::on_RotationDialZ_sliderMoved Updates the number of degrees
  * of rotation in the z direction.
  * @param value Unused.
- */
+
 void MainWindow::on_RotationDialZ_sliderMoved(int value)
 {
   qDebug() << ":: on_RotationDialZ_sliderMoved";
@@ -912,6 +911,7 @@ void MainWindow::on_RotationDialZ_sliderMoved(int value)
                             ui->RotationDialY->value(), value);
   ui->mainView->update();
 }
+*/
 
 /**
  * @brief MainWindow::on_ResetScaleButton_clicked Resets the scale factor.
@@ -919,21 +919,21 @@ void MainWindow::on_RotationDialZ_sliderMoved(int value)
 void MainWindow::on_ResetScaleButton_clicked()
 {
   qDebug() << ":: on_ResetScaleButton_clicked";
-  ui->ScaleSlider->setValue(100);
   ui->mainView->setScale(1);
   ui->mainView->update();
 }
-
+/*
 /**
  * @brief MainWindow::on_ScaleSlider_sliderMoved Updates the scale value.
  * @param value The new scale value.
- */
+
 void MainWindow::on_ScaleSlider_sliderMoved(int value)
 {
   qDebug() << ":: on_ScaleSlider_sliderMoved";
   ui->mainView->setScale(value / 100.0f);
   ui->mainView->update();
 }
+*/
 
 /**
  * @brief MainWindow::renderToFile Used to render the frame buffer to the file.

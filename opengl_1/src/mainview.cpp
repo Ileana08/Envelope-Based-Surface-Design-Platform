@@ -326,6 +326,34 @@ void MainView::paintGL()
     // Clear the screen before rendering
     gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    if (updateAllUniforms) {
+        // Reset the scale matrix
+        modelScaling.setToIdentity();
+        // Make the new scale matrix
+        modelScaling.scale(scalingFactor);
+
+        modelTransf = modelTranslation * modelScaling * modelRotation;
+        normalTransf = modelTransf.normalMatrix();
+
+        for (int i = 0; i < indicesUsed.size(); i++) {
+            if (!indicesUsed[i]) continue;
+            if (!envelopes[i]->isActive()) continue;
+            toolRenderers[i]->setModelTransf(modelTransf);
+            toolRenderers[i]->setNormalTransf(normalTransf);
+            envelopeRenderers[i]->setModelTransf(modelTransf);
+            envelopeRenderers[i]->setNormalTransf(normalTransf);
+            moveRenderers[i]->setModelTransf(modelTransf);
+            moveRenderers[i]->setNormalTransf(normalTransf);
+            controlPointsRenderers[i]->setModelTransf(modelTransf);
+            controlPointsRenderers[i]->setNormalTransf(normalTransf);
+            orientationCPsRenderers[i]->setModelTransf(modelTransf);
+            orientationCPsRenderers[i]->setNormalTransf(normalTransf);
+        }
+        updateToolTransf();
+        updateUniforms();
+        updateAllUniforms = false;
+    }
+
 
     QList topoSort = getTopoSortEnvelopes();
 
@@ -371,37 +399,7 @@ void MainView::paintGL()
     }
     envelopeMeshUpdates.clear();
     toolMeshUpdates.clear();
-    toolMeshUpdates.clear();
-
-    if (updateAllUniforms) {
-        updateUniforms();
-
-        // Reset the scale matrix
-        modelScaling.setToIdentity();
-        // Make the new scale matrix
-        modelScaling.scale(scalingFactor);
-
-        modelTransf = modelTranslation * modelScaling * modelRotation;
-        normalTransf = modelTransf.normalMatrix();
-
-        for (int i = 0; i < indicesUsed.size(); i++) {
-            if (!indicesUsed[i]) continue;
-            if (!envelopes[i]->isActive()) continue;
-            toolRenderers[i]->setModelTransf(modelTransf);
-            toolRenderers[i]->setNormalTransf(normalTransf);
-            envelopeRenderers[i]->setModelTransf(modelTransf);
-            envelopeRenderers[i]->setNormalTransf(normalTransf);
-            moveRenderers[i]->setModelTransf(modelTransf);
-            moveRenderers[i]->setNormalTransf(normalTransf);
-            controlPointsRenderers[i]->setModelTransf(modelTransf);
-            controlPointsRenderers[i]->setNormalTransf(normalTransf);
-            orientationCPsRenderers[i]->setModelTransf(modelTransf);
-            orientationCPsRenderers[i]->setNormalTransf(normalTransf);
-        }
-        updateToolTransf();
-
-        updateAllUniforms = false;
-    }
+    toolTransfUpdates.clear();
 
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;

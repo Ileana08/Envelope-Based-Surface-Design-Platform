@@ -14,7 +14,6 @@ in vec3 vertColor;
 in vec3 vertNormal;
 
 // Specify the Uniforms of the fragment shaders
-uniform vec3 matColor; //not used as of now
 uniform vec3 lightPos;
 uniform vec3 lightCol;
 
@@ -29,7 +28,7 @@ void main() {
   vec3 diffuse = vertColor * lightCol * kd * max(0.0f, dot(L, vertNormal));
   vec3 specular = max(0, pow(dot(V, R), p)) * lightCol * ks;
   vec3 color = ambient + diffuse + specular;
-  //fColor = vec4(vec3(max(0.0f, dot(L, vertNormal))), 1.0f);
+
   fColor = vec4(color, 1.0f);
-  //fColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+
 }
