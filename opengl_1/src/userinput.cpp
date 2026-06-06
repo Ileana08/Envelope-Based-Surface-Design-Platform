@@ -96,7 +96,8 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
       QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
       controlPoint->setPosition(newWorldPos);
-      orientationControlPoint->setPosition(controlPoint->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(selectedControlPoint) * 2);
+      float height = envelopes[selectedEnvelope]->getTool()->getHeight();
+      orientationControlPoint->setPosition(controlPoint->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(selectedControlPoint) * height);
       controlPointsRenderers[selectedEnvelope]->updateBuffers();
       orientationCPsRenderers[selectedEnvelope]->updateBuffers();
     }
@@ -213,11 +214,13 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   if (controlPointPressed == true || orientationControlPointPressed == true) {
     // update everything based on the new position of the control 
     if(orientationControlPointPressed) {
+      // the distance between a control point and its orientation point must be the height of the tool
       QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
       ControlPoint* controlPoint = cps[selectedOrientationControlPoint];
       QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
       ControlPoint* orientationControlPoint = orientationcps[selectedOrientationControlPoint];
-      orientationControlPoint->setPosition(controlPoint->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(selectedOrientationControlPoint) * 2);
+      float height = envelopes[selectedEnvelope]->getTool()->getHeight();
+      orientationControlPoint->setPosition(controlPoint->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(selectedOrientationControlPoint) * height);
       orientationCPsRenderers[selectedEnvelope]->updateBuffers();
     }
     envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
