@@ -26,10 +26,12 @@ class CubicBezier2D
     inline void setP1(QVector2D p) {p1.setX(p.x()); p1.setY(p.y());};
     inline void setP2(QVector2D p) {p2.setX(p.x()); p2.setY(p.y());};
     inline void setP3(QVector2D p) {p3.setX(p.x()); p3.setY(p.y());};
+    void setPoint(int i, QVector2D p);
     inline QVector2D getP0() {return p0;};
     inline QVector2D getP1() {return p1;};
     inline QVector2D getP2() {return p2;};
     inline QVector2D getP3() {return p3;};
+    QVector2D getPoint(int i);
 };
 
 

@@ -21,6 +21,7 @@ public:
   inline float getInnerRadius() { return innerRadius; }
   inline CubicBezier2D getBezier() { return bezier; }
   void setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p3);
+  inline void setBezier(CubicBezier2D newBezier) {bezier = newBezier;};
 
   float getRadiusAt(float a) override;
   float getRadiusDaAt(float a) override;

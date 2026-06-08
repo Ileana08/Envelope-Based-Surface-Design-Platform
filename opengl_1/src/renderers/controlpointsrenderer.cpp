@@ -63,13 +63,15 @@ void ControlPointsRenderer::updateBuffers()
     gl->glBufferData(GL_ARRAY_BUFFER, allVertices.size() * sizeof(Vertex), allVertices.data(), GL_STATIC_DRAW);
 
     controlLines.clear();
+    float cpSize = controlPoints[0]->getRadius();
     int n = controlPoints.size();
     for (int i = 0; i < n - 1; ++i) {
         QVector3D start = controlPoints[i]->getPosition();
         QVector3D end = controlPoints[i+1]->getPosition();
+        QVector3D dir = (end - start).normalized();
         QVector3D col = QVector3D(0.0f, 1.0f, 0.0f);
-        controlLines.append(Vertex(start, col, col));
-        controlLines.append(Vertex(end, col, col));
+        controlLines.append(Vertex(start + dir*cpSize, col, col));
+        controlLines.append(Vertex(end - dir*cpSize, col, col));
     }
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, vboControlLines);
@@ -97,7 +99,9 @@ void ControlPointsRenderer::paintGL()
         gl->glBindVertexArray(vaoControlPoints);
         int vertexCount = 0;
         for (ControlPoint* cp : controlPoints)
+        {
             vertexCount += cp->getVertexArr().size();
+        }
         gl->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         gl->glBindVertexArray(vaoControlLines);
         gl->glDrawArrays(GL_LINES, 0, controlLines.size());

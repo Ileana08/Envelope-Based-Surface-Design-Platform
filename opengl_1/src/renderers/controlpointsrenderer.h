@@ -1,6 +1,7 @@
 #ifndef CONTROLPOINTSRENDERER_H
 #define CONTROLPOINTSRENDERER_H
 
+#include "CubicBezier2D.h"
 #include "renderer.h"
 #include "../movement/controlpoint.h"
 

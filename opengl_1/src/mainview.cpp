@@ -4,7 +4,6 @@
 
 #include <QDateTime>
 #include <QOpenGLVersionFunctionsFactory>
-
 /**
  * @brief MainView::MainView Constructs a new main view.
  *
