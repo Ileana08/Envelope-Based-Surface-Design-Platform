@@ -371,12 +371,11 @@ QVector3D Envelope::calcSurfaceNormalAt(float t, float a)
 QVector3D Envelope::calcNormalAt(float t, float a)
 {
 
-    /* Old implementation */
-    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
+    QVector3D axisAt = getAxisAt(t);
+    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * axisAt;
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
-    QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
-
-
+    //sa switches direction sometimes, so we use axisAt to calculate the surface normal
+    QVector3D sNormal = QVector3D::crossProduct(axisAt, st).normalized();
 
     float ra = tool->getSphereRadiusDaAt(a);
 
