@@ -9,6 +9,7 @@
 #include <QOpenGLVersionFunctionsFactory>
 
 #include "mainwindow.h"
+#include "renderers/beziertoolrenderer.h"
 
 BezierToolView::BezierToolView(QWidget* parent) : QOpenGLWidget(parent)
 {
@@ -29,7 +30,7 @@ void BezierToolView::initializeGL()
 
   glClearColor(0.37f, 0.42f, 0.45f, 1.0f);
 
-  ControlPointsRenderer* rend = new ControlPointsRenderer();
+  BezierToolRenderer* rend = new BezierToolRenderer();
   renderer = rend;
   QMatrix4x4 proj;
   QMatrix4x4 model;
@@ -54,6 +55,7 @@ void BezierToolView::paintGL()
 {
   gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  renderer->updateUniforms();
   renderer->updateBuffers();
   renderer->paintGL();
 }
@@ -87,27 +89,25 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
   {
     case 0:
       newPos.setX(bezier.getP0().x());
-      newPos.setY(std::clamp(static_cast<float>(glPos.y()), 0.0f, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 1:
-      newPos.setX(std::clamp(static_cast<float>(glPos.x()), bezier.getP0().x() + cpDelta, bezier.getP2().x() - cpDelta));
-      newPos.setY(std::clamp(static_cast<float>(glPos.y()), 0.0f, 1.0f));
+      newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP2().x() - cpDelta));
+      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 2:
-      newPos.setX(std::clamp(static_cast<float>(glPos.x()), bezier.getP1().x() + cpDelta, bezier.getP3().x() - cpDelta));
-      newPos.setY(std::clamp(static_cast<float>(glPos.y()), 0.0f, 1.0f));
+      newPos.setX(std::clamp(glPos.x(), bezier.getP1().x() + cpDelta, bezier.getP3().x() - cpDelta));
+      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 3:
       newPos.setX(bezier.getP3().x());
-      newPos.setY(std::clamp(static_cast<float>(glPos.y()), 0.0f, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
   default:
     return;
   }
   bezier.setPoint(draggedPoint, newPos);
   updateControlPoints();
-  renderer->updateUniforms();
-  renderer->updateBuffers();
   update();
 }
 
@@ -134,6 +134,7 @@ void BezierToolView::updateControlPoints()
   }
 
   renderer->setControlPoints(controlPoints);
+  renderer->setBezier(bezier);
 }
 
 

@@ -12,11 +12,13 @@ layout(location = 2) in vec3 vertColor_in;
 uniform mat4 modelTransform;
 uniform mat3 normalTransform;
 uniform mat4 projTransform;
+uniform vec3 lightPos;
 
 // Specify the output of the vertex stage
 out vec3 vertPos;
 out vec3 vertNormal;
 out vec3 vertColor;
+out vec3 lightMov;
 
 void main() {
   // gl_Position is the output (a vec4) of the vertex shader
@@ -24,6 +26,7 @@ void main() {
   // gl_Position = vec4(vertCoordinates_in, 1.0F);
   gl_Position = projTransform * modelTransform * vec4(vertCoordinates_in, 1.0f);
 
+  lightMov = vec3(modelTransform * vec4(lightPos, 1.0f));
   vertPos = vec3(modelTransform * vec4(vertCoordinates_in, 1.0f));;
   vertNormal = normalize(normalTransform * vertNormal_in);
   vertColor = vertColor_in;

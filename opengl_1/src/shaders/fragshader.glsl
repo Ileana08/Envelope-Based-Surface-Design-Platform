@@ -12,6 +12,7 @@ const float p = 8.0f;
 in vec3 vertPos;
 in vec3 vertColor;
 in vec3 vertNormal;
+in vec3 lightMov;
 
 // Specify the Uniforms of the fragment shaders
 uniform vec3 lightPos;
@@ -22,6 +23,7 @@ out vec4 fColor;
 
 void main() {
   vec3 L = normalize(lightPos - vertPos);
+  //vec3 L = normalize(lightMov - vertPos);
   vec3 V = -normalize(vertPos);
   vec3 R = normalize(2.0f*max(0.0f, dot(L, vertNormal)) * vertNormal - L);
   vec3 ambient = vertColor * ka;

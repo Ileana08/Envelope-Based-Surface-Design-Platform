@@ -58,6 +58,8 @@ qt_add_executable(OpenGL_1 WIN32 MACOSX_BUNDLE
     renderers/orientationcpsrenderer.cpp
         beziertoolview.cpp
         beziertoolview.h
+        renderers/beziertoolrenderer.cpp
+        renderers/beziertoolrenderer.h
 
 )
 

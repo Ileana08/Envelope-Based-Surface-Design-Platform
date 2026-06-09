@@ -12,6 +12,7 @@
 #include <qtmetamacros.h>
 
 #include "CubicBezier2D.h"
+#include "renderers/beziertoolrenderer.h"
 #include "renderers/controlpointsrenderer.h"
 
 
@@ -26,7 +27,7 @@ class BezierToolView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
   float cpDelta = 0.05;
   float cpRadius = 0.05f;
 
-  ControlPointsRenderer* renderer;
+  BezierToolRenderer* renderer;
 
   float left = 0.0f;
   float right = 1.0f;
