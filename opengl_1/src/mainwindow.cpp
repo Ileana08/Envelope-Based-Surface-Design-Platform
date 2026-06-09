@@ -12,11 +12,6 @@ MainWindow::MainWindow(QWidget* parent)
 {
   ui->setupUi(this);
 
-  ui->orientVector_1->setValidator(new QRegularExpressionValidator(
-    QRegularExpression("\\(\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+)\\)")));
-  ui->orientVector_2->setValidator(new QRegularExpressionValidator(
-    QRegularExpression("\\(\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+)\\)")));
-
   ui->envelopeSelectBox->setItemData(0, QVariant(-1));
   ui->constraintA0SelectBox->setItemData(0, QVariant(-1));
   ui->constraintA1SelectBox->setItemData(0, QVariant(-1));
@@ -115,10 +110,6 @@ void MainWindow::updateUI(int prevIdx)
   QSignalBlocker b2(ui->constraintA0SelectBox);
   QSignalBlocker b3(ui->constraintA1SelectBox);
   QSignalBlocker b4(ui->tanContCheckBox);
-  QSignalBlocker b5(ui->orientVector_1);
-  QSignalBlocker b6(ui->orientVector_2);
-  QSignalBlocker b7(ui->angleOrient_1_SpinBox);
-  QSignalBlocker b8(ui->angleOrient_2_SpinBox);
   QSignalBlocker b9(ui->radiusSpinBox);
   QSignalBlocker b10(ui->drumRadiusSpinBox);
   QSignalBlocker b11(ui->angleSpinBox);
@@ -166,20 +157,12 @@ void MainWindow::updateUI(int prevIdx)
     bool tanCont = env->getTanContinuity();
     ui->tanContCheckBox->setChecked(tanCont);
     ui->tanContCheckBox->setEnabled(env->isPositContinuous());
-    ui->orientVector_1->setEnabled(!tanCont);
-    ui->orientVector_2->setEnabled(!tanCont);
-    ui->angleOrient_1_SpinBox->setEnabled(tanCont);
-    ui->angleOrient_2_SpinBox->setEnabled(tanCont);
 
     int a1Idx = env->isAxisConstrained() ? env->getAdjA1Envelope()->getIndex() + 1 : 0;
     ui->constraintA1SelectBox->setCurrentIndex(a1Idx);
     ui->constraintA1SelectBox->setEnabled(env->isPositContinuous());
 
     // Tool settings
-    ui->orientVector_1->setText(QVectorToString(env->getToolMovement().getAxisT0()));
-    ui->orientVector_2->setText(QVectorToString(env->getToolMovement().getAxisT1()));
-    ui->angleOrient_1_SpinBox->setValue(env->getAdjAxisAngle1());
-    ui->angleOrient_2_SpinBox->setValue(env->getAdjAxisAngle2());
 
     Cylinder* cyl = ui->mainView->cylinders[idx];
     Drum* drum = ui->mainView->drums[idx];
@@ -327,10 +310,6 @@ void MainWindow::on_constraintA1SelectBox_currentIndexChanged(int index)
     ui->mainView->update();
   }
   ui->tanContCheckBox->setEnabled(adjEnv == nullptr);
-  ui->orientVector_1->setEnabled(adjEnv == nullptr && !envelope->getTanContinuity());
-  ui->orientVector_2->setEnabled(adjEnv == nullptr && !envelope->getTanContinuity());
-  ui->angleOrient_1_SpinBox->setEnabled(adjEnv == nullptr && envelope->getTanContinuity());
-  ui->angleOrient_2_SpinBox->setEnabled(adjEnv == nullptr && envelope->getTanContinuity());
 }
 
 /**
@@ -380,104 +359,6 @@ void MainWindow::on_newEnvelopeButton_clicked()
 /***********************************************************/
 /************************ Tool Menu ************************/
 /***********************************************************/
-
-/**
- * @brief MainWindow::on_orientVector_1_returnPressed Updates the orientation vector of the tool.
- */
-void MainWindow::on_orientVector_1_returnPressed()
-{
-  qDebug() << ":: on_orientVector_1_returnPressed";
-  int idx = ui->mainView->settings.selectedIdx;
-  qDebug() << "orientation vector changed";
-  QVector3D vector1 = ui->mainView->settings.stringToVector3D(ui->orientVector_1->text());
-  QVector3D vector2 = ui->mainView->settings.stringToVector3D(ui->orientVector_2->text());
-
-  qDebug() << "to" << vector1 << "and" << vector2;
-
-  Envelope* env = ui->mainView->envelopes[idx];
-  bool success = env->setAxes(vector1, vector2);
-  if (!success)
-  {
-    error.showMessage("The inputed vector is not a valid orientation 1 vector");
-  }
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_orientVector_2_returnPressed Updates the orientation vector of the tool.
- */
-void MainWindow::on_orientVector_2_returnPressed()
-{
-  qDebug() << ":: on_orientVector_2_returnPressed";
-  int idx = ui->mainView->settings.selectedIdx;
-  qDebug() << "orientation vector changed";
-  QVector3D vector1 = ui->mainView->settings.stringToVector3D(ui->orientVector_1->text());
-  QVector3D vector2 = ui->mainView->settings.stringToVector3D(ui->orientVector_2->text());
-
-  qDebug() << "to" << vector1 << "and" << vector2;
-
-  Envelope* env = ui->mainView->envelopes[idx];
-  bool success = env->setAxes(vector1, vector2);
-  if (!success)
-  {
-    error.showMessage("The inputed vector is not a valid orientation 2 vector");
-  }
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_angleOrient_1_SpinBox_valueChanged Updates the angle of the axis initial orientation of the
- * second tool with respect to the one of the first tool.
- * @param value new angle.
- */
-void MainWindow::on_angleOrient_1_SpinBox_valueChanged(double value)
-{
-  qDebug() << ":: on_angleOrient_1_SpinBox_valueChanged";
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  Envelope* env = ui->mainView->envelopes[idx];
-  env->setAdjacentAxisAngles(value, ui->angleOrient_2_SpinBox->value());
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_angleOrient_2_SpinBox_valueChanged Updates the angle of the axis final orientation of the
- * second tool with respect to the one of the first tool.
- * @param value new angle.
- */
-void MainWindow::on_angleOrient_2_SpinBox_valueChanged(double value)
-{
-  qDebug() << ":: on_angleOrient_2_SpinBox_valueChanged";
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  Envelope* env = ui->mainView->envelopes[idx];
-  env->setAdjacentAxisAngles(ui->angleOrient_1_SpinBox->value(), value);
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
 
 
 /**

@@ -49,11 +49,6 @@ private slots:
   void on_newEnvelopeButton_clicked();
 
   // Tool menu
-  void on_orientVector_1_returnPressed();
-  void on_orientVector_2_returnPressed();
-  void on_angleOrient_1_SpinBox_valueChanged(double value);
-  void on_angleOrient_2_SpinBox_valueChanged(double value);
-
   void on_radiusSpinBox_valueChanged(double value);
   void on_drumRadiusSpinBox_valueChanged(double value);
   void on_angleSpinBox_valueChanged(double value);
