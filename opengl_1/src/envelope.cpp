@@ -214,7 +214,9 @@ void Envelope::computeEnvelope()
                     else
                         col[i] = QVector3D(1,1,1);
                 } else {
-                    col[i] = norm[i];
+                    col[i].setX(abs(norm[i].x()));
+                    col[i].setY(abs(norm[i].y()));
+                    col[i].setZ(abs(norm[i].z()));
                 }
             }
 

@@ -98,14 +98,15 @@ void ToolRenderer::updateBuffers()
 
 /**
  * @brief ToolRenderer::updateUniforms Updates the uniforms for the tool renderer.
- * @param toolTransf Tool transformation matrix.
- * @param projTransf Projection transformation matrix.
  */
 void ToolRenderer::updateUniforms()
 {
+    QMatrix4x4 fullModelTransform = modelTransform * toolTransform;
+    QMatrix3x3 fullNormalTransform = fullModelTransform.normalMatrix();
+
     shader.bind();
-    shader.setUniformValue("modelTransform", modelTransform * toolTransform);
-    shader.setUniformValue("normalTransform", normalTransform);
+    shader.setUniformValue("modelTransform", fullModelTransform);
+    shader.setUniformValue("normalTransform", fullNormalTransform);
     shader.setUniformValue("projTransform", projTransform);
 
     shader.setUniformValue("lightPos", settings->lightPos);
