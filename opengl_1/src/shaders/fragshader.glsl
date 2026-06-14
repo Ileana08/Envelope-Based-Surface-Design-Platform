@@ -26,7 +26,7 @@ void main() {
   vec3 R = normalize(2.0f*max(0.0f, dot(L, vertNormal)) * vertNormal - L);
   vec3 ambient = vertColor * ka;
   vec3 diffuse = vertColor * lightCol * kd * max(0.0f, dot(L, vertNormal));
-  vec3 specular = max(0, pow(dot(V, R), p)) * lightCol * ks;
+  vec3 specular = pow(max(0.0f, dot(V, R)), p) * lightCol * ks;
   vec3 color = ambient + diffuse + specular;
 
   fColor = vec4(color, 1.0f);

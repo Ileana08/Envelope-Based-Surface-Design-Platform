@@ -173,16 +173,11 @@ void Envelope::setAdjacentA1Envelope(Envelope *env){
 void Envelope::computeEnvelope()
 {
     vertexArr.clear();
-    float epsilon = 1e-2f;
+    float epsilon = 1e-3f;
 
     QVector3D env[4];
     QVector3D norm[4];
     QVector3D col[4];
-    // SimplePath path = toolMovement->getPath();
-    // float aDelta = (tool->getA1()-tool->getA0())/sectorsA;
-    // float a1 = tool->getA1()-aDelta;
-    // float tDelta = (path.getT1()-path.getT0())/sectorsT;
-    // float t1 = path.getT1()-tDelta;
     for (int tIdx = 0; tIdx < sectorsT; tIdx++)
     {
         float tDelta = 1.0f/sectorsT;
@@ -214,7 +209,9 @@ void Envelope::computeEnvelope()
                     else
                         col[i] = QVector3D(1,1,1);
                 } else {
-                    col[i] = norm[i];
+                    col[i].setX(abs(norm[i].x()));
+                    col[i].setY(abs(norm[i].y()));
+                    col[i].setZ(abs(norm[i].z()));
                 }
             }
 
@@ -305,11 +302,6 @@ void Envelope::computeGrazingCurves()
     QVector3D color = QVector3D(0,1,0);
 
     QVector3D v1, v2;
-    // SimplePath path = toolMovement->getPath();
-    // float aDelta = (tool->getA1()-tool->getA0())/sectorsA;
-    // float a1 = tool->getA1()-aDelta;
-    // float tDelta = (path.getT1()-path.getT0())/sectorsT;
-    // float t1 = path.getT1();
     for (int tIdx = 0; tIdx <= sectorsT; tIdx++)
     {
         for (int aIdx = 0; aIdx < sectorsA; aIdx++)
@@ -369,12 +361,11 @@ QVector3D Envelope::calcSurfaceNormalAt(float t, float a)
 QVector3D Envelope::calcNormalAt(float t, float a)
 {
 
-    /* Old implementation */
-    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
+    QVector3D axisAt = getAxisAt(t);
+    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * axisAt;
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
-    QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
-
-
+    //sa switches direction sometimes, so we use axisAt to calculate the surface normal
+    QVector3D sNormal = QVector3D::crossProduct(axisAt, st).normalized();
 
     float ra = tool->getSphereRadiusDaAt(a);
 

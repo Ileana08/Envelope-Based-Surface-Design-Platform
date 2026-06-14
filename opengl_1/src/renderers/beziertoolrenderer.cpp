@@ -1,12 +1,16 @@
-#include "controlpointsrenderer.h"
+//
+// Created by david on 6/9/26.
+//
 
-ControlPointsRenderer::ControlPointsRenderer() : controlPoints() {}
+#include "beziertoolrenderer.h"
 
-ControlPointsRenderer::ControlPointsRenderer(QVector<ControlPoint*> controlPoints) : 
-    controlPoints(controlPoints) 
+BezierToolRenderer::BezierToolRenderer() : controlPoints() {}
+
+BezierToolRenderer::BezierToolRenderer(QVector<ControlPoint*> controlPoints) :
+    controlPoints(controlPoints)
 {}
 
-ControlPointsRenderer::~ControlPointsRenderer()
+BezierToolRenderer::~BezierToolRenderer()
 {
     gl->glDeleteVertexArrays(1, &vaoControlPoints);
     gl->glDeleteBuffers(1, &vboControlPoints);
@@ -15,15 +19,15 @@ ControlPointsRenderer::~ControlPointsRenderer()
 }
 
 
-void ControlPointsRenderer::initShaders()
+void BezierToolRenderer::initShaders()
 {
-    shader.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
-    shader.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
+    shader.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader2d.glsl");
+    shader.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader2d.glsl");
 
     shader.link();
 }
 
-void ControlPointsRenderer::initBuffers()
+void BezierToolRenderer::initBuffers()
 {
     gl->glGenVertexArrays(1, &vaoControlPoints);
     gl->glBindVertexArray(vaoControlPoints);
@@ -50,9 +54,22 @@ void ControlPointsRenderer::initBuffers()
     gl->glEnableVertexAttribArray(2);
     gl->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, rVal));
     gl->glBindVertexArray(0);
+
+    gl->glGenVertexArrays(1, &vaoBezierCurve);
+    gl->glBindVertexArray(vaoBezierCurve);
+    gl->glGenBuffers(1, &vboBezierCurve);
+    gl->glBindBuffer(GL_ARRAY_BUFFER, vboBezierCurve);
+
+    gl->glEnableVertexAttribArray(0);
+    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, xCoord));
+    gl->glEnableVertexAttribArray(1);
+    gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, xNormal));
+    gl->glEnableVertexAttribArray(2);
+    gl->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, rVal));
+    gl->glBindVertexArray(0);
 }
 
-void ControlPointsRenderer::updateBuffers()
+void BezierToolRenderer::updateBuffers()
 {
     QVector<Vertex> allVertices;
     for (ControlPoint* cp : controlPoints) {
@@ -76,9 +93,23 @@ void ControlPointsRenderer::updateBuffers()
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, vboControlLines);
     gl->glBufferData(GL_ARRAY_BUFFER, controlLines.size() * sizeof(Vertex), controlLines.data(), GL_STATIC_DRAW);
+
+    bezierCurve.clear();
+    for (int i = 0; i < N; i++)
+    {
+        float t = float(i) / float(N);;
+        float t_1 = float(i+1) / float(N);
+        QVector3D pos = QVector3D(bezier.at(t), 0.0f);
+        QVector3D pos_1 = QVector3D(bezier.at(t_1), 0.0f);
+        QVector3D col = QVector3D(0.0f, 1.0f, 1.0f);
+        bezierCurve.append(Vertex(pos, pos, col));
+        bezierCurve.append(Vertex(pos_1, pos_1, col));
+    }
+    gl->glBindBuffer(GL_ARRAY_BUFFER, vboBezierCurve);
+    gl->glBufferData(GL_ARRAY_BUFFER, bezierCurve.size() * sizeof(Vertex), bezierCurve.data(), GL_STATIC_DRAW);
 }
 
-void ControlPointsRenderer::updateUniforms()
+void BezierToolRenderer::updateUniforms()
 {
     shader.bind();
     shader.setUniformValue("modelTransform", modelTransform);
@@ -91,9 +122,9 @@ void ControlPointsRenderer::updateUniforms()
     shader.release();
 }
 
-void ControlPointsRenderer::paintGL()
+void BezierToolRenderer::paintGL()
 {
-    qDebug() << "ControlPointsRenderer::paintGL";
+    qDebug() << "BezierToolRenderer::paintGL";
     shader.bind();
     if(settings->showControlPoints) {
         gl->glBindVertexArray(vaoControlPoints);
@@ -105,6 +136,9 @@ void ControlPointsRenderer::paintGL()
         gl->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         gl->glBindVertexArray(vaoControlLines);
         gl->glDrawArrays(GL_LINES, 0, controlLines.size());
+        gl->glBindVertexArray(vaoBezierCurve);
+        gl->glDrawArrays(GL_LINES, 0, bezierCurve.size());
+        gl->glLineWidth(5.0f);
     }
     gl->glBindVertexArray(0);
     shader.release();

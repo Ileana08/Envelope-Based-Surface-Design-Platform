@@ -36,7 +36,7 @@ class MainWindow : public QMainWindow {
 
   void updateUI();
   void updateUI(int prevIdx);
-  void updateControlPointBoxes(CubicBezier2D bezier);
+  // void updateControlPointBoxes(CubicBezier2D bezier);
 
 private slots:
   // Envelope Menu
@@ -49,18 +49,14 @@ private slots:
   void on_newEnvelopeButton_clicked();
 
   // Tool menu
-  void on_orientVector_1_returnPressed();
-  void on_orientVector_2_returnPressed();
-  void on_angleOrient_1_SpinBox_valueChanged(double value);
-  void on_angleOrient_2_SpinBox_valueChanged(double value);
-
   void on_radiusSpinBox_valueChanged(double value);
   void on_drumRadiusSpinBox_valueChanged(double value);
   void on_angleSpinBox_valueChanged(double value);
   void on_heightSpinBox_valueChanged(double value);
   void on_toolBox_currentIndexChanged(int index);
 
-  void on_controlPointChanged();
+  // void on_controlPointChanged();
+  void on_bezierToolChanged(CubicBezier2D bezier);
 
   // Render menu
   void on_envelopeCheckBox_toggled(bool checked);

@@ -12,11 +12,6 @@ MainWindow::MainWindow(QWidget* parent)
 {
   ui->setupUi(this);
 
-  ui->orientVector_1->setValidator(new QRegularExpressionValidator(
-    QRegularExpression("\\(\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+)\\)")));
-  ui->orientVector_2->setValidator(new QRegularExpressionValidator(
-    QRegularExpression("\\(\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+),\\-?(\\d*\\.?\\d+)\\)")));
-
   ui->envelopeSelectBox->setItemData(0, QVariant(-1));
   ui->constraintA0SelectBox->setItemData(0, QVariant(-1));
   ui->constraintA1SelectBox->setItemData(0, QVariant(-1));
@@ -24,14 +19,17 @@ MainWindow::MainWindow(QWidget* parent)
   ui->aSlider->setMaximum(ui->mainView->settings.aSectors);
   ui->TimeSlider->setMaximum(ui->mainView->settings.tSectors);
 
-  connect(ui->p0x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p0y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p1x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p1y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p2x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p2y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p3x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  connect(ui->p3y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p0x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p0y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p1x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p1y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p2x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p2y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p3x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+  // connect(ui->p3y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
+
+  connect(ui->bezierToolView, &BezierToolView::bezierToolChanged,
+    this, &MainWindow::on_bezierToolChanged);
 
   updateUI();
 }
@@ -112,10 +110,6 @@ void MainWindow::updateUI(int prevIdx)
   QSignalBlocker b2(ui->constraintA0SelectBox);
   QSignalBlocker b3(ui->constraintA1SelectBox);
   QSignalBlocker b4(ui->tanContCheckBox);
-  QSignalBlocker b5(ui->orientVector_1);
-  QSignalBlocker b6(ui->orientVector_2);
-  QSignalBlocker b7(ui->angleOrient_1_SpinBox);
-  QSignalBlocker b8(ui->angleOrient_2_SpinBox);
   QSignalBlocker b9(ui->radiusSpinBox);
   QSignalBlocker b10(ui->drumRadiusSpinBox);
   QSignalBlocker b11(ui->angleSpinBox);
@@ -163,20 +157,12 @@ void MainWindow::updateUI(int prevIdx)
     bool tanCont = env->getTanContinuity();
     ui->tanContCheckBox->setChecked(tanCont);
     ui->tanContCheckBox->setEnabled(env->isPositContinuous());
-    ui->orientVector_1->setEnabled(!tanCont);
-    ui->orientVector_2->setEnabled(!tanCont);
-    ui->angleOrient_1_SpinBox->setEnabled(tanCont);
-    ui->angleOrient_2_SpinBox->setEnabled(tanCont);
 
     int a1Idx = env->isAxisConstrained() ? env->getAdjA1Envelope()->getIndex() + 1 : 0;
     ui->constraintA1SelectBox->setCurrentIndex(a1Idx);
     ui->constraintA1SelectBox->setEnabled(env->isPositContinuous());
 
     // Tool settings
-    ui->orientVector_1->setText(QVectorToString(env->getToolMovement().getAxisT0()));
-    ui->orientVector_2->setText(QVectorToString(env->getToolMovement().getAxisT1()));
-    ui->angleOrient_1_SpinBox->setValue(env->getAdjAxisAngle1());
-    ui->angleOrient_2_SpinBox->setValue(env->getAdjAxisAngle2());
 
     Cylinder* cyl = ui->mainView->cylinders[idx];
     Drum* drum = ui->mainView->drums[idx];
@@ -185,10 +171,33 @@ void MainWindow::updateUI(int prevIdx)
     ui->drumRadiusSpinBox->setValue(drum->getCurvatureRadius());
     ui->angleSpinBox->setValue(cyl->getAngle());
     ui->heightSpinBox->setValue(cyl->getHeight());
-    updateControlPointBoxes(bezierTool->getBezier());
 
     int toolTypeIdx = (int)env->getTool()->getType();
     ui->toolBox->setCurrentIndex(toolTypeIdx);
+
+    switch (toolTypeIdx)
+    {
+    case ToolType::Tool_Cylinder:
+      ui->angleSpinBox->setEnabled(true);
+      ui->drumRadiusSpinBox->setEnabled(false);
+      ui->bezierToolView->setEnabled(false);
+      break;
+    case ToolType::Tool_Drum:
+      ui->angleSpinBox->setEnabled(false);
+      ui->drumRadiusSpinBox->setEnabled(true);
+      ui->bezierToolView->setEnabled(false);
+      break;
+    case ToolType::Tool_Bezier:
+      ui->angleSpinBox->setEnabled(false);
+      ui->drumRadiusSpinBox->setEnabled(false);
+      ui->bezierToolView->setEnabled(true);
+      break;
+    default:
+      ui->angleSpinBox->setEnabled(false);
+      ui->drumRadiusSpinBox->setEnabled(false);
+      ui->bezierToolView->setEnabled(false);
+      break;
+    }
   }
   else
   {
@@ -200,17 +209,17 @@ void MainWindow::updateUI(int prevIdx)
   qDebug() << "done updating ui";
 }
 
-void MainWindow::updateControlPointBoxes(CubicBezier2D bezier)
-{
-  ui->p0x->setValue(bezier.getP0().x());
-  ui->p0y->setValue(bezier.getP0().y());
-  ui->p1x->setValue(bezier.getP1().x());
-  ui->p1y->setValue(bezier.getP1().y());
-  ui->p2x->setValue(bezier.getP2().x());
-  ui->p2y->setValue(bezier.getP2().y());
-  ui->p3x->setValue(bezier.getP3().x());
-  ui->p3y->setValue(bezier.getP3().y());
-}
+// void MainWindow::updateControlPointBoxes(CubicBezier2D bezier)
+// {
+//   ui->p0x->setValue(bezier.getP0().x());
+//   ui->p0y->setValue(bezier.getP0().y());
+//   ui->p1x->setValue(bezier.getP1().x());
+//   ui->p1y->setValue(bezier.getP1().y());
+//   ui->p2x->setValue(bezier.getP2().x());
+//   ui->p2y->setValue(bezier.getP2().y());
+//   ui->p3x->setValue(bezier.getP3().x());
+//   ui->p3y->setValue(bezier.getP3().y());
+// }
 
 /***********************************************************/
 /********************** Envelope Menu **********************/
@@ -301,10 +310,6 @@ void MainWindow::on_constraintA1SelectBox_currentIndexChanged(int index)
     ui->mainView->update();
   }
   ui->tanContCheckBox->setEnabled(adjEnv == nullptr);
-  ui->orientVector_1->setEnabled(adjEnv == nullptr && !envelope->getTanContinuity());
-  ui->orientVector_2->setEnabled(adjEnv == nullptr && !envelope->getTanContinuity());
-  ui->angleOrient_1_SpinBox->setEnabled(adjEnv == nullptr && envelope->getTanContinuity());
-  ui->angleOrient_2_SpinBox->setEnabled(adjEnv == nullptr && envelope->getTanContinuity());
 }
 
 /**
@@ -354,104 +359,6 @@ void MainWindow::on_newEnvelopeButton_clicked()
 /***********************************************************/
 /************************ Tool Menu ************************/
 /***********************************************************/
-
-/**
- * @brief MainWindow::on_orientVector_1_returnPressed Updates the orientation vector of the tool.
- */
-void MainWindow::on_orientVector_1_returnPressed()
-{
-  qDebug() << ":: on_orientVector_1_returnPressed";
-  int idx = ui->mainView->settings.selectedIdx;
-  qDebug() << "orientation vector changed";
-  QVector3D vector1 = ui->mainView->settings.stringToVector3D(ui->orientVector_1->text());
-  QVector3D vector2 = ui->mainView->settings.stringToVector3D(ui->orientVector_2->text());
-
-  qDebug() << "to" << vector1 << "and" << vector2;
-
-  Envelope* env = ui->mainView->envelopes[idx];
-  bool success = env->setAxes(vector1, vector2);
-  if (!success)
-  {
-    error.showMessage("The inputed vector is not a valid orientation 1 vector");
-  }
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_orientVector_2_returnPressed Updates the orientation vector of the tool.
- */
-void MainWindow::on_orientVector_2_returnPressed()
-{
-  qDebug() << ":: on_orientVector_2_returnPressed";
-  int idx = ui->mainView->settings.selectedIdx;
-  qDebug() << "orientation vector changed";
-  QVector3D vector1 = ui->mainView->settings.stringToVector3D(ui->orientVector_1->text());
-  QVector3D vector2 = ui->mainView->settings.stringToVector3D(ui->orientVector_2->text());
-
-  qDebug() << "to" << vector1 << "and" << vector2;
-
-  Envelope* env = ui->mainView->envelopes[idx];
-  bool success = env->setAxes(vector1, vector2);
-  if (!success)
-  {
-    error.showMessage("The inputed vector is not a valid orientation 2 vector");
-  }
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_angleOrient_1_SpinBox_valueChanged Updates the angle of the axis initial orientation of the
- * second tool with respect to the one of the first tool.
- * @param value new angle.
- */
-void MainWindow::on_angleOrient_1_SpinBox_valueChanged(double value)
-{
-  qDebug() << ":: on_angleOrient_1_SpinBox_valueChanged";
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  Envelope* env = ui->mainView->envelopes[idx];
-  env->setAdjacentAxisAngles(value, ui->angleOrient_2_SpinBox->value());
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
-
-/**
- * @brief MainWindow::on_angleOrient_2_SpinBox_valueChanged Updates the angle of the axis final orientation of the
- * second tool with respect to the one of the first tool.
- * @param value new angle.
- */
-void MainWindow::on_angleOrient_2_SpinBox_valueChanged(double value)
-{
-  qDebug() << ":: on_angleOrient_2_SpinBox_valueChanged";
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  Envelope* env = ui->mainView->envelopes[idx];
-  env->setAdjacentAxisAngles(ui->angleOrient_1_SpinBox->value(), value);
-
-  // QSet<int> depEnvs = env->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
-}
 
 
 /**
@@ -560,25 +467,25 @@ void MainWindow::on_toolBox_currentIndexChanged(int index)
   case ToolType::Tool_Cylinder:
     ui->angleSpinBox->setEnabled(true);
     ui->drumRadiusSpinBox->setEnabled(false);
-    ui->groupBoxControlPoints->setEnabled(false);
+    ui->bezierToolView->setEnabled(false);
     tool = ui->mainView->cylinders[idx];
     break;
   case ToolType::Tool_Drum:
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(true);
-    ui->groupBoxControlPoints->setEnabled(false);
+    ui->bezierToolView->setEnabled(false);
     tool = ui->mainView->drums[idx];
     break;
   case ToolType::Tool_Bezier:
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(false);
-    ui->groupBoxControlPoints->setEnabled(true);
+    ui->bezierToolView->setEnabled(true);
     tool = ui->mainView->bezierTools[idx];
     break;
   default:
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(false);
-    ui->groupBoxControlPoints->setEnabled(false);
+    ui->bezierToolView->setEnabled(false);
     break;
   }
 
@@ -595,27 +502,38 @@ void MainWindow::on_toolBox_currentIndexChanged(int index)
   ui->mainView->update();
 }
 
-void MainWindow::on_controlPointChanged()
+// void MainWindow::on_controlPointChanged()
+// {
+//   int idx = ui->mainView->settings.selectedIdx;
+//   if (idx == -1) return;
+//   QVector2D p0(ui->p0x->value(), ui->p0y->value());
+//   QVector2D p1(ui->p1x->value(), ui->p1y->value());
+//   QVector2D p2(ui->p2x->value(), ui->p2y->value());
+//   QVector2D p3(ui->p3x->value(), ui->p3y->value());
+//
+//   BezierTool *bezier_tool = ui->mainView->bezierTools[idx];
+//   bezier_tool->setPoints(p0, p1, p2, p3);
+//   qDebug() << "Control Points changed to:";
+//   qDebug() << "-| P0 " << p0;
+//   qDebug() << "-| P1 " << p1;
+//   qDebug() << "-| P2 " << p2;
+//   qDebug() << "-| P3 " << p3;
+//
+//   // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//   // ui->mainView->toolMeshUpdates += depEnvs;
+//   // ui->mainView->envelopeMeshUpdates += depEnvs;
+//   // ui->mainView->toolTransfUpdates += depEnvs;
+//   ui->mainView->envelopeMeshUpdates += idx;
+//   ui->mainView->toolMeshUpdates += idx;
+//   ui->mainView->toolTransfUpdates += idx;
+//   ui->mainView->update();
+// }
+
+void MainWindow::on_bezierToolChanged(CubicBezier2D bezier)
 {
   int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  QVector2D p0(ui->p0x->value(), ui->p0y->value());
-  QVector2D p1(ui->p1x->value(), ui->p1y->value());
-  QVector2D p2(ui->p2x->value(), ui->p2y->value());
-  QVector2D p3(ui->p3x->value(), ui->p3y->value());
+  ui->mainView->bezierTools[idx]->setBezier(bezier);
 
-  BezierTool *bezier_tool = ui->mainView->bezierTools[idx];
-  bezier_tool->setPoints(p0, p1, p2, p3);
-  qDebug() << "Control Points changed to:";
-  qDebug() << "-| P0 " << p0;
-  qDebug() << "-| P1 " << p1;
-  qDebug() << "-| P2 " << p2;
-  qDebug() << "-| P3 " << p3;
-
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
   ui->mainView->toolTransfUpdates += idx;

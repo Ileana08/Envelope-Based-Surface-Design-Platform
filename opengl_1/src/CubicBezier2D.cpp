@@ -67,4 +67,19 @@ void CubicBezier2D::setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2
     this->p3 = p3;
 }
 
+QVector2D CubicBezier2D::getPoint(int i) {
+    switch(i) {
+    case 0: return p0; case 1: return p1;
+    case 2: return p2; case 3: return p3;
+    default: return p0;
+    }
+}
+void CubicBezier2D::setPoint(int i, QVector2D p) {
+    switch(i) {
+    case 0: setP0(p); break; case 1: setP1(p); break;
+    case 2: setP2(p); break; case 3: setP3(p); break;
+    default: break;
+    }
+}
+
 
