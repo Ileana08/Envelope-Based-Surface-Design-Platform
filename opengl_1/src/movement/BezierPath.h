@@ -7,7 +7,7 @@
 
 class BezierPath : public Path
 {
-    // cubic: C(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2+ t^3 P3
+    // cubic: C(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3
     QVector<ControlPoint*> controlPoints;
     
 public:
@@ -15,11 +15,14 @@ public:
     BezierPath(QVector<ControlPoint*> controlPoints);
 
     QVector3D getPathAt(float t) override;
+    void addNewBezierCurve();
     void updateVertexArr() override;
     QVector3D getDerivativeAt(float t);
     QVector3D getDerivative2At(float t);
     QVector3D getDerivative3At(float t);
     QVector3D getDerivative4PlusAt(float t);
+    void ensureContinuityC0(QVector<ControlPoint*> cps);
+    void ensureContinuityC1(QVector<ControlPoint*> cps, int indexSelectedPoint);
 
     inline void setControlPoints(QVector<ControlPoint*> controlPoints) {this->controlPoints = controlPoints; updateVertexArr();}
 

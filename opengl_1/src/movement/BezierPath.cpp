@@ -10,15 +10,37 @@ BezierPath::BezierPath(QVector<ControlPoint*> controlPoints)
 
 QVector3D BezierPath::getPathAt(float t)
 {
-// cubic: C(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3
+    int nrBezierCurves = controlPoints.size() / 4;
+    //find in which segment t is 
+    int segment = int(t * nrBezierCurves);
+    if(t==1){
+        segment = nrBezierCurves-1; 
+    }
+    // segment boundaries
+    float ti1 = float(segment)/float(nrBezierCurves);
+    float ti2 = float(segment+1)/float(nrBezierCurves);
 
-    QVector3D pt = QVector3D();
-    QVector3D p0 = controlPoints[0]->getPosition();
-    QVector3D p1 = controlPoints[1]->getPosition();
-    QVector3D p2 = controlPoints[2]->getPosition();
-    QVector3D p3 = controlPoints[3]->getPosition();
-    pt = (1-t) * (1-t) * (1-t) * p0 + 3 * (1-t) * (1-t) * t * p1 + 3 * (1-t) * t * t * p2 + t * t * t * p3;
-    return pt;
+    float localT = (t - ti1) / (ti2 - ti1);
+
+    QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
+    QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
+    QVector3D p2 = controlPoints[4 * segment + 2]->getPosition();
+    QVector3D p3 = controlPoints[4 * segment + 3]->getPosition();
+
+    QVector3D ct = (1-localT) * (1-localT) * (1-localT) * p0 + 3 * (1-localT) * (1-localT) * localT * p1 + 3 * (1-localT) * localT * localT * p2 + localT * localT * localT * p3;
+    return ct;
+}
+
+void BezierPath::addNewBezierCurve()
+{
+    QVector3D p3 = controlPoints[controlPoints.size() - 1]->getPosition();
+    QVector3D p2 = controlPoints[controlPoints.size() - 2]->getPosition();
+    controlPoints.append(new ControlPoint(p3, 0.05f, 20));
+    controlPoints.append(new ControlPoint(2.0f * p3 - p2, 0.05f, 20));
+    controlPoints.append(new ControlPoint(3.0f * p3 - 2.0f * p2, 0.05f, 20));
+    controlPoints.append(new ControlPoint(4.0f * p3 - 3.0f * p2, 0.05f, 20));
+
+    updateVertexArr();
 }
 
 void BezierPath::updateVertexArr()
@@ -34,50 +56,102 @@ void BezierPath::updateVertexArr()
 
 QVector3D BezierPath::getDerivativeAt(float t)
 {
-    QVector3D tangent = QVector3D();
-    QVector3D p0 = controlPoints[0]->getPosition();
-    QVector3D p1 = controlPoints[1]->getPosition();
-    QVector3D p2 = controlPoints[2]->getPosition();
-    QVector3D p3 = controlPoints[3]->getPosition();
-    float first_multiplier = -1 * 3 * (1-t) * (1-t);
-    float second_multipier = 3 * (1-t) * (1-t) - 6 * (1-t) * t;
-    float third_multipier = 6 * (1-t) * t - 3 * t * t;
-    float fourth_multiplier = 3 * t * t;
-    tangent = first_multiplier * p0 + second_multipier * p1 + third_multipier * p2 + fourth_multiplier * p3;
+    int nrBezierCurves = controlPoints.size() / 4;
+    int segment = int(t * nrBezierCurves);
+    if(t==1){
+        segment = nrBezierCurves-1; 
+    }
+    float ti1 = float(segment)/float(nrBezierCurves);
+    float ti2 = float(segment+1)/float(nrBezierCurves);
+
+    float localT = (t - ti1) / (ti2 - ti1);
+
+    QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
+    QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
+    QVector3D p2 = controlPoints[4 * segment + 2]->getPosition();
+    QVector3D p3 = controlPoints[4 * segment + 3]->getPosition();
+    float first_multiplier = -1 * 3 * (1-localT) * (1-localT);
+    float second_multiplier = 3 * (1-localT) * (1-localT) - 6 * (1-localT) * localT;
+    float third_multiplier = 6 * (1-localT) * localT - 3 * localT * localT;
+    float fourth_multiplier = 3 * localT * localT;
+
+    QVector3D tangent = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
     return tangent;
 }
 
 QVector3D BezierPath::getDerivative2At(float t) {
-    QVector3D acc = QVector3D();
-    QVector3D p0 = controlPoints[0]->getPosition();
-    QVector3D p1 = controlPoints[1]->getPosition();
-    QVector3D p2 = controlPoints[2]->getPosition();
-    QVector3D p3 = controlPoints[3]->getPosition();
-    float first_multiplier = 6 * (1-t);
-    float second_multipier = 6 * t - 12 * (1-t);
-    float third_multipier = 6 * (1-t) - 12 * t;
-    float fourth_multiplier = 6 * t;
-    acc = first_multiplier * p0 + second_multipier * p1 + third_multipier * p2 + fourth_multiplier * p3;
+    int nrBezierCurves = controlPoints.size() / 4;
+    int segment = int(t * nrBezierCurves);
+    if(t==1){
+        segment = nrBezierCurves-1; 
+    }
+    float ti1 = float(segment)/float(nrBezierCurves);
+    float ti2 = float(segment+1)/float(nrBezierCurves);
+
+    float localT = (t - ti1) / (ti2 - ti1);
+
+    QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
+    QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
+    QVector3D p2 = controlPoints[4 * segment + 2]->getPosition();
+    QVector3D p3 = controlPoints[4 * segment + 3]->getPosition();
+    float first_multiplier = 6 * (1-localT);
+    float second_multiplier = 6 * localT - 12 * (1-localT);
+    float third_multiplier = 6 * (1-localT) - 12 * localT;
+    float fourth_multiplier = 6 * localT;
+
+    QVector3D acc = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
     return acc;
 }
 
 QVector3D BezierPath::getDerivative3At(float t) {
-    QVector3D p0 = controlPoints[0]->getPosition();
-    QVector3D p1 = controlPoints[1]->getPosition();
-    QVector3D p2 = controlPoints[2]->getPosition();
-    QVector3D p3 = controlPoints[3]->getPosition();
-    QVector3D acc = QVector3D();
+    int nrBezierCurves = controlPoints.size() / 4;
+    int segment = int(t * nrBezierCurves);
+    if(t==1){
+        segment = nrBezierCurves-1; 
+    }
+    float ti1 = float(segment)/float(nrBezierCurves);
+    float ti2 = float(segment+1)/float(nrBezierCurves);
+
+    float localT = (t - ti1) / (ti2 - ti1);
+
+    QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
+    QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
+    QVector3D p2 = controlPoints[4 * segment + 2]->getPosition();
+    QVector3D p3 = controlPoints[4 * segment + 3]->getPosition();
     float first_multiplier = -6;
-    float second_multipier = 18;
-    float third_multipier = -18;
+    float second_multiplier = 18;
+    float third_multiplier = -18;
     float fourth_multiplier = 6;
-    acc = first_multiplier * p0 + second_multipier * p1 + third_multipier * p2 + fourth_multiplier * p3;
+
+    QVector3D acc = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
     return acc;
 }
-
 
 QVector3D BezierPath::getDerivative4PlusAt(float t) {
     return QVector3D(0,0,0);
 }
 
+void BezierPath::ensureContinuityC0(QVector<ControlPoint*> cps){
+     for (int i = 3; i<cps.size(); i++) {
+        if (i%4 == 0) {
+            cps[i]->setPosition(cps[i-1]->getPosition());
+        }
+    }
+}
 
+void BezierPath::ensureContinuityC1(QVector<ControlPoint*> cps, int cpMoved){
+    for (int i = 3; i<cps.size(); i++) {
+        if (i%4 == 0) {
+            cps[i]->setPosition(cps[i-1]->getPosition());
+        }
+        if (i%4 == 1) {
+            // ensuring continuity depending on the control point that was moved
+            if(cpMoved % 4 != 1) {
+            cps[i]->setPosition(-cps[i-3]->getPosition() + 2*cps[i-1]->getPosition());
+            } else {
+            cps[i-1]->setPosition(cps[i-3]->getPosition()/2 + cps[i]->getPosition()/2);
+            cps[i-2]->setPosition(cps[i-3]->getPosition()/2 + cps[i]->getPosition()/2);
+            }
+        }
+    }
+}

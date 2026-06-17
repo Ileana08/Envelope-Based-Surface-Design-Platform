@@ -91,6 +91,9 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     int selectedEnvelope = -1;
     bool controlPointPressed = false;
     bool orientationControlPointPressed = false;
+    bool addNewBezierCurve = false;
+    // Orientation direction at each control point of the needed envelope;
+    QVector<QVector3D> directioncps;
 
     int viewportWidth = 1;
     int viewportHeight = 1;

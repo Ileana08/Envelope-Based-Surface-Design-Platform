@@ -28,12 +28,15 @@ public:
     CylinderMovement(BezierPath path, QVector3D axisDirection1, QVector3D axisDirection2, const Tool *tool);
 
     inline BezierPath& getPath() {return path;}
+    inline BezierPath& getOrientationPath() {return orientationPath;}
     bool setAxisDirections(QVector3D axisDirection1, QVector3D axisDirection2);
     inline QVector<Vertex>& getPathVertexArr() { return path.getVertexArr(); }
 
     inline QVector3D getAxisT0() const { return axisT0; }
     inline QVector3D getAxisT1() const { return axisT1; }
     inline void setOrientationPath(BezierPath orientationPath) { this->orientationPath = orientationPath; }
+
+    void addNewBezierCurve();
 
     QVector3D getAxisAt(float time);
     QVector3D getAxisAtCp(int idx);

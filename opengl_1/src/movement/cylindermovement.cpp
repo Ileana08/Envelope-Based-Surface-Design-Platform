@@ -54,6 +54,14 @@ bool CylinderMovement::setAxisDirections(QVector3D axisDirection1, QVector3D axi
 }
 
 /**
+ * @brief CylinderMovement::addNewBezierCurve Adds a new Curve for the path.
+ */
+void CylinderMovement::addNewBezierCurve() {
+    path.addNewBezierCurve();
+    orientationPath.addNewBezierCurve();
+}
+
+/**
  * @brief CylinderMovement::getAxisAt returns the axis direction at time time
  * @param time time of interest
  * @return axis direction
@@ -83,7 +91,7 @@ QVector3D CylinderMovement::getAxisAtCp(int idx)
 }
 
 /**
- * @brief CylinderMovement::getAxisAt returns the derivative of the axis direction at time time
+ * @brief CylinderMovement::getAxisDtAt returns the derivative of the axis direction at time time
  * @param time time of interest
  * @return axis direction
  */
