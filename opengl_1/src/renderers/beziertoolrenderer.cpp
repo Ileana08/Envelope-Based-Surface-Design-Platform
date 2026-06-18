@@ -127,18 +127,23 @@ void BezierToolRenderer::paintGL()
     qDebug() << "BezierToolRenderer::paintGL";
     shader.bind();
     if(settings->showControlPoints) {
+        gl->glLineWidth(5.0f);
+        gl->glBindVertexArray(vaoBezierCurve);
+        gl->glDrawArrays(GL_LINES, 0, bezierCurve.size());
+
+
         gl->glBindVertexArray(vaoControlPoints);
         int vertexCount = 0;
         for (ControlPoint* cp : controlPoints)
         {
             vertexCount += cp->getVertexArr().size();
         }
+
         gl->glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         gl->glBindVertexArray(vaoControlLines);
         gl->glDrawArrays(GL_LINES, 0, controlLines.size());
-        gl->glBindVertexArray(vaoBezierCurve);
-        gl->glDrawArrays(GL_LINES, 0, bezierCurve.size());
-        gl->glLineWidth(5.0f);
+
+
     }
     gl->glBindVertexArray(0);
     shader.release();

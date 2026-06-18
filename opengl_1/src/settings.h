@@ -25,7 +25,7 @@ typedef struct Settings {
     float percentBlack = 0.5;
     int aIdx = 0;
     int timeIdx = 0;
-    int aSectors = 20;
+    int aSectors = 50;
     int tSectors = 50;
     float rotSensitivity = 0.1f;
     float panSensitivity = 0.005f;
