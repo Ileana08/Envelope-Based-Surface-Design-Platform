@@ -1,6 +1,7 @@
 #ifndef MAINVIEW_H
 #define MAINVIEW_H
 
+#include <QElapsedTimer>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLDebugLogger>
@@ -98,9 +99,15 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     int viewportWidth = 1;
     int viewportHeight = 1;
 
+
+
 public:
     MainView(QWidget *parent = nullptr);
     ~MainView() override;
+
+    //performance measuring
+    bool m_pendingTimerMeasurement = false;
+    QElapsedTimer m_timer;
 
     // Functions for widget input events
     void setRotation(int rotateX, int rotateY, int rotateZ);

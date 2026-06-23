@@ -7,12 +7,15 @@
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QOpenGLVersionFunctionsFactory>
+#include <QDebug>
+#include <QElapsedTimer>
 
 #include "mainwindow.h"
 #include "renderers/beziertoolrenderer.h"
 
-BezierToolView::BezierToolView(QWidget* parent) : QOpenGLWidget(parent)
+BezierToolView::BezierToolView(QWidget* parent) : QOpenGLWidget(parent), mainView(nullptr)
 {
+  bezier = CubicBezier2D();
   qDebug() << "BezierToolView constructor";
 }
 
@@ -32,6 +35,7 @@ void BezierToolView::initializeGL()
 
   BezierToolRenderer* rend = new BezierToolRenderer();
   renderer = rend;
+  rend->setBezier(bezier);
   QMatrix4x4 proj;
   QMatrix4x4 model;
   QMatrix3x3 normal;
@@ -42,11 +46,11 @@ void BezierToolView::initializeGL()
   rend->setModelTransf(model);
   rend->setNormalTransf(normal);
 
-  //TODO make this somewhat global
+  //TODO make this somewhat global or give this window its own settings
   settings.showControlPoints = true;
   rend->init(gl, &settings);
 
-  updateControlPoints();
+  updateAllCPs = true;
   rend->updateUniforms();
   rend->updateBuffers();
 }
@@ -54,6 +58,11 @@ void BezierToolView::initializeGL()
 void BezierToolView::paintGL()
 {
   gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (updateAllCPs)
+  {
+    updateControlPoints();
+  }
 
   renderer->updateUniforms();
   renderer->updateBuffers();
@@ -66,10 +75,9 @@ void BezierToolView::resizeGL(int w, int h)
 }
 
 void BezierToolView::mousePressEvent(QMouseEvent* ev) {
-  qDebug() << "Mouse button pressed:" << ev->button();
+  //qDebug() << "Mouse button pressed:" << ev->button();
 
   QVector2D pos = pixelToGL(ev->pos());
-  qDebug() << pos;
   for (int i = 0; i < 4; i++) {
     if ((pos - bezier.getPoint(i)).length() < pointRadius) {
       draggedPoint = i;
@@ -79,7 +87,7 @@ void BezierToolView::mousePressEvent(QMouseEvent* ev) {
 }
 
 void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
-  qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
+  //qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
 
   if (draggedPoint < 0) return;
   QVector2D glPos = pixelToGL(ev->pos());
@@ -92,11 +100,11 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
       newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 1:
-      newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP2().x() - cpDelta));
+      newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP3().x() - cpDelta));
       newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 2:
-      newPos.setX(std::clamp(glPos.x(), bezier.getP1().x() + cpDelta, bezier.getP3().x() - cpDelta));
+      newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP3().x() - cpDelta));
       newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
       break;
     case 3:
@@ -107,12 +115,16 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
     return;
   }
   bezier.setPoint(draggedPoint, newPos);
-  updateControlPoints();
+  updateAllCPs = true;
   update();
 }
 
 void BezierToolView::mouseReleaseEvent(QMouseEvent* ev) {
-  qDebug() << "Mouse button released" << ev->button();
+  //qDebug() << "Mouse button released" << ev->button();
+  mainView->m_pendingTimerMeasurement = true;
+  mainView->m_timer.restart();
+  qDebug() << "Measuring envelope attachment";
+
   if (draggedPoint != -1) {bezierToolChanged(bezier);}
   draggedPoint = -1;
 }
@@ -126,15 +138,15 @@ QVector2D BezierToolView::pixelToGL(QPoint p) const {
 
 void BezierToolView::updateControlPoints()
 {
-  QVector<ControlPoint*> controlPoints;
-  for (int i = 0; i < 4; i++)
-  {
-    QVector3D position = QVector3D(bezier.getPoint(i), 0.0f);
-    controlPoints.append(new ControlPoint(position, cpRadius, 10));
+  if (!renderer) {
+    qDebug() << "called too early!";
+    return;
   }
 
-  renderer->setControlPoints(controlPoints);
-  renderer->setBezier(bezier);
+  for (int i = 0; i < 4; i++)
+  {
+    renderer->updateControlPoint(i, bezier.getPoint(i));
+  }
 }
 
 

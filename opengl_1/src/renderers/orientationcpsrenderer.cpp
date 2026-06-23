@@ -116,7 +116,7 @@ void OrientationCPsRenderer::updateUniforms()
 
 void OrientationCPsRenderer::paintGL()
 {
-    qDebug() << "OrientationCPsRenderer::paintGL";
+    //qDebug() << "OrientationCPsRenderer::paintGL";
     shader.bind();
     if(settings->showOrientationControlPoints) {
         gl->glBindVertexArray(vaoOrientationControlPoints);

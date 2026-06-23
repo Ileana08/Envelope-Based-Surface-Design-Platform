@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QElapsedTimer>
 
 #include "mainview.h"
 
@@ -59,7 +60,7 @@ void MainView::keyReleaseEvent(QKeyEvent *ev) {
  * @param ev Mouse events.
  */
 void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
-  qDebug() << "Mouse double clicked:" << ev->button();
+  //qDebug() << "Mouse double clicked:" << ev->button();
 
   if (ev->button() == Qt::LeftButton)
   {
@@ -76,7 +77,7 @@ void MainView::mouseDoubleClickEvent(QMouseEvent *ev) {
  * @param ev Mouse event.
  */
 void MainView::mouseMoveEvent(QMouseEvent *ev) {
-  qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
+  //qDebug() << "x" << ev->position().x() << "y" << ev->position().y();
 
   QVector2D currentMousePos(ev->position());
 
@@ -154,7 +155,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
  * @param ev Mouse event.
  */
 void MainView::mousePressEvent(QMouseEvent *ev) {
-  qDebug() << "Mouse button pressed:" << ev->button();
+  //qDebug() << "Mouse button pressed:" << ev->button();
 
   QVector2D currentMousePos(ev->position());
   // if control points are shown and one of them is selected
@@ -238,7 +239,11 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
  * @param ev Mouse event.
  */
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
-  qDebug() << "Mouse button released" << ev->button();
+  //qDebug() << "Mouse button released" << ev->button();
+  m_timer.restart();
+  m_pendingTimerMeasurement = true;
+  qDebug() << "measuring mouse release";
+
 
   QVector2D currentMousePos(ev->position());
 
@@ -299,7 +304,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
  */
 void MainView::wheelEvent(QWheelEvent *ev) {
   // Implement something
-  qDebug() << "Mouse wheel:" << ev->angleDelta();
+  //qDebug() << "Mouse wheel:" << ev->angleDelta();
   QPoint delta = ev->angleDelta();
   float scroll = delta.y();
   float scale = powf(1.1f, -settings.scaleSensitivity * scroll);

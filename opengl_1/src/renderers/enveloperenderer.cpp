@@ -107,7 +107,7 @@ void EnvelopeRenderer::initBuffers()
  */
 void EnvelopeRenderer::updateBuffers()
 {
-    qDebug() << "EnvelopeRenderer::updateBuffers";
+    //qDebug() << "EnvelopeRenderer::updateBuffers";
     QVector<Vertex>& vertexArrEnv = envelope->getVertexArr();
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, vboEnv);
@@ -156,7 +156,7 @@ void EnvelopeRenderer::paintGL()
     shader.bind();
 
     if(settings->showEnvelope){
-        qDebug() << "EnvelopeRenderer::paintGL envelope";
+        //qDebug() << "EnvelopeRenderer::paintGL envelope";
         // Bind envelope buffer
         gl->glBindVertexArray(vaoEnv);
         // Draw envelope
@@ -164,7 +164,7 @@ void EnvelopeRenderer::paintGL()
     }
 
     if(settings->showToolAxis){
-        qDebug() << "EnvelopeRenderer::paintGL axis";
+        //qDebug() << "EnvelopeRenderer::paintGL axis";
         // Bind centers buffer
         gl->glBindVertexArray(vaoCenters);
         // Draw centers
@@ -172,7 +172,7 @@ void EnvelopeRenderer::paintGL()
     }
 
     if(settings->showGrazingCurve){
-        qDebug() << "EnvelopeRenderer::paintGL grazing";
+        //qDebug() << "EnvelopeRenderer::paintGL grazing";
         // Bind grazing curve buffer
         gl->glBindVertexArray(vaoGrazingCurve);
         // Draw grazing curve
@@ -180,7 +180,7 @@ void EnvelopeRenderer::paintGL()
     }
 
     if(settings->showNormals){
-        qDebug() << "EnvelopeRenderer::paintGL normals";
+        //qDebug() << "EnvelopeRenderer::paintGL normals";
         // Bind normals buffer
         gl->glBindVertexArray(vaoNormals);
         // Draw normals

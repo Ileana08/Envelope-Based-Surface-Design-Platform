@@ -26,7 +26,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent)
  */
 MainView::~MainView()
 {
-    qDebug() << "MainView destructor";
+    //qDebug() << "MainView destructor";
     indicesUsed.clear();
     indicesUsed.squeeze();
     for (auto i : toolRenderers){
@@ -91,7 +91,7 @@ Envelope* MainView::addNewEnvelope() {
     int idx = envelopes.indexOf(nullptr);
     if (idx == -1) return nullptr;
 
-    qDebug() << "addNewEnvelope setup tools";
+    //qDebug() << "addNewEnvelope setup tools";
     // Tools
     Cylinder *cyl = new Cylinder();
     cyl->initTool();
@@ -103,7 +103,7 @@ Envelope* MainView::addNewEnvelope() {
     bezierTool->initTool();
     bezierTools[idx] = bezierTool;
 
-    qDebug() << "addNewEnvelope setup path";
+    //qDebug() << "addNewEnvelope setup path";
 
     // Path and envelope
     QVector<ControlPoint*> controlPoints = {
@@ -133,38 +133,38 @@ Envelope* MainView::addNewEnvelope() {
     default:                      tool = nullptr;      break;
     }
 
-    qDebug() << "addNewEnvelope setup envelope";
+    //qDebug() << "addNewEnvelope setup envelope";
     Envelope *env = new Envelope(idx, tool, path);
     env->getToolMovement().setOrientationPath(orientationPath);
     env->initEnvelope();
     envelopes[idx] = env;
 
-    qDebug() << "addNewEnvelope setup tool renderer";
+    //qDebug() << "addNewEnvelope setup tool renderer";
 
     // Set related renderers
     toolRenderers[idx]->setTool(tool);
     toolRenderers[idx]->setModelTransf(modelTransf);
     toolRenderers[idx]->setProjTransf(projTransf);
 
-    qDebug() << "addNewEnvelope envelope renderer";
+    //qDebug() << "addNewEnvelope envelope renderer";
 
     envelopeRenderers[idx]->setEnvelope(env);
     envelopeRenderers[idx]->setModelTransf(modelTransf);
     envelopeRenderers[idx]->setProjTransf(projTransf);
 
-    qDebug() << "addNewEnvelope setup movement renderer";
+    //qDebug() << "addNewEnvelope setup movement renderer";
 
     moveRenderers[idx]->setMovement(&env->getToolMovement());
     moveRenderers[idx]->setModelTransf(modelTransf);
     moveRenderers[idx]->setProjTransf(projTransf);
 
-    qDebug() << "addNewEnvelope setup control point renderer";
+    //qDebug() << "addNewEnvelope setup control point renderer";
 
     controlPointsRenderers[idx]->setControlPoints(env->getToolMovement().getPath().getControlPoints());
     controlPointsRenderers[idx]->setModelTransf(modelTransf);
     controlPointsRenderers[idx]->setProjTransf(projTransf);
 
-    qDebug() << "addNewEnvelope setup orientation control point renderer";
+    //qDebug() << "addNewEnvelope setup orientation control point renderer";
 
     orientationCPsRenderers[idx]->setOrientationControlPoints(envelopeOrientationCPs[idx]);
     orientationCPsRenderers[idx]->setControlPoints(envelopeControlPoints[idx]);
@@ -181,7 +181,7 @@ Envelope* MainView::addNewEnvelope() {
  * @param env
  */
 void MainView::deleteEnvelope(Envelope *env) {
-    qDebug() << "TODO";
+    //qDebug() << "TODO";
 }
 
 // --- OpenGL initialization
@@ -293,7 +293,7 @@ void MainView::initializeGL()
  * TODO: extend to update buffer of other cylinders and enveloping surfaces.
  */
 void MainView::updateBuffers(){
-    qDebug() << "main update buffers";
+    //qDebug() << "main update buffers";
 
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;
@@ -306,7 +306,7 @@ void MainView::updateBuffers(){
 }
 
 void MainView::updateUniforms() {
-    qDebug() << "main update uniforms";
+    //qDebug() << "main update uniforms";
 
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;
@@ -356,14 +356,18 @@ void MainView::paintGL()
         updateAllUniforms = false;
     }
 
-
     QList topoSort = getTopoSortEnvelopes();
+
 
     while (!topoSort.isEmpty())
     {
+        // qDebug() << "--------------------------";
+        // qDebug() << "toposort" << topoSort;
+        // qDebug() << "envMesh" << envelopeMeshUpdates;
+        // qDebug() << "toolMesh" << toolMeshUpdates;
+        // qDebug() << "toolTransf" << toolTransfUpdates;
+
         int idx = topoSort.takeFirst();
-        int adj0 = (envelopes[idx]->getAdjA0Envelope() != nullptr ? envelopes[idx]->getAdjA0Envelope()->getIndex() : -1);
-        int adj1 = (envelopes[idx]->getAdjA1Envelope() != nullptr ? envelopes[idx]->getAdjA1Envelope()->getIndex() : -1);
 
         if (envelopeMeshUpdates.contains(idx))
         {
@@ -373,8 +377,7 @@ void MainView::paintGL()
             controlPointsRenderers[idx]->updateBuffers();
             orientationCPsRenderers[idx]->updateBuffers();
 
-            if (adj0 != -1) {envelopeMeshUpdates.insert(adj0);}
-            if (adj1 != -1) {envelopeMeshUpdates.insert(adj1);}
+            envelopeMeshUpdates.unite(envelopes[idx]->getAllDependents());
 
         }
 
@@ -385,8 +388,7 @@ void MainView::paintGL()
             bezierTools[idx]->update();
             toolRenderers[idx]->updateBuffers();
 
-            if (adj0 != -1) {toolMeshUpdates.insert(adj0);}
-            if (adj1 != -1) {toolMeshUpdates.insert(adj1);}
+            toolMeshUpdates.unite(envelopes[idx]->getAllDependents());
         }
 
         if (toolTransfUpdates.contains(idx))
@@ -394,9 +396,10 @@ void MainView::paintGL()
             toolRenderers[idx]->setToolTransf(envelopes[idx]->getToolTransformAt(settings.t()));
             toolRenderers[idx]->updateUniforms();
 
-            if (adj0 != -1) {toolTransfUpdates.insert(adj0);}
-            if (adj1 != -1) {toolTransfUpdates.insert(adj1);}
+            toolTransfUpdates.unite(envelopes[idx]->getAllDependents());
+
         }
+
 
     }
     envelopeMeshUpdates.clear();
@@ -414,6 +417,12 @@ void MainView::paintGL()
             orientationCPsRenderers[i]->paintGL();
         }
     }
+
+    if (m_pendingTimerMeasurement) {
+        m_pendingTimerMeasurement = false;
+        qDebug() << "wall time to frame:" << m_timer.elapsed() << "ms";
+    }
+
 }
 
 /**
@@ -424,7 +433,7 @@ void MainView::paintGL()
  */
 void MainView::resizeGL(int newWidth, int newHeight)
 {
-    qDebug() << "MainView::resizeGL";
+    //qDebug() << "MainView::resizeGL";
     // Get the aspect ratio of the new screen size
     float aspectRatio = newWidth / ((float)newHeight);
 
@@ -454,8 +463,8 @@ void MainView::resizeGL(int newWidth, int newHeight)
  */
 void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 {
-    qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << ","
-             << rotateZ << ")";
+    //qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << ","
+    //         << rotateZ << ")";
 
     // Reset the rotation matrix
     modelRotation.setToIdentity();
@@ -477,7 +486,7 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 // TODO remove the update call here and move it to wherever in mainwindow this function is called
 void MainView::setScale(float scale)
 {
-    qDebug() << "Scale changed to " << scale;
+    //qDebug() << "Scale changed to " << scale;
 
     scalingFactor = scale;
 

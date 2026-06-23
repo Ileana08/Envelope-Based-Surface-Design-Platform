@@ -80,7 +80,7 @@ void ToolRenderer::initBuffers()
  */
 void ToolRenderer::updateBuffers()
 {
-    qDebug()<< "ToolRenderer::updateBuffers";
+    //qDebug()<< "ToolRenderer::updateBuffers";
     QVector<Vertex>& vertexArrTool = tool->getVertexArr();
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, vboTool);
@@ -123,7 +123,7 @@ void ToolRenderer::paintGL()
     shader.bind();
 
     if(settings->showTool){
-        qDebug() << "ToolRenderer::paintGL tool";
+        //qDebug() << "ToolRenderer::paintGL tool";
         // Bind cylinder buffer
         gl->glBindVertexArray(vaoTool);
         // Draw cylinder
@@ -132,7 +132,7 @@ void ToolRenderer::paintGL()
 
     if (settings->showSpheres)
     {
-        qDebug() << "ToolRenderer::paintGL sphere";
+        //qDebug() << "ToolRenderer::paintGL sphere";
         // Bind sphere buffer
         gl->glBindVertexArray(vaoSph);
         // Draw sphere

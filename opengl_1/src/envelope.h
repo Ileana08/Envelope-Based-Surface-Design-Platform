@@ -31,14 +31,28 @@ class Envelope
     QVector<Vertex> vertexArrGrazingCurve;
     QVector<QVector<Vertex>> vertexArrNormals;
 
-    QVector<QVector3D> a0EnvelopeCache;
-    QVector<QVector3D> a1EnvelopeCache;
+    QVector<QVector3D> axisCache;
+    QVector<QVector3D> axisDtCache;
+    QVector<QVector3D> axisDt2Cache;
+    QVector<QVector3D> axisDt3Cache;
+    QVector<QVector3D> axisDt4Cache;
 
     QVector<QVector3D> pathCache;
     QVector<QVector3D> pathDtCache;
+    QVector<QVector3D> pathDt2Cache;
+    QVector<QVector3D> pathDt3Cache;
 
-    QVector<QVector3D> axisCache;
-    QVector<QVector3D> axisDtCache;
+    QVector<QVector3D> normalA0Cache;
+    QVector<QVector3D> normalA0DtCache;
+
+    QVector<QVector3D> normalA1Cache;
+    QVector<QVector3D> normalA1DtCache;
+
+    QVector<QVector3D> a0EnvelopeCache;
+    QVector<QVector3D> a1EnvelopeCache;
+
+    QVector<QVector3D> a0EnvelopeDtCache;
+    QVector<QVector3D> a1EnvelopeDtCache;
 
     // Render settings for reflection lines
     bool reflectionLines=false;
@@ -121,11 +135,22 @@ public:
 
     // These methods get the "cached" values, instead of recalculating them.
     inline QVector3D getA0EnvelopeAt(float t) {return MathUtility::interpolateArray(a0EnvelopeCache, t);}
+    inline QVector3D getA0EnvelopeDtAt(float t) {return MathUtility::interpolateArray(a0EnvelopeDtCache, t);}
     inline QVector3D getA1EnvelopeAt(float t) {return MathUtility::interpolateArray(a1EnvelopeCache, t);}
+    inline QVector3D getA1EnvelopeDtAt(float t) {return MathUtility::interpolateArray(a1EnvelopeDtCache, t);}
     inline QVector3D getPathAt(float t) {return MathUtility::interpolateArray(pathCache, t);}
     inline QVector3D getPathDtAt(float t) {return MathUtility::interpolateArray(pathDtCache, t);}
+    inline QVector3D getPathDt2At(float t) {return MathUtility::interpolateArray(pathDt2Cache, t);}
+    inline QVector3D getPathDt3At(float t) {return MathUtility::interpolateArray(pathDt3Cache, t);}
     inline QVector3D getAxisAt(float t) {return MathUtility::interpolateArray(axisCache, t);}
     inline QVector3D getAxisDtAt(float t) {return MathUtility::interpolateArray(axisDtCache, t);}
+    inline QVector3D getAxisDt2At(float t) {return MathUtility::interpolateArray(axisDt2Cache, t);}
+    inline QVector3D getAxisDt3At(float t) {return MathUtility::interpolateArray(axisDt3Cache, t);}
+    inline QVector3D getAxisDt4At(float t) {return MathUtility::interpolateArray(axisDt4Cache, t);}
+    inline QVector3D getNormalA0At(float t) {return MathUtility::interpolateArray(normalA0Cache, t);}
+    inline QVector3D getNormalA0DtAt(float t) {return MathUtility::interpolateArray(normalA0DtCache, t);}
+    inline QVector3D getNormalA1At(float t) {return MathUtility::interpolateArray(normalA1Cache, t);}
+    inline QVector3D getNormalA1DtAt(float t) {return MathUtility::interpolateArray(normalA1DtCache, t);}
 
     inline bool setAxes(QVector3D axisA0, QVector3D axisA1) { return toolMovement.setAxisDirections(axisA0, axisA1); }
     inline void setAdjacentAxisAngles(double angle1, double angle2) { adjAxisAngle1 = angle1; adjAxisAngle2 = angle2; }

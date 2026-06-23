@@ -1,6 +1,8 @@
 #include "envelope.h"
 #include "mathutility.h"
 
+#include <QElapsedTimer>
+
 /**
  * @brief Envelope::Envelope Creates a new envelope with default values.
  * @param index
@@ -58,25 +60,51 @@ void Envelope::initEnvelope()
 }
 
 void Envelope::update() {
-    qDebug() << "Updating envelope index =" << getIndex();
+    //qDebug() << "Updating envelope index =" << getIndex();
+    QElapsedTimer timer;
+    timer.start();
+
     updateCaches();
     computeEnvelope();
     computeToolCenters();
     computeGrazingCurves();
     computeNormals();
+
 }
 
 void Envelope::updateCaches()
 {
-    qDebug() << "Updating Envelope Caches";
+    //qDebug() << "Updating Envelope Caches";
+
+    // update after: None
+    axisCache.clear();
+    // update after: None
+    axisDtCache.clear();
+    axisDt2Cache.clear();
+    axisDt3Cache.clear();
+    axisDt4Cache.clear();
+
+    // update after: Axis
+    pathCache.clear();
+    // update after: AxisDt
+    pathDtCache.clear();
+    pathDt2Cache.clear();
+    pathDt3Cache.clear();
+
+    // update after: Axis, PathDt, AxisDt
+    normalA0Cache.clear();
+    normalA1Cache.clear();
+    // update after: Axis, AxisDt, PathDt, PathDt2, AxisDt2
+    normalA0DtCache.clear();
+    normalA1DtCache.clear();
+
+    // update after: Normal, Axis, Path
     a0EnvelopeCache.clear();
     a1EnvelopeCache.clear();
 
-    pathCache.clear();
-    pathDtCache.clear();
-
-    axisCache.clear();
-    axisDtCache.clear();
+    // update after: NormalDt, AxisDt, PathDt
+    a0EnvelopeDtCache.clear();
+    a1EnvelopeDtCache.clear();
 
     for (int tIdx = 0; tIdx < sectorsT + 1; tIdx++)
     {
@@ -84,6 +112,9 @@ void Envelope::updateCaches()
 
         axisCache.append(calcAxisAt(t));
         axisDtCache.append(calcAxisDtAt(t));
+        axisDt2Cache.append(calcAxisDt2At(t));
+        axisDt3Cache.append(calcAxisDt3At(t));
+        axisDt4Cache.append(calcAxisDt4At(t));
     }
 
     for (int tIdx = 0; tIdx < sectorsT + 1; tIdx++)
@@ -92,6 +123,18 @@ void Envelope::updateCaches()
 
         pathCache.append(calcPathAt(t));
         pathDtCache.append(calcPathDtAt(t));
+        pathDt2Cache.append(calcPathDt2At(t));
+        pathDt3Cache.append(calcPathDt3At(t));
+    }
+
+    for (int tIdx = 0; tIdx < sectorsT + 1; tIdx++)
+    {
+        float t = (float) tIdx / sectorsT;
+
+        normalA0Cache.append(calcNormalAt(t, 0));
+        normalA1Cache.append(calcNormalAt(t, 1));
+        normalA0DtCache.append(calcNormalDtAt(t, 0));
+        normalA1DtCache.append(calcNormalDtAt(t, 1));
     }
 
     for (int tIdx = 0; tIdx < sectorsT + 1; tIdx++)
@@ -102,6 +145,14 @@ void Envelope::updateCaches()
         a1EnvelopeCache.append(calcEnvelopeAt(t, 1));
     }
 
+    for (int tIdx = 0; tIdx < sectorsT + 1; tIdx++)
+    {
+        float t = (float) tIdx / sectorsT;
+
+        a0EnvelopeDtCache.append(calcEnvelopeDtAt(t, 0));
+        a1EnvelopeDtCache.append(calcEnvelopeDtAt(t, 1));
+    }
+
 
 
 }
@@ -110,12 +161,12 @@ void Envelope::registerDependent(Envelope *dependent) {
     // TODO check for circular dependencies when adding
     if (dependentEnvelopes.contains(dependent)) return;
     dependentEnvelopes.append(dependent);
-    qDebug() << "Added dependent";
+    //qDebug() << "Added dependent";
 }
 
 void Envelope::deregisterDependent(Envelope *dependent) {
     qsizetype num = dependentEnvelopes.removeAll(dependent);
-    qDebug() << "Removed" << num << "dependents";
+    //qDebug() << "Removed" << num << "dependents";
 }
 
 /**
@@ -249,12 +300,12 @@ QVector3D Envelope::calcEnvelopeDtAt(float t, float a)
 
 QVector3D Envelope::calcEnvelopeDt2At(float t, float a)
 {
-    return calcPathDt2At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt2At(t) + tool->getSphereRadiusAt(a) * calcNormalDt2At(t, a);
+    return getPathDt2At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt2At(t) + tool->getSphereRadiusAt(a) * calcNormalDt2At(t, a);
 }
 
 QVector3D Envelope::calcEnvelopeDt3At(float t, float a)
 {
-    return calcPathDt3At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt3At(t) + tool->getSphereRadiusAt(a) * calcNormalDt3At(t, a);
+    return getPathDt3At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt3At(t) + tool->getSphereRadiusAt(a) * calcNormalDt3At(t, a);
 }
 
 
@@ -381,6 +432,11 @@ QVector3D Envelope::calcNormalAt(float t, float a)
     float beta = -m21 * ra;
 
     float sqrt_term = 1 - ra * ra * m11;
+    if (sqrt_term < 0.0f)
+    {
+        qDebug() << "CalcNormal: negative sqrt term";
+        sqrt_term = 0.0f;
+    }
 
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrtf(sqrt_term);
 
@@ -396,7 +452,7 @@ QVector3D Envelope::calcNormalDtAt(float t, float a)
     QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
     QVector3D sat = tool->getSphereCenterHeightDaAt(a) * getAxisDtAt(t);
     QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
-    QVector3D stt = calcPathDt2At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt2At(t);
+    QVector3D stt = getPathDt2At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt2At(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st).normalized();
     QVector3D sNormal_t = MathUtility::normalVectorDerivative(QVector3D::crossProduct(sa, st), QVector3D::crossProduct(sat, st) + QVector3D::crossProduct(sa, stt));
 
@@ -424,6 +480,11 @@ QVector3D Envelope::calcNormalDtAt(float t, float a)
     float beta_t = -m21_t * ra;
 
     float sqrt_term = 1 - ra * ra * m11;
+    if (sqrt_term < 0.0f)
+    {
+        qDebug() << "CalcNormalDt: negative sqrt term";
+        sqrt_term = 0.0f;
+    }
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrtf(sqrt_term);
     float gamma_t = (EG_FF > 0 ? 1 : -1) * -ra * ra * m11_t / (2 * sqrtf(sqrt_term));
 
@@ -434,12 +495,12 @@ QVector3D Envelope::calcNormalDtAt(float t, float a)
 
 QVector3D Envelope::calcNormalDt2At(float t, float a)
 {
-    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * calcAxisAt(t);
-    QVector3D sat = tool->getSphereCenterHeightDaAt(a) * calcAxisDtAt(t);
-    QVector3D satt = tool->getSphereCenterHeightDaAt(a) * calcAxisDt2At(t);
-    QVector3D st = calcPathDtAt(t) + tool->getSphereCenterHeightAt(a) * calcAxisDtAt(t);
-    QVector3D stt = calcPathDt2At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt2At(t);
-    QVector3D sttt = calcPathDt3At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt3At(t);
+    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
+    QVector3D sat = tool->getSphereCenterHeightDaAt(a) * getAxisDtAt(t);
+    QVector3D satt = tool->getSphereCenterHeightDaAt(a) * getAxisDt2At(t);
+    QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
+    QVector3D stt = getPathDt2At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt2At(t);
+    QVector3D sttt = getPathDt3At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt3At(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st);
     QVector3D sNormal_t = QVector3D::crossProduct(sat, st) + QVector3D::crossProduct(sa, stt);
     QVector3D sNormal_tt = QVector3D::crossProduct(satt, st) + QVector3D::crossProduct(sat, stt) + QVector3D::crossProduct(sat, stt) + QVector3D::crossProduct(sa, sttt);
@@ -487,6 +548,11 @@ QVector3D Envelope::calcNormalDt2At(float t, float a)
     float beta_tt = -m21_tt * ra;
 
     float sqrt_term = 1 - ra * ra * m11;
+    if (sqrt_term < 0.0f)
+    {
+        qDebug() << "CalcNormalDt2: negative sqrt term";
+        sqrt_term = 0.0f;
+    }
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrt(sqrt_term);
     float gamma_t = (EG_FF > 0 ? 1 : -1) * -ra * ra * m11_t / (2 * sqrt(sqrt_term));
     float gamma_tt = (EG_FF > 0 ? 1 : -1) *
@@ -514,14 +580,14 @@ QVector3D Envelope::calcNormalDt2At(float t, float a)
 
 QVector3D Envelope::calcNormalDt3At(float t, float a)
 {
-    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * calcAxisAt(t);
-    QVector3D sat = tool->getSphereCenterHeightDaAt(a) * calcAxisDtAt(t);
-    QVector3D satt = tool->getSphereCenterHeightDaAt(a) * calcAxisDt2At(t);
-    QVector3D sattt = tool->getSphereCenterHeightDaAt(a) * calcAxisDt3At(t);
-    QVector3D st = calcPathDtAt(t) + tool->getSphereCenterHeightAt(a) * calcAxisDtAt(t);
-    QVector3D stt = calcPathDt2At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt2At(t);
-    QVector3D sttt = calcPathDt3At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt3At(t);
-    QVector3D stttt = calcPathDt4At(t) + tool->getSphereCenterHeightAt(a) * calcAxisDt4At(t);
+    QVector3D sa = tool->getSphereCenterHeightDaAt(a) * getAxisAt(t);
+    QVector3D sat = tool->getSphereCenterHeightDaAt(a) * getAxisDtAt(t);
+    QVector3D satt = tool->getSphereCenterHeightDaAt(a) * getAxisDt2At(t);
+    QVector3D sattt = tool->getSphereCenterHeightDaAt(a) * getAxisDt3At(t);
+    QVector3D st = getPathDtAt(t) + tool->getSphereCenterHeightAt(a) * getAxisDtAt(t);
+    QVector3D stt = getPathDt2At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt2At(t);
+    QVector3D sttt = getPathDt3At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt3At(t);
+    QVector3D stttt = calcPathDt4At(t) + tool->getSphereCenterHeightAt(a) * getAxisDt4At(t);
     QVector3D sNormal = QVector3D::crossProduct(sa, st);
     QVector3D sNormal_t = QVector3D::crossProduct(sat, st) + QVector3D::crossProduct(sa, stt);
     QVector3D sNormal_tt = QVector3D::crossProduct(satt, st) + 2 * QVector3D::crossProduct(sat, stt) + QVector3D::crossProduct(sa, sttt);
@@ -592,6 +658,11 @@ QVector3D Envelope::calcNormalDt3At(float t, float a)
     float beta_ttt = -m21_ttt * ra;
 
     float sqrt_term = 1 - ra * ra * m11;
+    if (sqrt_term < 0.0f)
+    {
+        qDebug() << "CalcNormalDt3: negative sqrt term";
+        sqrt_term = 0.0f;
+    }
     float gamma = (EG_FF > 0 ? 1 : -1) * sqrt(sqrt_term);
     float gamma_t = (EG_FF > 0 ? 1 : -1) * -ra * ra * m11_t / (2 * sqrt(sqrt_term));
     float gamma_tt = (EG_FF > 0 ? 1 : -1) *
@@ -639,15 +710,15 @@ QVector3D Envelope::calcPathAt(float t)
 {
     if (isTanContinuous())
     {
-        return adjEnvA0->getA1EnvelopeAt(t) - tool->getSphereRadiusAt(0) * adjEnvA0->calcNormalAt(t, 1) - tool->getSphereCenterHeightAt(0) * getAxisAt(t);
+        return adjEnvA0->getA1EnvelopeAt(t) - tool->getSphereRadiusAt(0) * adjEnvA0->getNormalA1At(t) - tool->getSphereCenterHeightAt(0) * getAxisAt(t);
     }
     else if (isPositContinuous())
     {
         // The normal is orthogonal to X_t of the adjacent envelope, and at an angle to the axis of its own envelope.
         // Thus start with the cross product of these two, and rotate it a certain amount around X_t of the adjacent.
-        QVector3D adjEnv = adjEnvA0->calcEnvelopeAt(t, 1);
-        QVector3D adjEnv_t = adjEnvA0->calcEnvelopeDtAt(t, 1);
-        QVector3D axis = calcAxisAt(t);
+        QVector3D adjEnv = adjEnvA0->getA1EnvelopeAt(t);
+        QVector3D adjEnv_t = adjEnvA0->getA1EnvelopeDtAt(t);
+        QVector3D axis = getAxisAt(t);
         float dotValue = -tool->getSphereRadiusDaAt(0) / tool->getSphereCenterHeightDaAt(0);
 
         // MATH
@@ -676,13 +747,13 @@ QVector3D Envelope::calcPathDtAt(float t)
 {
     if (isTanContinuous())
     {
-        return adjEnvA0->calcEnvelopeDtAt(t, 1) - tool->getSphereRadiusAt(0) * adjEnvA0->calcNormalDtAt(t, 1) - tool->getSphereCenterHeightAt(0) * getAxisDtAt(t);
+        return adjEnvA0->getA1EnvelopeDtAt(t) - tool->getSphereRadiusAt(0) * adjEnvA0->getNormalA1DtAt(t) - tool->getSphereCenterHeightAt(0) * getAxisDtAt(t);
     }
     else if (isPositContinuous())
     {
-        QVector3D axis = calcAxisAt(t); // unit vector
-        QVector3D axis_t = calcAxisDtAt(t); // derivative of unit vector
-        QVector3D adjEnv_t = adjEnvA0->calcEnvelopeDtAt(t, 1); // not yet unit vector
+        QVector3D axis = getAxisAt(t); // unit vector
+        QVector3D axis_t = getAxisDtAt(t); // derivative of unit vector
+        QVector3D adjEnv_t = adjEnvA0->getA1EnvelopeDtAt(t); // not yet unit vector
         QVector3D adjEnv_tt = adjEnvA0->calcEnvelopeDt2At(t, 1); // not yet derivative of unit vector
         float dotValue = -tool->getSphereRadiusDaAt(0) / tool->getSphereCenterHeightDaAt(0);
 
@@ -723,14 +794,14 @@ QVector3D Envelope::calcPathDt2At(float t)
 {
     if (isTanContinuous())
     {
-        return adjEnvA0->calcEnvelopeDt2At(t, 1) - tool->getSphereRadiusAt(0) * adjEnvA0->calcNormalDt2At(t, 1) - tool->getSphereCenterHeightAt(0) * calcAxisDt2At(t);
+        return adjEnvA0->calcEnvelopeDt2At(t, 1) - tool->getSphereRadiusAt(0) * adjEnvA0->calcNormalDt2At(t, 1) - tool->getSphereCenterHeightAt(0) * getAxisDt2At(t);
     }
     else if (isPositContinuous())
     {
-        QVector3D axis = calcAxisAt(t); // unit vector
-        QVector3D axis_t = calcAxisDtAt(t); // derivative of unit vector
-        QVector3D axis_tt = calcAxisDt2At(t); // 2nd derivative of unit vector
-        QVector3D adjEnv_t = adjEnvA0->calcEnvelopeDtAt(t, 1); // not yet unit vector
+        QVector3D axis = getAxisAt(t); // unit vector
+        QVector3D axis_t = getAxisDtAt(t); // derivative of unit vector
+        QVector3D axis_tt = getAxisDt2At(t); // 2nd derivative of unit vector
+        QVector3D adjEnv_t = adjEnvA0->getA1EnvelopeDtAt(t); // not yet unit vector
         QVector3D adjEnv_tt = adjEnvA0->calcEnvelopeDt2At(t, 1); // not yet derivative of unit vector
         QVector3D adjEnv_ttt = adjEnvA0->calcEnvelopeDt3At(t, 1); // not yet derivative of unit vector
         float dotValue = -tool->getSphereRadiusDaAt(0) / tool->getSphereCenterHeightDaAt(0);
@@ -808,7 +879,7 @@ QQuaternion Envelope::calcAxisRotationAt(float t)
     // First rotate the axis of the previous envelope to its normal.
     // This is to establish a frame of reference for all its derivatives.
 
-    QVector3D adjNormal = adjEnvA0->calcNormalAt(t, 1);
+    QVector3D adjNormal = adjEnvA0->getNormalA1At(t);
     QVector3D adjAxis = adjEnvA0->getAxisAt(t);
     QQuaternion rotationFrame = QQuaternion::rotationTo(adjAxis, adjNormal);
 
@@ -839,13 +910,13 @@ QVector3D Envelope::calcAxisAt(float t)
     QVector3D axis;
     if (isAxisConstrained())
     {
-        QVector3D x0 = adjEnvA0->calcEnvelopeAt(t, 1);
-        QVector3D x1 = adjEnvA1->calcEnvelopeAt(t, 0);
+        QVector3D x0 = adjEnvA0->getA1EnvelopeAt(t);
+        QVector3D x1 = adjEnvA1->getA0EnvelopeAt(t);
         QVector3D deltaX = x1 - x0;
         QVector3D deltaX_hat = deltaX.normalized();
 
-        QVector3D x0_t = adjEnvA0->calcEnvelopeDtAt(t, 1);
-        QVector3D x1_t = adjEnvA1->calcEnvelopeDtAt(t, 0);
+        QVector3D x0_t = adjEnvA0->getA1EnvelopeDtAt(t);
+        QVector3D x1_t = adjEnvA1->getA0EnvelopeDtAt(t);
         QVector3D x0_t_hat = x0_t.normalized();
         QVector3D x1_t_hat = x1_t.normalized();
 
@@ -903,13 +974,13 @@ QVector3D Envelope::calcAxisDtAt(float t)
     QVector3D axis, axis_t;
     if (isAxisConstrained())
     {
-        QVector3D x0 = adjEnvA0->calcEnvelopeAt(t, 1);
-        QVector3D x1 = adjEnvA1->calcEnvelopeAt(t, 0);
+        QVector3D x0 = adjEnvA0->getA1EnvelopeAt(t);
+        QVector3D x1 = adjEnvA1->getA0EnvelopeAt(t);
         QVector3D deltaX = x1 - x0;
         QVector3D deltaX_hat = deltaX.normalized();
 
-        QVector3D x0_t = adjEnvA0->calcEnvelopeDtAt(t, 1);
-        QVector3D x1_t = adjEnvA1->calcEnvelopeDtAt(t, 0);
+        QVector3D x0_t = adjEnvA0->getA1EnvelopeDtAt(t);
+        QVector3D x1_t = adjEnvA1->getA0EnvelopeDtAt(t);
         QVector3D deltaX_t = x1_t - x0_t;
         QVector3D deltaX_hat_t = MathUtility::normalVectorDerivative(deltaX, deltaX_t);
         QVector3D x0_t_hat = x0_t.normalized();
@@ -1003,7 +1074,7 @@ QVector3D Envelope::calcAxisDt2At(float t)
     QVector3D axis, axis_t, axis_tt;
     if (isTanContinuous())
     {
-        axis_tt = calcAxisRotationAt(t) * adjEnvA0->calcAxisDt2At(t);
+        axis_tt = calcAxisRotationAt(t) * adjEnvA0->getAxisDt2At(t);
     }
     else
     {
@@ -1018,7 +1089,7 @@ QVector3D Envelope::calcAxisDt3At(float t)
     QVector3D axis, axis_t, axis_tt, axis_ttt;
     if (isTanContinuous())
     {
-        axis_ttt = calcAxisRotationAt(t) * adjEnvA0->calcAxisDt3At(t);
+        axis_ttt = calcAxisRotationAt(t) * adjEnvA0->getAxisDt3At(t);
     }
     else
     {
@@ -1033,7 +1104,7 @@ QVector3D Envelope::calcAxisDt4At(float t)
     QVector3D axis, axis_t, axis_tt, axis_ttt, axis_tttt;
     if (isTanContinuous())
     {
-        axis_tttt = calcAxisRotationAt(t) * adjEnvA0->calcAxisDt4At(t);
+        axis_tttt = calcAxisRotationAt(t) * adjEnvA0->getAxisDt4At(t);
     }
     else
     {

@@ -1,7 +1,7 @@
 #include "tool.h"
 
 void Tool::computeTool() {
-    qDebug() << "Computing tool" << toolType;
+    //qDebug() << "Computing tool" << toolType;
     vertexArr.clear();
     QVector3D v1,v2,v3,v4;
     QVector3D n1,n2,n3,n4;
@@ -43,17 +43,9 @@ void Tool::computeTool() {
 QVector3D Tool::getToolSurfaceAt(float a, float tRad) {
     QVector3D planeAxis(cosf(tRad), sinf(tRad), 0);
     planeAxis.normalize();
-    /* Old implementation
-    float toolRad = getRadiusAt(a);
-    QVector3D p(
-        toolRad*cosf(tRad),
-        toolRad*sinf(tRad),
-        a*height
-        );
-    */
+
     QVector3D p = getProfile(a).x() * getAxisVector() + getProfile(a).y() * planeAxis;
     return p;
-    //return getProfile(a).x() * getAxisVector() + getProfile(a).y() * planeAxis;
 }
 
 QVector3D Tool::getToolNormalAt(float a, float tRad)

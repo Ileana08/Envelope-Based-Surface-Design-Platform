@@ -4,7 +4,13 @@
 
 #include "beziertoolrenderer.h"
 
-BezierToolRenderer::BezierToolRenderer() : controlPoints() {}
+BezierToolRenderer::BezierToolRenderer() : controlPoints()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        controlPoints.append(new ControlPoint(QVector3D(0, 0, 0), 0.2, 10));
+    }
+}
 
 BezierToolRenderer::BezierToolRenderer(QVector<ControlPoint*> controlPoints) :
     controlPoints(controlPoints)
@@ -29,6 +35,13 @@ void BezierToolRenderer::initShaders()
 
 void BezierToolRenderer::initBuffers()
 {
+    controlPoints.clear();
+    for (int i = 0; i < 4; i++)
+    {
+        QVector3D position = QVector3D(bezier.getPoint(i), 0.0f);
+        controlPoints.append(new ControlPoint(position, 0.05, 20));
+    }
+
     gl->glGenVertexArrays(1, &vaoControlPoints);
     gl->glBindVertexArray(vaoControlPoints);
     gl->glGenBuffers(1, &vboControlPoints);
@@ -124,8 +137,9 @@ void BezierToolRenderer::updateUniforms()
 
 void BezierToolRenderer::paintGL()
 {
-    qDebug() << "BezierToolRenderer::paintGL";
+    //qDebug() << "BezierToolRenderer::paintGL";
     shader.bind();
+
     if(settings->showControlPoints) {
         gl->glLineWidth(5.0f);
         gl->glBindVertexArray(vaoBezierCurve);
@@ -147,4 +161,15 @@ void BezierToolRenderer::paintGL()
     }
     gl->glBindVertexArray(0);
     shader.release();
+}
+
+void BezierToolRenderer::updateControlPoint(int i, QVector2D pos)
+{
+    if (i < 0 || i >= controlPoints.size())
+    {
+        return;
+    }
+
+    controlPoints[i]->setPosition(QVector3D(pos.x(), pos.y(), 0.0f));
+    bezier.setPoint(i, pos);
 }

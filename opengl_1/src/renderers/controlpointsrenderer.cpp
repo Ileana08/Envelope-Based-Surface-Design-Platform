@@ -93,7 +93,7 @@ void ControlPointsRenderer::updateUniforms()
 
 void ControlPointsRenderer::paintGL()
 {
-    qDebug() << "ControlPointsRenderer::paintGL";
+    //qDebug() << "ControlPointsRenderer::paintGL";
     shader.bind();
     if(settings->showControlPoints) {
         gl->glBindVertexArray(vaoControlPoints);

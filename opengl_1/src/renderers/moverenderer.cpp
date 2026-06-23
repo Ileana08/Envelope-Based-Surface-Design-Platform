@@ -90,7 +90,7 @@ void MoveRenderer::paintGL()
     shader.bind();
     if(settings->showPath)
     {
-        qDebug() << "MoveRenderer::paintGL";
+        //qDebug() << "MoveRenderer::paintGL";
         gl->glBindVertexArray(vaoPath);
         gl->glDrawArrays(GL_LINE_STRIP, 0, move->getPathVertexArr().size());
     }

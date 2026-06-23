@@ -45,6 +45,7 @@ class BezierToolRenderer : public Renderer
     inline void setControlPoints(QVector<ControlPoint*> controlPoints) { this->controlPoints = controlPoints; }
     inline void setBezier(CubicBezier2D bezier) { this->bezier = bezier; }
 
+    void updateControlPoint(int i, QVector2D pos);
 };
 
 
