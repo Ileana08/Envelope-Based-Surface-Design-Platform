@@ -103,7 +103,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     }
 
     // C1 continuity
-    envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityC1(cps, selectedControlPoint);
+    envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForCps(selectedControlPoint);
 
     controlPointsRenderers[selectedEnvelope]->updateBuffers();
     orientationCPsRenderers[selectedEnvelope]->updateBuffers();
@@ -122,7 +122,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       orientationControlPoint->setPosition(newWorldPos);
 
       // C0 continuity
-      envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityC0(orientationcps);
+      envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForOcps(orientationcps, selectedOrientationControlPoint);
 
       controlPointsRenderers[selectedEnvelope]->updateBuffers();
       orientationCPsRenderers[selectedEnvelope]->updateBuffers();
@@ -254,7 +254,12 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
       QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
       ControlPoint* controlPoint = cps[selectedOrientationControlPoint];
       QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
-      for(int i = 0; i<cps.size(); i++) {
+      float s1 = (orientationcps[0]->getPosition().x() - cps[0]->getPosition().x())*(orientationcps[0]->getPosition().x() - cps[0]->getPosition().x());
+      float s2 = (orientationcps[0]->getPosition().y() - cps[0]->getPosition().y())*(orientationcps[0]->getPosition().y() - cps[0]->getPosition().y());
+      float s3 = (orientationcps[0]->getPosition().z() - cps[0]->getPosition().z())*(orientationcps[0]->getPosition().z() - cps[0]->getPosition().z());
+      float height = std::sqrt(s1 + s2 + s3);
+      envelopes[selectedEnvelope]->getTool()->setHeight(height);
+      for(int i = 1; i<cps.size(); i++) {
         float height = envelopes[selectedEnvelope]->getTool()->getHeight();
         orientationcps[i]->setPosition(cps[i]->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
       }

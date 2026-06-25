@@ -21,8 +21,8 @@ public:
     QVector3D getDerivative2At(float t);
     QVector3D getDerivative3At(float t);
     QVector3D getDerivative4PlusAt(float t);
-    void ensureContinuityC0(QVector<ControlPoint*> cps);
-    void ensureContinuityC1(QVector<ControlPoint*> cps, int indexSelectedPoint);
+    void ensureContinuityForCps(int indexSelectedPoint);
+    void ensureContinuityForOcps(QVector<ControlPoint*> ocps, int indexSelectedPoint);
 
     inline void setControlPoints(QVector<ControlPoint*> controlPoints) {this->controlPoints = controlPoints; updateVertexArr();}
 
