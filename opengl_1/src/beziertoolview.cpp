@@ -4,6 +4,7 @@
 
 #include "beziertoolview.h"
 
+#include <complex>
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QOpenGLVersionFunctionsFactory>
@@ -36,14 +37,19 @@ void BezierToolView::initializeGL()
   BezierToolRenderer* rend = new BezierToolRenderer();
   renderer = rend;
   rend->setBezier(bezier);
-  QMatrix4x4 proj;
-  QMatrix4x4 model;
   QMatrix3x3 normal;
-  proj.ortho(left, right, bottom, top, -1.0f, 1.0f);
-  model.setToIdentity();
-  normal.setToIdentity();
-  rend->setProjTransf(proj);
-  rend->setModelTransf(model);
+  projectionMatrix.ortho(left, right, bottom, top, -1.0f, 1.0f);
+  modelMatrix.setToIdentity();
+
+  QVector3D center = QVector3D((left + right) / 2.0f, (bottom + top) / 2.0f, 0.0f);
+  modelMatrix.translate(center.x(), center.y(), center.z());
+  modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+  modelMatrix.translate(-center.x(), -center.y(), -center.z());
+  invTransform = (projectionMatrix * modelMatrix).inverted();
+
+  normal = modelMatrix.normalMatrix();
+  rend->setProjTransf(projectionMatrix);
+  rend->setModelTransf(modelMatrix);
   rend->setNormalTransf(normal);
 
   //TODO make this somewhat global or give this window its own settings
@@ -97,7 +103,7 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
   {
     case 0:
       newPos.setX(bezier.getP0().x());
-      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), cpDelta, 1.0f));
       break;
     case 1:
       newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP3().x() - cpDelta));
@@ -109,7 +115,7 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
       break;
     case 3:
       newPos.setX(bezier.getP3().x());
-      newPos.setY(std::clamp(glPos.y(), 0.0f, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), cpDelta, 1.0f));
       break;
   default:
     return;
@@ -130,10 +136,11 @@ void BezierToolView::mouseReleaseEvent(QMouseEvent* ev) {
 }
 
 QVector2D BezierToolView::pixelToGL(QPoint p) const {
-  return {
-    (right - left) * p.x() / width()  - left,
-    top - (top - bottom) * p.y() / height()
-  };
+  float ndcX = 2.0f * p.x() / width()  - 1.0f;
+  float ndcY = 1.0f - 2.0f * p.y() / height();
+  QVector4D clip(ndcX, ndcY, 0.0f, 1.0f);
+  QVector4D worldPos = invTransform * clip;
+  return worldPos.toVector2D();
 }
 
 void BezierToolView::updateControlPoints()

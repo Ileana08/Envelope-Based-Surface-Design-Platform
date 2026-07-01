@@ -11,13 +11,15 @@ class ControlPoint
     QVector3D position;
     float radius;
     int sectors = 20;
-    QVector<Vertex> vertexArr;
+    QVector3D color;
 
+    QVector<Vertex> vertexArr;
     constexpr static float PI = 3.14159265;
 
     public:
         ControlPoint();
         ControlPoint(QVector3D position, float radius, int sectors);
+        ControlPoint(QVector3D position, QVector3D color, float radius, int sectors);
 
         inline QVector3D getPosition() { return position; }
         inline float getRadius() { return radius; }

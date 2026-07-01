@@ -39,7 +39,7 @@ void BezierToolRenderer::initBuffers()
     for (int i = 0; i < 4; i++)
     {
         QVector3D position = QVector3D(bezier.getPoint(i), 0.0f);
-        controlPoints.append(new ControlPoint(position, 0.05, 20));
+        controlPoints.append(new ControlPoint(position, QVector3D(1, 0.7, 0.0), 0.05, 20));
     }
 
     gl->glGenVertexArrays(1, &vaoControlPoints);

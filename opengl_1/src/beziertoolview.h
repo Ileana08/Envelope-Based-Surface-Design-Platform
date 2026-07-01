@@ -29,7 +29,7 @@ class BezierToolView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
   CubicBezier2D bezier;
   int draggedPoint = -1;  // index of point being dragged, -1 if none
   float pointRadius = 0.1f;
-  float cpDelta = 0.05;
+  float cpDelta = 0.1;
   float cpRadius = 0.05f;
 
   bool updateAllCPs = true;
@@ -42,6 +42,10 @@ class BezierToolView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
   float top = 1.0f;
 
   int N = 100; //sections of the bezier curve.
+
+  QMatrix4x4 modelMatrix;
+  QMatrix4x4 projectionMatrix;
+  QMatrix4x4 invTransform;
 
   Settings settings;
 

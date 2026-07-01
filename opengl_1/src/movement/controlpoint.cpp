@@ -1,7 +1,8 @@
 #include "controlpoint.h"
 
 ControlPoint::ControlPoint():
-    position(QVector3D(0.0,0.0,0.0)), 
+    position(QVector3D(0.0,0.0,0.0)),
+    color(QVector3D(0.0f, 1.0f, 0.0f)),
     radius(0.2), 
     sectors(20),
     vertexArr()
@@ -10,8 +11,19 @@ ControlPoint::ControlPoint():
 }
 
 ControlPoint::ControlPoint(QVector3D position, float radius , int sectors) : 
-    position(position), 
+    position(position),
+    color(QVector3D(0.0f, 1.0f, 0.0f)),
     radius(radius), 
+    sectors(sectors),
+    vertexArr()
+{
+    computeControlPoint();
+}
+
+ControlPoint::ControlPoint(QVector3D position, QVector3D color, float radius, int sectors) :
+    position(position),
+    color(color),
+    radius(radius),
     sectors(sectors),
     vertexArr()
 {
@@ -27,7 +39,7 @@ Vertex ControlPoint::getSurfaceAt(float angle, float rotation)
     );
 
     QVector3D n = (p - position).normalized();
-    return Vertex(p, n, QVector3D(0.0f, 1.0f, 0.0f));
+    return Vertex(p, n, color);
 }
 
 void ControlPoint::computeControlPoint() {
