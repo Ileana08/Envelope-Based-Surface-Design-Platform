@@ -121,8 +121,9 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
       orientationControlPoint->setPosition(newWorldPos);
 
-      // C0 continuity
-      envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForOcps(orientationcps, selectedOrientationControlPoint);
+      // orientation continuity
+      float height = envelopes[selectedEnvelope]->getTool()->getHeight();
+      envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForOcps(orientationcps, selectedOrientationControlPoint, height);
 
       controlPointsRenderers[selectedEnvelope]->updateBuffers();
       orientationCPsRenderers[selectedEnvelope]->updateBuffers();
@@ -170,7 +171,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
       for(int i=0; i<cps.size(); i++){
         QVector3D pos = cps[i]->getPosition();
         QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
-        if((currentMousePos - controlPointScreenPos).length() <= 10.0f){
+        if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
           selectedControlPoint = i;
           selectedEnvelope = e;
           controlPointPressed = true;
@@ -189,7 +190,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
       if(cps.size() > 0) {
         QVector3D pos = cps[cps.size()-1]->getPosition();
         QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
-        if((currentMousePos - controlPointScreenPos).length() <= 10.0f){
+        if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
           selectedEnvelope = e;
           addNewBezierCurve = true;
           lastMousePos = currentMousePos;
@@ -209,7 +210,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
         // if(i != 0 && i!=orientationcps.size()-1) continue;
         QVector3D pos = orientationcps[i]->getPosition();
         QVector2D orientationcpScreenPos = toNormalizedScreenCoordinates(pos);
-        if((currentMousePos - orientationcpScreenPos).length() <= 10.0f){
+        if((currentMousePos - orientationcpScreenPos).length() <= 20.0f){
           selectedOrientationControlPoint = i;
           selectedEnvelope = e;
           orientationControlPointPressed = true;
@@ -248,35 +249,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   QVector2D currentMousePos(ev->position());
 
   if (controlPointPressed == true || orientationControlPointPressed == true || addNewBezierCurve == true) {
-    // update everything based on the new position of the control 
-    if(orientationControlPointPressed) {
-      // the distance between a control point and its orientation point must be the height of the tool
-      QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
-      ControlPoint* controlPoint = cps[selectedOrientationControlPoint];
-      QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
-      float s1 = (orientationcps[0]->getPosition().x() - cps[0]->getPosition().x())*(orientationcps[0]->getPosition().x() - cps[0]->getPosition().x());
-      float s2 = (orientationcps[0]->getPosition().y() - cps[0]->getPosition().y())*(orientationcps[0]->getPosition().y() - cps[0]->getPosition().y());
-      float s3 = (orientationcps[0]->getPosition().z() - cps[0]->getPosition().z())*(orientationcps[0]->getPosition().z() - cps[0]->getPosition().z());
-      float height = std::sqrt(s1 + s2 + s3);
-      cylinders[selectedEnvelope]->setHeight(height);
-      drums[selectedEnvelope]->setHeight(height);
-      bezierTools[selectedEnvelope]->setHeight(height);
-      for(int i = 1; i<cps.size(); i++) {
-        float height = envelopes[selectedEnvelope]->getTool()->getHeight();
-        orientationcps[i]->setPosition(cps[i]->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
-      }
-      orientationCPsRenderers[selectedEnvelope]->updateBuffers();
-    }
-    if(addNewBezierCurve) {
-      envelopes[selectedEnvelope]->getToolMovement().addNewBezierCurve();
-      envelopeControlPoints[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getPath().getControlPoints();
-      envelopeOrientationCPs[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getOrientationPath().getControlPoints();
-      controlPointsRenderers[selectedEnvelope]->setControlPoints(envelopeControlPoints[selectedEnvelope]);
-      orientationCPsRenderers[selectedEnvelope]->setControlPoints(envelopeControlPoints[selectedEnvelope]);
-      orientationCPsRenderers[selectedEnvelope]->setOrientationControlPoints(envelopeOrientationCPs[selectedEnvelope]);
-      controlPointsRenderers[selectedEnvelope]->updateBuffers();
-      orientationCPsRenderers[selectedEnvelope]->updateBuffers();
-    }
+    updateMotionAfterInteraction();
     envelopes[selectedEnvelope]->getToolMovement().getPath().updateVertexArr();
     QSet<int> depEnvs = envelopes[selectedEnvelope]->getAllDependents();
     updateToolTransf();

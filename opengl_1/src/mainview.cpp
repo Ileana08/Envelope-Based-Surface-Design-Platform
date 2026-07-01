@@ -318,6 +318,35 @@ void MainView::updateUniforms() {
     }
 }
 
+void MainView::updateMotionAfterInteraction(){
+    QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
+    QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
+    if(orientationControlPointPressed) {
+        ControlPoint* controlPoint = cps[selectedOrientationControlPoint];
+        float s1 = (orientationcps[0]->getPosition().x() - cps[0]->getPosition().x())*(orientationcps[0]->getPosition().x() - cps[0]->getPosition().x());
+        float s2 = (orientationcps[0]->getPosition().y() - cps[0]->getPosition().y())*(orientationcps[0]->getPosition().y() - cps[0]->getPosition().y());
+        float s3 = (orientationcps[0]->getPosition().z() - cps[0]->getPosition().z())*(orientationcps[0]->getPosition().z() - cps[0]->getPosition().z());
+        float height = std::sqrt(s1 + s2 + s3);
+        cylinders[selectedEnvelope]->setHeight(height);
+        drums[selectedEnvelope]->setHeight(height);
+        bezierTools[selectedEnvelope]->setHeight(height);
+    }
+    if(addNewBezierCurve) {
+        envelopes[selectedEnvelope]->getToolMovement().addNewBezierCurve();
+        envelopeControlPoints[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getPath().getControlPoints();
+        envelopeOrientationCPs[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getOrientationPath().getControlPoints();
+        controlPointsRenderers[selectedEnvelope]->setControlPoints(envelopeControlPoints[selectedEnvelope]);
+        orientationCPsRenderers[selectedEnvelope]->setControlPoints(envelopeControlPoints[selectedEnvelope]);
+        orientationCPsRenderers[selectedEnvelope]->setOrientationControlPoints(envelopeOrientationCPs[selectedEnvelope]);
+        controlPointsRenderers[selectedEnvelope]->updateBuffers();
+        orientationCPsRenderers[selectedEnvelope]->updateBuffers();
+    }
+    for(int i = 1; i<cps.size(); i++) {
+        float height = envelopes[selectedEnvelope]->getTool()->getHeight();
+        orientationcps[i]->setPosition(cps[i]->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
+    }
+    orientationCPsRenderers[selectedEnvelope]->updateBuffers();
+}
 
 /**
  * @brief MainView::paintGL Actual function used for drawing to the screen.

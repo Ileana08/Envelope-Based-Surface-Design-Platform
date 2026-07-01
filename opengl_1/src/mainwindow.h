@@ -52,7 +52,7 @@ private slots:
   void on_radiusSpinBox_valueChanged(double value);
   void on_drumRadiusSpinBox_valueChanged(double value);
   void on_angleSpinBox_valueChanged(double value);
-  void on_heightSpinBox_valueChanged(double value);
+  // void on_heightSpinBox_valueChanged(double value);
   void on_toolBox_currentIndexChanged(int index);
 
   // void on_controlPointChanged();

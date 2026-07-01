@@ -118,7 +118,7 @@ void MainWindow::updateUI(int prevIdx)
   QSignalBlocker b9(ui->radiusSpinBox);
   QSignalBlocker b10(ui->drumRadiusSpinBox);
   QSignalBlocker b11(ui->angleSpinBox);
-  QSignalBlocker b12(ui->heightSpinBox);
+  // QSignalBlocker b12(ui->heightSpinBox);
   QSignalBlocker b13(ui->toolBox);
 
   int idx = ui->mainView->settings.selectedIdx;
@@ -175,7 +175,7 @@ void MainWindow::updateUI(int prevIdx)
     ui->radiusSpinBox->setValue(cyl->getRadius());
     ui->drumRadiusSpinBox->setValue(drum->getCurvatureRadius());
     ui->angleSpinBox->setValue(cyl->getAngle());
-    ui->heightSpinBox->setValue(cyl->getHeight());
+    // ui->heightSpinBox->setValue(cyl->getHeight());
 
     //Update the Bezier tool window
     ui->bezierToolView->setBezier(bezierTool->getBezier());
@@ -431,35 +431,35 @@ void MainWindow::on_angleSpinBox_valueChanged(double value)
   ui->mainView->update();
 }
 
-/**
- * @brief MainWindow::on_heightSpinBox_valueChanged Updates the height (length) of the tool.
- * @param value new height.
- */
-void MainWindow::on_heightSpinBox_valueChanged(double value)
-{
-  //qDebug() << ":: on_heightSpinBox_valueChanged";
+// /**
+//  * @brief MainWindow::on_heightSpinBox_valueChanged Updates the height (length) of the tool.
+//  * @param value new height.
+//  */
+// void MainWindow::on_heightSpinBox_valueChanged(double value)
+// {
+//   //qDebug() << ":: on_heightSpinBox_valueChanged";
 
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring tool height change";
+//   ui->mainView->m_pendingTimerMeasurement = true;
+//   ui->mainView->m_timer.restart();
+//   qDebug() << "Measuring tool height change";
 
-  int idx = ui->mainView->settings.selectedIdx;
-  if (idx == -1) return;
-  ui->mainView->cylinders[idx]->setHeight(value);
-  ui->mainView->drums[idx]->setHeight(value);
-  ui->mainView->bezierTools[idx]->setHeight(value);
+//   int idx = ui->mainView->settings.selectedIdx;
+//   if (idx == -1) return;
+//   ui->mainView->cylinders[idx]->setHeight(value);
+//   ui->mainView->drums[idx]->setHeight(value);
+//   ui->mainView->bezierTools[idx]->setHeight(value);
 
 
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
-  ui->mainView->envelopeMeshUpdates += idx;
-  ui->mainView->toolMeshUpdates += idx;
-  ui->mainView->toolTransfUpdates += idx;
-  ui->mainView->update();
+//   // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
+//   // ui->mainView->toolMeshUpdates += depEnvs;
+//   // ui->mainView->envelopeMeshUpdates += depEnvs;
+//   // ui->mainView->toolTransfUpdates += depEnvs;
+//   ui->mainView->envelopeMeshUpdates += idx;
+//   ui->mainView->toolMeshUpdates += idx;
+//   ui->mainView->toolTransfUpdates += idx;
+//   ui->mainView->update();
 
-}
+// }
 
 /**
  * @brief MainWindow::on_toolBox_currentIndexChanged Updates the tool type. Activates/Deactivates their corresponding input fields.

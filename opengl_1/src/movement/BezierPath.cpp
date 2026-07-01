@@ -148,24 +148,24 @@ void BezierPath::ensureContinuityForCps(int cpMoved){
 
 }
 
-void BezierPath::ensureContinuityForOcps(QVector<ControlPoint*> ocps, int ocpMoved){
+void BezierPath::ensureContinuityForOcps(QVector<ControlPoint*> ocps, int ocpMoved, float height){
     for (int i = 3; i<ocps.size(); i++) {
         if (i%4 == 0) {
             ocps[i]->setPosition(ocps[i-1]->getPosition());
         }
         if (i%4 == 1) {
             // ensuring continuity depending on the orientation control point that was moved
-            // getting the 3 orientation vectors
+            // getting the 3 orientation vector directions
             QVector3D a1 = (ocps[i-3]->getPosition() - controlPoints[i-3]->getPosition()).normalized();
             QVector3D a2 = (ocps[i-1]->getPosition() - controlPoints[i-1]->getPosition()).normalized();
             QVector3D a3 = (ocps[i]->getPosition() - controlPoints[i]->getPosition()).normalized();
             // 2 (N\cdot L) N - L
             if(ocpMoved % 4 != 1) {
             a3 = 2 * QVector3D::dotProduct(a2,a1) * a2 - a1;
-            ocps[i]->setPosition(controlPoints[i]->getPosition() + 2*a3);
+            ocps[i]->setPosition(controlPoints[i]->getPosition() + height*a3);
             } else {
             a1 = 2 * QVector3D::dotProduct(a3,a2) * a2 - a3;
-            ocps[i-3]->setPosition(controlPoints[i-3]->getPosition() + 2*a1);
+            ocps[i-3]->setPosition(controlPoints[i-3]->getPosition() + height*a1);
             }
         }
     }

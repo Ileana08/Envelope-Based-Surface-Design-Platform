@@ -121,6 +121,7 @@ public:
 protected:
     void initializeGL() override;
     void updateUniforms();
+    void updateMotionAfterInteraction();
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
     QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
