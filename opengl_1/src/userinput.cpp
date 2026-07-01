@@ -258,7 +258,6 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
       float s2 = (orientationcps[0]->getPosition().y() - cps[0]->getPosition().y())*(orientationcps[0]->getPosition().y() - cps[0]->getPosition().y());
       float s3 = (orientationcps[0]->getPosition().z() - cps[0]->getPosition().z())*(orientationcps[0]->getPosition().z() - cps[0]->getPosition().z());
       float height = std::sqrt(s1 + s2 + s3);
-      envelopes[selectedEnvelope]->getTool()->setHeight(height);
       cylinders[selectedEnvelope]->setHeight(height);
       drums[selectedEnvelope]->setHeight(height);
       bezierTools[selectedEnvelope]->setHeight(height);
