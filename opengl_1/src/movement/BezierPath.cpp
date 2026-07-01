@@ -131,26 +131,41 @@ QVector3D BezierPath::getDerivative4PlusAt(float t) {
     return QVector3D(0,0,0);
 }
 
-void BezierPath::ensureContinuityC0(QVector<ControlPoint*> cps){
-     for (int i = 3; i<cps.size(); i++) {
+void BezierPath::ensureContinuityForCps(int cpMoved){
+    for (int i = 3; i<controlPoints.size(); i++) {
         if (i%4 == 0) {
-            cps[i]->setPosition(cps[i-1]->getPosition());
-        }
-    }
-}
-
-void BezierPath::ensureContinuityC1(QVector<ControlPoint*> cps, int cpMoved){
-    for (int i = 3; i<cps.size(); i++) {
-        if (i%4 == 0) {
-            cps[i]->setPosition(cps[i-1]->getPosition());
+            controlPoints[i]->setPosition(controlPoints[i-1]->getPosition());
         }
         if (i%4 == 1) {
             // ensuring continuity depending on the control point that was moved
             if(cpMoved % 4 != 1) {
-            cps[i]->setPosition(-cps[i-3]->getPosition() + 2*cps[i-1]->getPosition());
+            controlPoints[i]->setPosition(-controlPoints[i-3]->getPosition() + 2*controlPoints[i-1]->getPosition());
             } else {
-            cps[i-1]->setPosition(cps[i-3]->getPosition()/2 + cps[i]->getPosition()/2);
-            cps[i-2]->setPosition(cps[i-3]->getPosition()/2 + cps[i]->getPosition()/2);
+            controlPoints[i-3]->setPosition(-controlPoints[i]->getPosition() + 2*controlPoints[i-1]->getPosition());
+            }
+        }
+    }
+
+}
+
+void BezierPath::ensureContinuityForOcps(QVector<ControlPoint*> ocps, int ocpMoved){
+    for (int i = 3; i<ocps.size(); i++) {
+        if (i%4 == 0) {
+            ocps[i]->setPosition(ocps[i-1]->getPosition());
+        }
+        if (i%4 == 1) {
+            // ensuring continuity depending on the orientation control point that was moved
+            // getting the 3 orientation vectors
+            QVector3D a1 = (ocps[i-3]->getPosition() - controlPoints[i-3]->getPosition()).normalized();
+            QVector3D a2 = (ocps[i-1]->getPosition() - controlPoints[i-1]->getPosition()).normalized();
+            QVector3D a3 = (ocps[i]->getPosition() - controlPoints[i]->getPosition()).normalized();
+            // 2 (N\cdot L) N - L
+            if(ocpMoved % 4 != 1) {
+            a3 = 2 * QVector3D::dotProduct(a2,a1) * a2 - a1;
+            ocps[i]->setPosition(controlPoints[i]->getPosition() + 2*a3);
+            } else {
+            a1 = 2 * QVector3D::dotProduct(a3,a2) * a2 - a3;
+            ocps[i-3]->setPosition(controlPoints[i-3]->getPosition() + 2*a1);
             }
         }
     }
