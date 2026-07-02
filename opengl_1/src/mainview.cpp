@@ -319,7 +319,7 @@ void MainView::updateUniforms() {
 }
 
 /**
- * @brief MainView::updateMotionAfterInteraction Takes care of the updates 
+ * @brief MainView::updateMotionAfterInteraction Updates the selcted envelope 
  * after every mouse interaction with the control or orientation points.
  * 
  */
@@ -353,7 +353,7 @@ void MainView::updateMotionAfterInteraction(){
     // maintain the distance and direction between a control point and its orientation control point
     for(int i = 1; i<cps.size(); i++) {
         float height = envelopes[selectedEnvelope]->getTool()->getHeight();
-        orientationcps[i]->setPosition(cps[i]->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
+        orientationcps[i]->setPosition(cps[i]->getPosition() + envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
     }
     orientationCPsRenderers[selectedEnvelope]->updateBuffers();
 }
@@ -539,7 +539,7 @@ void MainView::updateToolTransf(){
     }
 }
 
-QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {
+QVector2D MainView::toScreenCoordinates(const QVector3D &Position) {
     QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(Position, 1.0f);
     QVector3D normalizedDeviceCoord = clipCoordinates.toVector3D() / clipCoordinates.w();
     float screenX = normalizedDeviceCoord.x() * 0.5f * viewportWidth + 0.5f * viewportWidth;
@@ -547,7 +547,7 @@ QVector2D MainView::toNormalizedScreenCoordinates(const QVector3D &Position) {
     float screenY = viewportHeight - normalizedDeviceCoord.y() * 0.5f * viewportHeight - 0.5f* viewportHeight;
     return QVector2D(screenX, screenY);
 }
-QVector3D MainView::toNormalizedWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
+QVector3D MainView::toWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
     float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
     float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
     QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);

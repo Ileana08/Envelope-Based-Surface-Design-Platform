@@ -85,7 +85,7 @@ QVector3D CylinderMovement::getAxisAtCp(int idx)
 {
     ControlPoint* cp = path.getControlPoints()[idx];
     ControlPoint* ocp = orientationPath.getControlPoints()[idx];
-    QVector3D direction =  (cp->getPosition() - ocp->getPosition()).normalized();
+    QVector3D direction =  (ocp->getPosition() - cp->getPosition()).normalized();
     return direction;
 }
 

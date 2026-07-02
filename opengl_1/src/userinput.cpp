@@ -91,15 +91,15 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
 
     QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
     float ndcZ = clipCoordinates.z() / clipCoordinates.w();
-    QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
+    QVector2D currentScreenPos = toScreenCoordinates(position);
     QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
-    QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
+    QVector3D newWorldPos = toWorldCoordinates(newScreenPos, ndcZ);
     controlPoint->setPosition(newWorldPos);
 
     // Maintain the distance and direction between a control point and its orientation control point
     for(int i = 0; i<cps.size(); i++){
       float height = envelopes[selectedEnvelope]->getTool()->getHeight();
-      orientationcps[i]->setPosition(cps[i]->getPosition() - directioncps[i] * height);
+      orientationcps[i]->setPosition(cps[i]->getPosition() + directioncps[i] * height);
     }
 
     // Path tangent continuity
@@ -116,12 +116,12 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
     if (clipCoordinates.w() != 0.0f) {
       float ndcZ = clipCoordinates.z() / clipCoordinates.w();
-      QVector2D currentScreenPos = toNormalizedScreenCoordinates(position);
+      QVector2D currentScreenPos = toScreenCoordinates(position);
       QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
-      QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
+      QVector3D newWorldPos = toWorldCoordinates(newScreenPos, ndcZ);
       orientationControlPoint->setPosition(newWorldPos);
 
-      // Orientation tangent continuity
+      // Orientation path continuity
       float height = envelopes[selectedEnvelope]->getTool()->getHeight();
       envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForOcps(orientationcps, selectedOrientationControlPoint, height);
 
@@ -171,7 +171,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
 
       for(int i=0; i<cps.size(); i++){
         QVector3D pos = cps[i]->getPosition();
-        QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
+        QVector2D controlPointScreenPos = toScreenCoordinates(pos);
         if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
           selectedControlPoint = i;
           selectedEnvelope = e;
@@ -192,7 +192,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       if(cps.size() > 0) {
         QVector3D pos = cps[cps.size()-1]->getPosition();
-        QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
+        QVector2D controlPointScreenPos = toScreenCoordinates(pos);
         if((currentMousePos - controlPointScreenPos).length() <= 20.0f){
           selectedEnvelope = e;
           addNewBezierCurve = true;
@@ -212,7 +212,7 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
       const QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[e];
       for(int i=0; i<orientationcps.size(); i++){
         QVector3D pos = orientationcps[i]->getPosition();
-        QVector2D orientationcpScreenPos = toNormalizedScreenCoordinates(pos);
+        QVector2D orientationcpScreenPos = toScreenCoordinates(pos);
         if((currentMousePos - orientationcpScreenPos).length() <= 20.0f){
           selectedOrientationControlPoint = i;
           selectedEnvelope = e;

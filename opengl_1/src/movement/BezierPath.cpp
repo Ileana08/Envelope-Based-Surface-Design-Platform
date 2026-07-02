@@ -181,7 +181,7 @@ void BezierPath::ensureContinuityForCps(int cpMoved){
 }
 
 /**
- * @brief BezierPath::ensureContinuityForCps Ensures tangent vector continuity 
+ * @brief BezierPath::ensureContinuityForOcps Ensures smooth transition 
  * for the orientation path using the conditions for orientation vectors.
  * @param ocps list with the orientation control points of the envelope.
  * @param ocpMoved Orientation control point where the interaction is happening.
@@ -194,16 +194,16 @@ void BezierPath::ensureContinuityForOcps(QVector<ControlPoint*> ocps, int ocpMov
         }
         if (i%4 == 1) {
             // The 3 orientation vector directions
-            QVector3D a1 = (ocps[i-3]->getPosition() - controlPoints[i-3]->getPosition()).normalized();
-            QVector3D a2 = (ocps[i-1]->getPosition() - controlPoints[i-1]->getPosition()).normalized();
-            QVector3D a3 = (ocps[i]->getPosition() - controlPoints[i]->getPosition()).normalized();
+            QVector3D a2 = (ocps[i-3]->getPosition() - controlPoints[i-3]->getPosition()).normalized();
+            QVector3D a3 = (ocps[i-2]->getPosition() - controlPoints[i-2]->getPosition()).normalized();
+            QVector3D a5 = (ocps[i]->getPosition() - controlPoints[i]->getPosition()).normalized();
             // Using reflection on the vectors (2 (N\cdot L) N - L)
             if(ocpMoved % 4 != 1) {
-            a3 = 2 * QVector3D::dotProduct(a2,a1) * a2 - a1;
-            ocps[i]->setPosition(controlPoints[i]->getPosition() + height*a3);
+            a5 = 2 * QVector3D::dotProduct(a3,a2) * a3 - a2;
+            ocps[i]->setPosition(controlPoints[i]->getPosition() + height*a5);
             } else {
-            a1 = 2 * QVector3D::dotProduct(a3,a2) * a2 - a3;
-            ocps[i-3]->setPosition(controlPoints[i-3]->getPosition() + height*a1);
+            a2 = 2 * QVector3D::dotProduct(a5,a3) * a3 - a5;
+            ocps[i-3]->setPosition(controlPoints[i-3]->getPosition() + height*a2);
             }
         }
     }

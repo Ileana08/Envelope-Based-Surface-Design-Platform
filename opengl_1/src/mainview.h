@@ -124,8 +124,8 @@ protected:
     void updateMotionAfterInteraction();
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
-    QVector2D toNormalizedScreenCoordinates(const QVector3D &worldPos);
-    QVector3D toNormalizedWorldCoordinates(const QVector2D &screenPos, float ndcZ);
+    QVector2D toScreenCoordinates(const QVector3D &worldPos);
+    QVector3D toWorldCoordinates(const QVector2D &screenPos, float ndcZ);
 
     QList<int> getTopoSortEnvelopes();
 
