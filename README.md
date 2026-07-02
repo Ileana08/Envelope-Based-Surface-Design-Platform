@@ -16,7 +16,9 @@ Our goal is to determine the feasibility of a novel computer-aided design (CAD) 
 - Connect two envelopes via an intermediary third with G0 continuity, in specific circumstances described in this thesis (To Be Published soon)
 
 ## Contributions
-As mentioned, this application is an extension on the work of Bassegoda and Couperus. It also includes contributions by Ileana ...
+As mentioned, this application is an extension on the work of Bassegoda and Couperus. The most recent contributions are those of Dijkman and Untaru. Dijkman implemented 
+Bezier defined tool shapes, improved user interface and visuals, and improved application performance from exponential to linear time. Untaru implemented Bezier curves and splines
+for defining the tool movement and orientation.
 
 ## Installation
 This application is made in C++ with the QT framework.
