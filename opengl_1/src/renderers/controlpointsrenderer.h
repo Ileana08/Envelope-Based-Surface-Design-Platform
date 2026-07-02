@@ -5,6 +5,9 @@
 #include "renderer.h"
 #include "../movement/controlpoint.h"
 
+/**
+ * @brief The ControlPointsRenderer class is a renderer for the control points of the tool.
+ */
 class ControlPointsRenderer : public Renderer
 {
     QVector<ControlPoint*> controlPoints;

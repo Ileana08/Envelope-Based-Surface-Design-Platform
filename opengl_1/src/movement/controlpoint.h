@@ -6,6 +6,9 @@
 #include <QOpenGLDebugLogger>
 #include "../vertex.h"
 
+/**
+ * @brief The ControlPoint class is a control point parameterized as a sphere.
+ */
 class ControlPoint
 {
     QVector3D position;

@@ -4,6 +4,9 @@
 #include "renderer.h"
 #include "../movement/controlpoint.h"
 
+/**
+ * @brief The OrientationCPsRenderer class is a renderer for the orientation control points of the tool.
+ */
 class OrientationCPsRenderer : public Renderer
 {
     QVector<ControlPoint*> orientationControlPoints;

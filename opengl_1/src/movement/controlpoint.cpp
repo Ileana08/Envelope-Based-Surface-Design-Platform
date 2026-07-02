@@ -1,5 +1,8 @@
 #include "controlpoint.h"
 
+/**
+ * @brief ControlPoint::ControlPoint Default constructor for ControlPoint.
+*/
 ControlPoint::ControlPoint():
     position(QVector3D(0.0,0.0,0.0)),
     color(QVector3D(0.0f, 1.0f, 0.0f)),
@@ -10,6 +13,12 @@ ControlPoint::ControlPoint():
     computeControlPoint();
 }
 
+/**
+ * @brief ControlPoint::ControlPoint Constructor for ControlPoint.
+ * @param position Position of the center of the sphere that defines the control point.
+ * @param radius Radius of the sphere.
+ * @param sectors Sectors of the sphere.
+*/
 ControlPoint::ControlPoint(QVector3D position, float radius , int sectors) : 
     position(position),
     color(QVector3D(0.0f, 1.0f, 0.0f)),
@@ -20,6 +29,13 @@ ControlPoint::ControlPoint(QVector3D position, float radius , int sectors) :
     computeControlPoint();
 }
 
+/**
+ * @brief ControlPoint::ControlPoint Constructor for ControlPoint.
+ * @param position Position of the center of the sphere that defines the control point.
+ * @param color Color of the sphere.
+ * @param radius Radius of the sphere.
+ * @param sectors Sectors of the sphere.
+*/
 ControlPoint::ControlPoint(QVector3D position, QVector3D color, float radius, int sectors) :
     position(position),
     color(color),
@@ -30,6 +46,13 @@ ControlPoint::ControlPoint(QVector3D position, QVector3D color, float radius, in
     computeControlPoint();
 }
 
+/**
+ * @brief ControlPoint::getSurfaceAt Get surface of the control point based on the 
+ * angle and rotation using the sphere parametrization.
+ * @param angle Angle
+ * @param rotation Rotation
+ *
+*/
 Vertex ControlPoint::getSurfaceAt(float angle, float rotation)
 {
     QVector3D p(
@@ -42,6 +65,9 @@ Vertex ControlPoint::getSurfaceAt(float angle, float rotation)
     return Vertex(p, n, color);
 }
 
+/**
+ * @brief ControlPoint::computeControlPoint Create the control point using the surface function.
+*/
 void ControlPoint::computeControlPoint() {
     vertexArr.clear();
 

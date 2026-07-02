@@ -1,5 +1,8 @@
 #include "BezierPath.h"
 
+/**
+ * @brief BezierPath::BezierPath Default constructor for BezierPath.
+*/
 BezierPath::BezierPath()
     : controlPoints(QVector<ControlPoint*>())
 {}
