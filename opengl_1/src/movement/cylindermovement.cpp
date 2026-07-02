@@ -55,14 +55,16 @@ bool CylinderMovement::setAxisDirections(QVector3D axisDirection1, QVector3D axi
 
 /**
  * @brief CylinderMovement::addNewBezierCurve Adds a new Curve for the path.
+ * @param height height of the tool
  */
-void CylinderMovement::addNewBezierCurve() {
+void CylinderMovement::addNewBezierCurve(float height) {
     path.addNewBezierCurve();
     orientationPath.addNewBezierCurve();
+    path.ensureContinuityForOcps(orientationPath.getControlPoints(), 0 , height);
 }
 
 /**
- * @brief CylinderMovement::getAxisAt returns the axis direction at time time
+ * @brief CylinderMovement::getAxisAt returns the axis direction at time time.
  * @param time time of interest
  * @return axis direction
  */
@@ -72,9 +74,6 @@ QVector3D CylinderMovement::getAxisAt(float time)
     QVector3D d = orientationPath.getPathAt(time);
     QVector3D axis = d - c;
     return axis.normalized();
-    // QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    // axis.normalize();
-    // return axis;
 }
 
 /**

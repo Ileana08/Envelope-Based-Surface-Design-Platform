@@ -4,24 +4,35 @@ BezierPath::BezierPath()
     : controlPoints(QVector<ControlPoint*>())
 {}
 
+/**
+ * @brief BezierPath::BezierPath Constructor for BezierPath.
+ * @param controlPoints List of all the control points that define the path.
+*/
 BezierPath::BezierPath(QVector<ControlPoint*> controlPoints)
     : controlPoints(controlPoints)
 {}
 
+/**
+ * @brief BezierPath::getPathAt Returns the path at a given time.
+ * @param t Time.
+ * @return Path at time t.
+*/
 QVector3D BezierPath::getPathAt(float t)
 {
     int nrBezierCurves = controlPoints.size() / 4;
-    //find in which segment t is 
+    // Find in which segment t is 
     int segment = int(t * nrBezierCurves);
     if(t==1){
         segment = nrBezierCurves-1; 
     }
-    // segment boundaries
+    // Segment boundaries
     float ti1 = float(segment)/float(nrBezierCurves);
     float ti2 = float(segment+1)/float(nrBezierCurves);
 
+    // Local time of the segment
     float localT = (t - ti1) / (ti2 - ti1);
-
+    
+    // Control points of the selected segment
     QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
     QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
     QVector3D p2 = controlPoints[4 * segment + 2]->getPosition();
@@ -31,8 +42,13 @@ QVector3D BezierPath::getPathAt(float t)
     return ct;
 }
 
+/**
+ * @brief BezierPath::addNewBezierCurve Adds four control points
+ * for a new cubic Bezier curve.
+*/
 void BezierPath::addNewBezierCurve()
 {
+    // Add four interpolated control points using continuity conditions 
     QVector3D p3 = controlPoints[controlPoints.size() - 1]->getPosition();
     QVector3D p2 = controlPoints[controlPoints.size() - 2]->getPosition();
     controlPoints.append(new ControlPoint(p3, 0.05f, 20));
@@ -43,6 +59,9 @@ void BezierPath::addNewBezierCurve()
     updateVertexArr();
 }
 
+/**
+ * @brief BezierPath::updateVertexArr Updates the vertex array.
+*/
 void BezierPath::updateVertexArr()
 {
     vertexArr.clear();
@@ -54,6 +73,11 @@ void BezierPath::updateVertexArr()
     }
 }
 
+/**
+ * @brief BezierPath::getDerivativeAt Returns the tangent at a given time.
+ * @param t Time.
+ * @return Tangent at time t.
+*/
 QVector3D BezierPath::getDerivativeAt(float t)
 {
     int nrBezierCurves = controlPoints.size() / 4;
@@ -131,6 +155,11 @@ QVector3D BezierPath::getDerivative4PlusAt(float t) {
     return QVector3D(0,0,0);
 }
 
+/**
+ * @brief BezierPath::ensureContinuityForCps Ensures tangent vector continuity 
+ * for the path using the conditions for control points.
+ * @param cpMoved Control point where the interaction is happening.
+*/
 void BezierPath::ensureContinuityForCps(int cpMoved){
     for (int i = 3; i<controlPoints.size(); i++) {
         if (i%4 == 0) {
@@ -148,18 +177,24 @@ void BezierPath::ensureContinuityForCps(int cpMoved){
 
 }
 
+/**
+ * @brief BezierPath::ensureContinuityForCps Ensures tangent vector continuity 
+ * for the orientation path using the conditions for orientation vectors.
+ * @param ocps list with the orientation control points of the envelope.
+ * @param ocpMoved Orientation control point where the interaction is happening.
+ * @param height Height of the tool.
+*/
 void BezierPath::ensureContinuityForOcps(QVector<ControlPoint*> ocps, int ocpMoved, float height){
     for (int i = 3; i<ocps.size(); i++) {
         if (i%4 == 0) {
             ocps[i]->setPosition(ocps[i-1]->getPosition());
         }
         if (i%4 == 1) {
-            // ensuring continuity depending on the orientation control point that was moved
-            // getting the 3 orientation vector directions
+            // The 3 orientation vector directions
             QVector3D a1 = (ocps[i-3]->getPosition() - controlPoints[i-3]->getPosition()).normalized();
             QVector3D a2 = (ocps[i-1]->getPosition() - controlPoints[i-1]->getPosition()).normalized();
             QVector3D a3 = (ocps[i]->getPosition() - controlPoints[i]->getPosition()).normalized();
-            // 2 (N\cdot L) N - L
+            // Using reflection on the vectors (2 (N\cdot L) N - L)
             if(ocpMoved % 4 != 1) {
             a3 = 2 * QVector3D::dotProduct(a2,a1) * a2 - a1;
             ocps[i]->setPosition(controlPoints[i]->getPosition() + height*a3);

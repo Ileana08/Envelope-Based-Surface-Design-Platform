@@ -1,15 +1,13 @@
 #ifndef CYLINDERMOVEMENT_H
 #define CYLINDERMOVEMENT_H
 
-#include "simplepath.h"
+#include "BezierPath.h"
 #include "../tools/cylinder.h"
 #include "../tools/drum.h"
 #include <QVector>
 #include <QVector3D>
 #include <QOpenGLDebugLogger>
 #include <QMatrix4x4>
-
-#include "BezierPath.h"
 
 class CylinderMovement
 {
@@ -36,7 +34,7 @@ public:
     inline QVector3D getAxisT1() const { return axisT1; }
     inline void setOrientationPath(BezierPath orientationPath) { this->orientationPath = orientationPath; }
 
-    void addNewBezierCurve();
+    void addNewBezierCurve(float height);
 
     QVector3D getAxisAt(float time);
     QVector3D getAxisAtCp(int idx);

@@ -318,10 +318,16 @@ void MainView::updateUniforms() {
     }
 }
 
+/**
+ * @brief MainView::updateMotionAfterInteraction Takes care of the updates 
+ * after every mouse interaction with the control or orientation points.
+ * 
+ */
 void MainView::updateMotionAfterInteraction(){
     QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
     QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
     if(orientationControlPointPressed) {
+        // First orientation control point can change the height of the tool
         ControlPoint* controlPoint = cps[selectedOrientationControlPoint];
         float s1 = (orientationcps[0]->getPosition().x() - cps[0]->getPosition().x())*(orientationcps[0]->getPosition().x() - cps[0]->getPosition().x());
         float s2 = (orientationcps[0]->getPosition().y() - cps[0]->getPosition().y())*(orientationcps[0]->getPosition().y() - cps[0]->getPosition().y());
@@ -332,7 +338,8 @@ void MainView::updateMotionAfterInteraction(){
         bezierTools[selectedEnvelope]->setHeight(height);
     }
     if(addNewBezierCurve) {
-        envelopes[selectedEnvelope]->getToolMovement().addNewBezierCurve();
+        // Add the new control points and orientation control points properly
+        envelopes[selectedEnvelope]->getToolMovement().addNewBezierCurve(envelopes[selectedEnvelope]->getTool()->getHeight());
         envelopeControlPoints[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getPath().getControlPoints();
         envelopeOrientationCPs[selectedEnvelope] = envelopes[selectedEnvelope]->getToolMovement().getOrientationPath().getControlPoints();
         controlPointsRenderers[selectedEnvelope]->setControlPoints(envelopeControlPoints[selectedEnvelope]);
@@ -340,7 +347,10 @@ void MainView::updateMotionAfterInteraction(){
         orientationCPsRenderers[selectedEnvelope]->setOrientationControlPoints(envelopeOrientationCPs[selectedEnvelope]);
         controlPointsRenderers[selectedEnvelope]->updateBuffers();
         orientationCPsRenderers[selectedEnvelope]->updateBuffers();
+        cps = envelopeControlPoints[selectedEnvelope];
+        orientationcps = envelopeOrientationCPs[selectedEnvelope];
     }
+    // maintain the distance and direction between a control point and its orientation control point
     for(int i = 1; i<cps.size(); i++) {
         float height = envelopes[selectedEnvelope]->getTool()->getHeight();
         orientationcps[i]->setPosition(cps[i]->getPosition() - envelopes[selectedEnvelope]->getToolMovement().getAxisAtCp(i) * height);
