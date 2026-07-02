@@ -127,14 +127,19 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
 
 void BezierToolView::mouseReleaseEvent(QMouseEvent* ev) {
   //qDebug() << "Mouse button released" << ev->button();
-  mainView->m_pendingTimerMeasurement = true;
-  mainView->m_timer.restart();
-  qDebug() << "Measuring envelope attachment";
+  // mainView->m_pendingTimerMeasurement = true;
+  // mainView->m_timer.restart();
+  // qDebug() << "Measuring envelope attachment";
 
   if (draggedPoint != -1) {bezierToolChanged(bezier);}
   draggedPoint = -1;
 }
 
+/**
+ * Translates widget space to the world space.
+ * @param p 2d point in widget space
+ * @return world space coordinates
+ */
 QVector2D BezierToolView::pixelToGL(QPoint p) const {
   float ndcX = 2.0f * p.x() / width()  - 1.0f;
   float ndcY = 1.0f - 2.0f * p.y() / height();
@@ -143,6 +148,9 @@ QVector2D BezierToolView::pixelToGL(QPoint p) const {
   return worldPos.toVector2D();
 }
 
+/**
+ * Updates the control point objects with the values from the Bezier curve.
+ */
 void BezierToolView::updateControlPoints()
 {
   if (!renderer) {

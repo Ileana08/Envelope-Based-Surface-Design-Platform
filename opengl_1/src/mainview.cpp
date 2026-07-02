@@ -385,16 +385,11 @@ void MainView::paintGL()
         updateAllUniforms = false;
     }
 
+    // topological sort of the envelopes so we update in the correct order
     QList topoSort = getTopoSortEnvelopes();
-
 
     while (!topoSort.isEmpty())
     {
-        // qDebug() << "--------------------------";
-        // qDebug() << "toposort" << topoSort;
-        // qDebug() << "envMesh" << envelopeMeshUpdates;
-        // qDebug() << "toolMesh" << toolMeshUpdates;
-        // qDebug() << "toolTransf" << toolTransfUpdates;
 
         int idx = topoSort.takeFirst();
 
@@ -447,6 +442,7 @@ void MainView::paintGL()
         }
     }
 
+    // for measuring performance
     if (m_pendingTimerMeasurement) {
         m_pendingTimerMeasurement = false;
         qDebug() << "wall time to frame:" << m_timer.elapsed() << "ms";

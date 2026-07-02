@@ -442,8 +442,6 @@ QVector3D Envelope::calcNormalAt(float t, float a)
 
     QVector3D normal = alpha * sa + beta * st + gamma * sNormal;
 
-    QVector2D profileNormal = tool->getProfileNormal(a);
-
     return normal.normalized();
 }
 

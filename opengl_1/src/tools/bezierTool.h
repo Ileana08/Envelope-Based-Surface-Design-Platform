@@ -11,7 +11,7 @@
 class BezierTool : public Tool
 {
   CubicBezier2D bezier;
-  float innerRadius;
+  float innerRadius; // Does not stretch the bezier curve, but acts as an offset for the bezier y-coordinate.
 
 public:
   BezierTool();

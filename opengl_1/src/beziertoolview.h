@@ -28,14 +28,16 @@ class BezierToolView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
   CubicBezier2D bezier;
   int draggedPoint = -1;  // index of point being dragged, -1 if none
-  float pointRadius = 0.1f;
+  float pointRadius = 0.1f; // for dragging
   float cpDelta = 0.1;
-  float cpRadius = 0.05f;
+  float cpRadius = 0.05f; // for drawing
 
+  // updating flag
   bool updateAllCPs = true;
 
   BezierToolRenderer* renderer = nullptr;
 
+  // viewing window
   float left = 0.0f;
   float right = 1.0f;
   float bottom = 0.0f;
