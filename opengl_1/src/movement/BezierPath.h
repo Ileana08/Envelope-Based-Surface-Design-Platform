@@ -5,9 +5,13 @@
 #include "controlpoint.h"
 #include <QOpenGLDebugLogger>
 
+/**
+ * @brief The BezierPath class is a path parameterized by a
+ * cubic Bezier curve or multiple cubic Bezier curves.
+ */
 class BezierPath : public Path
 {
-    // cubic: C(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3
+    // Cubic: C(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3
     QVector<ControlPoint*> controlPoints;
     
 public:

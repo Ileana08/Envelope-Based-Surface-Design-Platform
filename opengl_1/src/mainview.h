@@ -15,7 +15,7 @@
 #include "tools/cylinder.h"
 #include "tools/bezierTool.h"
 #include "movement/cylindermovement.h"
-#include "movement/simplepath.h"
+#include "movement/BezierPath.h"
 #include "envelope.h"
 #include "settings.h"
 #include "renderers/controlpointsrenderer.h"

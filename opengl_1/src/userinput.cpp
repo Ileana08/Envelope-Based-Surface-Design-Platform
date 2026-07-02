@@ -82,7 +82,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
   QVector2D currentMousePos(ev->position());
 
   if(controlPointPressed == true) {
-    // movement of the control point accordingly to the mouse
+    // Movement of the control point accordingly to the mouse
     QVector<ControlPoint*>& cps = envelopeControlPoints[selectedEnvelope];
     ControlPoint* controlPoint = cps[selectedControlPoint];
     QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
@@ -96,19 +96,19 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
     controlPoint->setPosition(newWorldPos);
 
-    // maintain the distance and direction between a control point and its orientation control point
+    // Maintain the distance and direction between a control point and its orientation control point
     for(int i = 0; i<cps.size(); i++){
       float height = envelopes[selectedEnvelope]->getTool()->getHeight();
       orientationcps[i]->setPosition(cps[i]->getPosition() - directioncps[i] * height);
     }
 
-    // C1 continuity
+    // Path tangent continuity
     envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForCps(selectedControlPoint);
 
     controlPointsRenderers[selectedEnvelope]->updateBuffers();
     orientationCPsRenderers[selectedEnvelope]->updateBuffers();
   } else if(orientationControlPointPressed == true) {
-    // movement of the orientation control point accordingly to the mouse
+    // Movement of the orientation control point accordingly to the mouse
     QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[selectedEnvelope];
     ControlPoint* orientationControlPoint = orientationcps[selectedOrientationControlPoint];
     QVector3D position = orientationControlPoint->getPosition();
@@ -121,7 +121,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       QVector3D newWorldPos = toNormalizedWorldCoordinates(newScreenPos, ndcZ);
       orientationControlPoint->setPosition(newWorldPos);
 
-      // orientation continuity
+      // Orientation tangent continuity
       float height = envelopes[selectedEnvelope]->getTool()->getHeight();
       envelopes[selectedEnvelope]->getToolMovement().getPath().ensureContinuityForOcps(orientationcps, selectedOrientationControlPoint, height);
 
@@ -159,15 +159,16 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   //qDebug() << "Mouse button pressed:" << ev->button();
 
   QVector2D currentMousePos(ev->position());
-  // if control points are shown and one of them is selected
   if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
+    // Check if a control point is selected
     for(int e = 0; e<envelopes.size(); e++) {
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       directioncps.clear();
-      //save orientation direction at each control point of the envelope e
+      // Save orientation direction at each control point of the envelope e
       for(int i=0; i<cps.size(); i++){
         directioncps.append(envelopes[e]->getToolMovement().getAxisAtCp(i));
       }
+
       for(int i=0; i<cps.size(); i++){
         QVector3D pos = cps[i]->getPosition();
         QVector2D controlPointScreenPos = toNormalizedScreenCoordinates(pos);
@@ -184,7 +185,9 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
       }
     }
   }
+
   if(settings.showControlPoints==true && ev->button() == Qt::RightButton) {
+    // Check if last control point is right-clicked to add a new Bezier curve
     for(int e = 0; e<envelopes.size(); e++) {
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       if(cps.size() > 0) {
@@ -204,10 +207,10 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   }
 
   if(settings.showOrientationControlPoints==true && ev->button() == Qt::LeftButton){
+    // Check if a orientation control point is selected
     for(int e = 0; e<envelopes.size(); e++) {
       const QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[e];
       for(int i=0; i<orientationcps.size(); i++){
-        // if(i != 0 && i!=orientationcps.size()-1) continue;
         QVector3D pos = orientationcps[i]->getPosition();
         QVector2D orientationcpScreenPos = toNormalizedScreenCoordinates(pos);
         if((currentMousePos - orientationcpScreenPos).length() <= 20.0f){
