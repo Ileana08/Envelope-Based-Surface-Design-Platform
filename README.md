@@ -17,8 +17,7 @@ Our goal is to determine the feasibility of a novel computer-aided design (CAD) 
 
 ## Contributions
 As mentioned, this application is an extension on the work of Bassegoda and Couperus. The most recent contributions are those of Dijkman and Untaru. Dijkman implemented 
-Bezier defined tool shapes, improved user interface and visuals, and improved application performance from exponential to linear time. Untaru implemented Bezier curves and splines
-for defining the tool movement and orientation.
+Bezier defined tool shapes, improved user interface and visuals, and improved application performance from exponential to linear time. Untaru implemented Bezier curves and splines for defining and interactively editing the tool movement and orientation.
 
 ## Installation
 This application is made in C++ with the QT framework.
