@@ -171,6 +171,8 @@ Envelope* MainView::addNewEnvelope() {
     orientationCPsRenderers[idx]->setModelTransf(modelTransf);
     orientationCPsRenderers[idx]->setProjTransf(projTransf);
 
+    env->updateRenderSettings(settings);
+
     // Activate
     indicesUsed[idx] = true;
     return env;
