@@ -92,6 +92,7 @@ QVector3D BezierPath::getDerivativeAt(float t)
     float ti2 = float(segment+1)/float(nrBezierCurves);
 
     float localT = (t - ti1) / (ti2 - ti1);
+    // localT = t  * nrBezierCurves - segment
 
     QVector3D p0 = controlPoints[4 * segment + 0]->getPosition();
     QVector3D p1 = controlPoints[4 * segment + 1]->getPosition();
@@ -104,7 +105,7 @@ QVector3D BezierPath::getDerivativeAt(float t)
 
     // C'(t) = -3 (1-t)^2 P0 +(- 6(1-t) t + 3 (1-t)^2) P1 + (-3 t^2 + 6(1-t)t) P2 + 3t^2 P3
     QVector3D tangent = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
-    return tangent;
+    return tangent * nrBezierCurves;
 }
 
 QVector3D BezierPath::getDerivative2At(float t) {
@@ -128,7 +129,7 @@ QVector3D BezierPath::getDerivative2At(float t) {
     float fourth_multiplier = 6 * localT;
 
     QVector3D acc = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
-    return acc;
+    return acc * nrBezierCurves * nrBezierCurves;
 }
 
 QVector3D BezierPath::getDerivative3At(float t) {
@@ -152,7 +153,7 @@ QVector3D BezierPath::getDerivative3At(float t) {
     float fourth_multiplier = 6;
 
     QVector3D acc = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
-    return acc;
+    return acc * nrBezierCurves * nrBezierCurves * nrBezierCurves;
 }
 
 QVector3D BezierPath::getDerivative4PlusAt(float t) {
