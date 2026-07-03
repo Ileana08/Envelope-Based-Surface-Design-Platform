@@ -96,8 +96,12 @@ QVector3D CylinderMovement::getAxisAtCp(int idx)
  */
 QVector3D CylinderMovement::getAxisDtAt(float time)
 {
-    QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    QVector3D axis_t = axisT1 - axisT0;
+    QVector3D c = path.getPathAt(time);
+    QVector3D d = orientationPath.getPathAt(time);
+    QVector3D ct = path.getDerivativeAt(time);
+    QVector3D dt = orientationPath.getDerivativeAt(time);
+    QVector3D axis = d-c;
+    QVector3D axis_t = dt-ct;
     return MathUtility::normalVectorDerivative(axis, axis_t);
 }
 
@@ -108,9 +112,15 @@ QVector3D CylinderMovement::getAxisDtAt(float time)
  */
 QVector3D CylinderMovement::getAxisDt2At(float time)
 {
-    QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    QVector3D axis_t = axisT1 - axisT0;
-    QVector3D axis_tt(0,0,0);
+    QVector3D c = path.getPathAt(time);
+    QVector3D d = orientationPath.getPathAt(time);
+    QVector3D ct = path.getDerivativeAt(time);
+    QVector3D dt = orientationPath.getDerivativeAt(time);
+    QVector3D ctt = path.getDerivative2At(time);
+    QVector3D dtt = orientationPath.getDerivative2At(time);
+    QVector3D axis = d-c;
+    QVector3D axis_t = dt-ct;
+    QVector3D axis_tt = dtt-ctt;
     return MathUtility::normalVectorDerivative2(axis, axis_t, axis_tt);
 }
 
@@ -121,10 +131,18 @@ QVector3D CylinderMovement::getAxisDt2At(float time)
  */
 QVector3D CylinderMovement::getAxisDt3At(float time)
 {
-    QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    QVector3D axis_t = axisT1 - axisT0;
-    QVector3D axis_tt(0,0,0);
-    QVector3D axis_ttt(0,0,0);
+    QVector3D c = path.getPathAt(time);
+    QVector3D d = orientationPath.getPathAt(time);
+    QVector3D ct = path.getDerivativeAt(time);
+    QVector3D dt = orientationPath.getDerivativeAt(time);
+    QVector3D ctt = path.getDerivative2At(time);
+    QVector3D dtt = orientationPath.getDerivative2At(time);
+    QVector3D cttt = path.getDerivative3At(time);
+    QVector3D dttt = orientationPath.getDerivative3At(time);
+    QVector3D axis = d-c;
+    QVector3D axis_t = dt-ct;
+    QVector3D axis_tt = dtt-ctt;
+    QVector3D axis_ttt = dttt-cttt;
     return MathUtility::normalVectorDerivative3(axis, axis_t, axis_tt, axis_ttt);
 }
 
@@ -135,10 +153,18 @@ QVector3D CylinderMovement::getAxisDt3At(float time)
  */
 QVector3D CylinderMovement::getAxisDt4At(float time)
 {
-    QVector3D axis = axisT0 + (axisT1 - axisT0)*time;
-    QVector3D axis_t = axisT1 - axisT0;
-    QVector3D axis_tt(0,0,0);
-    QVector3D axis_ttt(0,0,0);
+    QVector3D c = path.getPathAt(time);
+    QVector3D d = orientationPath.getPathAt(time);
+    QVector3D ct = path.getDerivativeAt(time);
+    QVector3D dt = orientationPath.getDerivativeAt(time);
+    QVector3D ctt = path.getDerivative2At(time);
+    QVector3D dtt = orientationPath.getDerivative2At(time);
+    QVector3D cttt = path.getDerivative3At(time);
+    QVector3D dttt = orientationPath.getDerivative3At(time);
+    QVector3D axis = d-c;
+    QVector3D axis_t = dt-ct;
+    QVector3D axis_tt = dtt-ctt;
+    QVector3D axis_ttt = dttt-cttt;
     QVector3D axis_tttt(0,0,0);
     return MathUtility::normalVectorDerivative4(axis, axis_t, axis_tt, axis_ttt, axis_tttt);
 }

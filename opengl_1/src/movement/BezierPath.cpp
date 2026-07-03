@@ -102,6 +102,7 @@ QVector3D BezierPath::getDerivativeAt(float t)
     float third_multiplier = 6 * (1-localT) * localT - 3 * localT * localT;
     float fourth_multiplier = 3 * localT * localT;
 
+    // C'(t) = -3 (1-t)^2 P0 +(- 6(1-t) t + 3 (1-t)^2) P1 + (-3 t^2 + 6(1-t)t) P2 + 3t^2 P3
     QVector3D tangent = first_multiplier * p0 + second_multiplier * p1 + third_multiplier * p2 + fourth_multiplier * p3;
     return tangent;
 }
