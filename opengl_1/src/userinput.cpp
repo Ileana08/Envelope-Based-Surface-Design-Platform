@@ -162,6 +162,10 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   if(settings.showControlPoints==true && ev->button() == Qt::LeftButton){
     // Check if a control point is selected
     for(int e = 0; e<envelopes.size(); e++) {
+      if (!indicesUsed[e]) continue;
+      if (envelopes[e] == nullptr) continue;
+      if (!envelopes[e]->isActive()) continue;
+      if (envelopes[e]->isPositContinuous()) continue;
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       directioncps.clear();
       // Save orientation direction at each control point of the envelope e
@@ -189,6 +193,10 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   if(settings.showControlPoints==true && ev->button() == Qt::RightButton) {
     // Check if last control point is right-clicked to add a new Bezier curve
     for(int e = 0; e<envelopes.size(); e++) {
+      if (!indicesUsed[e]) continue;
+      if (envelopes[e] == nullptr) continue;
+      if (!envelopes[e]->isActive()) continue;
+      if (envelopes[e]->isPositContinuous()) continue;
       const QVector<ControlPoint*>& cps = envelopeControlPoints[e];
       if(cps.size() > 0) {
         QVector3D pos = cps[cps.size()-1]->getPosition();
@@ -209,6 +217,10 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
   if(settings.showOrientationControlPoints==true && ev->button() == Qt::LeftButton){
     // Check if a orientation control point is selected
     for(int e = 0; e<envelopes.size(); e++) {
+      if (!indicesUsed[e]) continue;
+      if (envelopes[e] == nullptr) continue;
+      if (!envelopes[e]->isActive()) continue;
+      if (envelopes[e]->isPositContinuous()) continue;
       const QVector<ControlPoint*>& orientationcps = envelopeOrientationCPs[e];
       for(int i=0; i<orientationcps.size(); i++){
         QVector3D pos = orientationcps[i]->getPosition();
