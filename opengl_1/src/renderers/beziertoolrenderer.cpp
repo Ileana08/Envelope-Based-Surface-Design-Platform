@@ -132,6 +132,10 @@ void BezierToolRenderer::updateUniforms()
     shader.setUniformValue("lightPos", settings->lightPos);
     shader.setUniformValue("lightCol", settings->lightColor);
 
+    shader.setUniformValue("reflFlag", false);
+    shader.setUniformValue("reflFreq", settings->reflFreq);
+    shader.setUniformValue("percentBlack", settings->percentBlack);
+
     shader.release();
 }
 

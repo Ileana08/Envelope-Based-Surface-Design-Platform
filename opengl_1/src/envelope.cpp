@@ -251,19 +251,9 @@ void Envelope::computeEnvelope()
             env[3] = calcEnvelopeAt(t+tDelta, a+aDelta) + norm[3] * epsilon;
 
             for (int i = 0; i < 4; i++) {
-                if (reflectionLines){
-                    float alpha;
-                    alpha = acos(QVector3D::dotProduct(norm[i],QVector3D(1,0,0)));
-                    float aux = alpha * reflFreq;
-                    if (aux -(int)aux <= percentBlack)
-                        col[i] = QVector3D(0,0,0);
-                    else
-                        col[i] = QVector3D(1,1,1);
-                } else {
-                    col[i].setX(abs(norm[i].x()));
-                    col[i].setY(abs(norm[i].y()));
-                    col[i].setZ(abs(norm[i].z()));
-                }
+                col[i].setX(abs(norm[i].x()));
+                col[i].setY(abs(norm[i].y()));
+                col[i].setZ(abs(norm[i].z()));
             }
 
             Vertex v1{env[0], norm[0], col[0]};

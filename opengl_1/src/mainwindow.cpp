@@ -644,8 +644,8 @@ void MainWindow::on_reflecLinesCheckBox_toggled(bool checked)
   {
     if (!ui->mainView->indicesUsed[i]) continue;
     ui->mainView->envelopes[i]->updateRenderSettings(ui->mainView->settings);
-    ui->mainView->envelopeMeshUpdates += i;
   }
+  ui->mainView->updateAllUniforms = true;
   ui->mainView->update();
 }
 
@@ -657,8 +657,8 @@ void MainWindow::on_freqReflSpinBox_valueChanged(int value)
   {
     if (!ui->mainView->indicesUsed[i]) continue;
     ui->mainView->envelopes[i]->updateRenderSettings(ui->mainView->settings);
-    ui->mainView->envelopeMeshUpdates += i;
   }
+  ui->mainView->updateAllUniforms = true;
   ui->mainView->update();
 }
 
@@ -672,6 +672,7 @@ void MainWindow::on_fracReflSpinBox_valueChanged(double value)
     ui->mainView->envelopes[i]->updateRenderSettings(ui->mainView->settings);
     ui->mainView->envelopeMeshUpdates += i;
   }
+  ui->mainView->updateAllUniforms = true;
   ui->mainView->update();
 }
 
