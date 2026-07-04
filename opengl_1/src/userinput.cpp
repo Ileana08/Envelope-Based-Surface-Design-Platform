@@ -256,9 +256,9 @@ void MainView::mousePressEvent(QMouseEvent *ev) {
  */
 void MainView::mouseReleaseEvent(QMouseEvent *ev) {
   //qDebug() << "Mouse button released" << ev->button();
-  m_timer.restart();
-  m_pendingTimerMeasurement = true;
-  qDebug() << "measuring mouse release";
+  // m_timer.restart();
+  // m_pendingTimerMeasurement = true;
+  // qDebug() << "measuring mouse release";
 
 
   QVector2D currentMousePos(ev->position());

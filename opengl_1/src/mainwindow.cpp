@@ -246,9 +246,9 @@ void MainWindow::on_envelopeActiveCheckBox_toggled(bool checked)
 void MainWindow::on_constraintA0SelectBox_currentIndexChanged(int index)
 {
   //qDebug() << ":: on_constraintA0SelectBox_currentIndexChanged";
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring envelope attachment";
+  // ui->mainView->m_pendingTimerMeasurement = true;
+  // ui->mainView->m_timer.restart();
+  // qDebug() << "Measuring envelope attachment";
 
   int idx = ui->mainView->settings.selectedIdx;
   if (idx == -1) return;
@@ -316,9 +316,9 @@ void MainWindow::on_constraintA1SelectBox_currentIndexChanged(int index)
 void MainWindow::on_tanContCheckBox_toggled(bool checked)
 {
   //qDebug() << ":: on_tanContCheckBox_toggled";
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring tan continuity toggle";
+  // ui->mainView->m_pendingTimerMeasurement = true;
+  // ui->mainView->m_timer.restart();
+  // qDebug() << "Measuring tan continuity toggle";
 
   int idx = ui->mainView->settings.selectedIdx;
   if (idx == -1) return;
@@ -365,9 +365,9 @@ void MainWindow::on_newEnvelopeButton_clicked()
 void MainWindow::on_radiusSpinBox_valueChanged(double value)
 {
   //qDebug() << ":: on_radiusSpinBox_valueChanged";
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring tool radius change";
+  // ui->mainView->m_pendingTimerMeasurement = true;
+  // ui->mainView->m_timer.restart();
+  // qDebug() << "Measuring tool radius change";
 
   int idx = ui->mainView->settings.selectedIdx;
   if (idx == -1) return;
@@ -390,9 +390,9 @@ void MainWindow::on_radiusSpinBox_valueChanged(double value)
 void MainWindow::on_drumRadiusSpinBox_valueChanged(double value)
 {
   //qDebug() << ":: on_drumRadiusSpinBox_valueChanged";
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring drum radius change";
+  // ui->mainView->m_pendingTimerMeasurement = true;
+  // ui->mainView->m_timer.restart();
+  // qDebug() << "Measuring drum radius change";
 
   int idx = ui->mainView->settings.selectedIdx;
   if (idx == -1) return;
@@ -429,9 +429,9 @@ void MainWindow::on_heightSpinBox_valueChanged(double value)
 {
   //qDebug() << ":: on_heightSpinBox_valueChanged";
 
-  ui->mainView->m_pendingTimerMeasurement = true;
-  ui->mainView->m_timer.restart();
-  qDebug() << "Measuring tool height change";
+  // ui->mainView->m_pendingTimerMeasurement = true;
+  // ui->mainView->m_timer.restart();
+  // qDebug() << "Measuring tool height change";
 
   int idx = ui->mainView->settings.selectedIdx;
   if (idx == -1) return;
