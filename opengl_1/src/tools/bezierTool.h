@@ -11,12 +11,15 @@
 class BezierTool : public Tool
 {
   CubicBezier2D bezier;
+  float r; // Stretches the bezier curve in the y-direction.
   float innerRadius; // Does not stretch the bezier curve, but acts as an offset for the bezier y-coordinate.
 
 public:
   BezierTool();
-  BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position);
+  BezierTool(CubicBezier2D bezier, float radius, float innerRadius, float height, int sectors, QVector3D position);
 
+  inline void setRadius(float radius) {this->r = radius;}
+  inline float getRadius() {return r;}
   inline void setInnerRadius(float innerRadius) { this->innerRadius = innerRadius; }
   inline float getInnerRadius() { return innerRadius; }
   inline CubicBezier2D getBezier() { return bezier; }
@@ -32,6 +35,7 @@ public:
 
   QVector2D getProfile(float a) override;
   QVector2D getProfileDa(float a);
+  QVector2D getProfileD2a(float a);
   QVector2D getProfileNormal(float a) override;
   QVector2D getProfileNormalDa(float a);
 };

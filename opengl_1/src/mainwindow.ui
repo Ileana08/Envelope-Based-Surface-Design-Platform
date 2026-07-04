@@ -390,6 +390,9 @@
                   <property name="singleStep">
                    <double>0.100000000000000</double>
                   </property>
+                  <property name="minimum">
+                   <double>0.100000000000000</double>
+                  </property>
                   <property name="value">
                    <double>0.500000000000000</double>
                   </property>
@@ -435,6 +438,9 @@
                   <property name="singleStep">
                    <double>0.100000000000000</double>
                   </property>
+                  <property name="minimum">
+                   <double>0.100000000000000</double>
+                  </property>
                   <property name="value">
                    <double>2.000000000000000</double>
                   </property>
@@ -467,6 +473,36 @@
                   </property>
                   <property name="value">
                    <double>1.500000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_bezrad">
+                <item>
+                 <widget class="QLabel" name="labelBezierRadius">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Bezier radial offset</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="bezierRadiusSpinBox">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimum">
+                   <double>0.0</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.1</double>
+                  </property>
+                  <property name="value">
+                   <double>0.0</double>
                   </property>
                  </widget>
                 </item>
@@ -536,8 +572,14 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
-                  <height>150</height>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
                  </size>
                 </property>
                </widget>

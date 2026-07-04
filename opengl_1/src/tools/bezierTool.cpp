@@ -8,12 +8,12 @@
 #include <QMatrix2x2>
 
 BezierTool::BezierTool()
-  : Tool(ToolType::Tool_Bezier), innerRadius(0.0f)
+  : Tool(ToolType::Tool_Bezier), r(1.0f), innerRadius(0.0f)
 {
 }
 
-BezierTool::BezierTool(CubicBezier2D bezier, float innerRadius, float height, int sectors, QVector3D position)
-  : Tool(ToolType::Tool_Bezier, sectors, height, position), innerRadius(innerRadius)
+BezierTool::BezierTool(CubicBezier2D bezier, float radius, float innerRadius, float height, int sectors, QVector3D position)
+  : Tool(ToolType::Tool_Bezier, sectors, height, position), r(radius), innerRadius(innerRadius), bezier(bezier)
 {
 }
 
@@ -24,12 +24,12 @@ void BezierTool::setPoints(QVector2D p0, QVector2D p1, QVector2D p2, QVector2D p
 
 float BezierTool::getRadiusAt(float a)
 {
-  return innerRadius + bezier.at(a).y();
+  return innerRadius + r*bezier.at(a).y();
 }
 
 float BezierTool::getRadiusDaAt(float a)
 {
-  return getProfileDa(a).y();
+  return r*getProfileDa(a).y();
 }
 
 float BezierTool::getSphereCenterHeightAt(float a)
@@ -126,17 +126,38 @@ QVector2D BezierTool::getProfile(float a)
 QVector2D BezierTool::getProfileDa(float a)
 {
   QVector2D baseProfileDa = bezier.derivativeAt(a);
-  return QVector2D(baseProfileDa.x() * height, baseProfileDa.y());
+  return QVector2D(baseProfileDa.x() * height, baseProfileDa.y() * r);
+}
+
+QVector2D BezierTool::getProfileD2a(float a)
+{
+  QVector2D baseProfileD2a = bezier.secondDerivativeAt(a);
+  return QVector2D(baseProfileD2a.x() * height, baseProfileD2a.y() * r);
 }
 
 QVector2D BezierTool::getProfileNormal(float a)
 {
-  QVector2D baseNormal = bezier.unitNormalAt(a);
-  return QVector2D(baseNormal.x()/height, baseNormal.y()).normalized();
+  QVector2D t = getProfileDa(a);
+  return QVector2D(-t.y(), t.x()).normalized();
 }
 
 QVector2D BezierTool::getProfileNormalDa(float a)
 {
-  QVector2D baseNormalDa = bezier.dNormalAt(a);
-  return QVector2D(baseNormalDa.x()/height, baseNormalDa.y());
+  //QVector2D baseNormalDa = bezier.dNormalAt(a);
+  //return QVector2D(baseNormalDa.x()/height, baseNormalDa.y());
+
+  QVector2D T  = getProfileDa(a);
+  QVector2D Td = getProfileD2a(a);
+
+  float len = T.length();
+  if (len < 1e-6f)
+    return QVector2D(0.0f, 0.0f);
+
+  QVector2D perpT(-T.y(), T.x());
+  QVector2D perpTd(-Td.y(), Td.x());
+
+  float dot = QVector2D::dotProduct(T, Td);
+
+  return perpTd / len
+    - perpT * (dot / (len * len * len));
 }

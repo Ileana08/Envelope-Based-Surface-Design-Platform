@@ -53,7 +53,9 @@ private slots:
   void on_drumRadiusSpinBox_valueChanged(double value);
   void on_angleSpinBox_valueChanged(double value);
   void on_heightSpinBox_valueChanged(double value);
+  void on_bezierRadiusSpinBox_valueChanged(double value);
   void on_toolBox_currentIndexChanged(int index);
+
 
   // void on_controlPointChanged();
   void on_bezierToolChanged(CubicBezier2D bezier);

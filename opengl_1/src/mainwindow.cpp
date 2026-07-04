@@ -346,10 +346,6 @@ void MainWindow::on_newEnvelopeButton_clicked()
   int idx = env->getIndex();
   addEnvToSelectorMenus(env);
 
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
   ui->mainView->toolTransfUpdates += idx;
@@ -377,7 +373,9 @@ void MainWindow::on_radiusSpinBox_valueChanged(double value)
   if (idx == -1) return;
   ui->mainView->cylinders[idx]->setRadius(value);
   ui->mainView->drums[idx]->setRadius(value);
-  ui->mainView->bezierTools[idx]->setInnerRadius(value);
+  // we scale by two here because the radius of the bezier tool refers to the maximum radius,
+  // and it's control points start at half that value.
+  ui->mainView->bezierTools[idx]->setRadius(2*value);
 
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
@@ -400,10 +398,6 @@ void MainWindow::on_drumRadiusSpinBox_valueChanged(double value)
   if (idx == -1) return;
   ui->mainView->drums[idx]->setCurvatureRadius(value);
 
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
   ui->mainView->toolTransfUpdates += idx;
@@ -421,10 +415,6 @@ void MainWindow::on_angleSpinBox_valueChanged(double value)
   if (idx == -1) return;
   ui->mainView->cylinders[idx]->setAngle(value);
 
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
   ui->mainView->toolTransfUpdates += idx;
@@ -449,16 +439,23 @@ void MainWindow::on_heightSpinBox_valueChanged(double value)
   ui->mainView->drums[idx]->setHeight(value);
   ui->mainView->bezierTools[idx]->setHeight(value);
 
-
-  // QSet<int> depEnvs = ui->mainView->envelopes[idx]->getAllDependents();
-  // ui->mainView->toolMeshUpdates += depEnvs;
-  // ui->mainView->envelopeMeshUpdates += depEnvs;
-  // ui->mainView->toolTransfUpdates += depEnvs;
   ui->mainView->envelopeMeshUpdates += idx;
   ui->mainView->toolMeshUpdates += idx;
   ui->mainView->toolTransfUpdates += idx;
   ui->mainView->update();
 
+}
+
+void MainWindow::on_bezierRadiusSpinBox_valueChanged(double value)
+{
+  int idx = ui->mainView->settings.selectedIdx;
+  if (idx == -1) return;
+  ui->mainView->bezierTools[idx]->setInnerRadius(value);
+
+  ui->mainView->envelopeMeshUpdates += idx;
+  ui->mainView->toolMeshUpdates += idx;
+  ui->mainView->toolTransfUpdates += idx;
+  ui->mainView->update();
 }
 
 /**
@@ -475,27 +472,35 @@ void MainWindow::on_toolBox_currentIndexChanged(int index)
   switch (index)
   {
   case ToolType::Tool_Cylinder:
+    ui->radiusSpinBox->setEnabled(true);
     ui->angleSpinBox->setEnabled(true);
     ui->drumRadiusSpinBox->setEnabled(false);
     ui->bezierToolView->setEnabled(false);
+    ui->bezierRadiusSpinBox->setEnabled(false);
     tool = ui->mainView->cylinders[idx];
     break;
   case ToolType::Tool_Drum:
+    ui->radiusSpinBox->setEnabled(true);
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(true);
     ui->bezierToolView->setEnabled(false);
+    ui->bezierRadiusSpinBox->setEnabled(false);
     tool = ui->mainView->drums[idx];
     break;
   case ToolType::Tool_Bezier:
+    ui->radiusSpinBox->setEnabled(true);
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(false);
     ui->bezierToolView->setEnabled(true);
+    ui->bezierRadiusSpinBox->setEnabled(true);
     tool = ui->mainView->bezierTools[idx];
     break;
   default:
+    ui->radiusSpinBox->setEnabled(false);
     ui->angleSpinBox->setEnabled(false);
     ui->drumRadiusSpinBox->setEnabled(false);
     ui->bezierToolView->setEnabled(false);
+    ui->bezierRadiusSpinBox->setEnabled(false);
     break;
   }
 

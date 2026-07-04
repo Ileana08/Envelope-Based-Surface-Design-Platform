@@ -103,7 +103,7 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
   {
     case 0:
       newPos.setX(bezier.getP0().x());
-      newPos.setY(std::clamp(glPos.y(), cpDelta, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), 0.01f, 1.0f));
       break;
     case 1:
       newPos.setX(std::clamp(glPos.x(), bezier.getP0().x() + cpDelta, bezier.getP3().x() - cpDelta));
@@ -115,7 +115,7 @@ void BezierToolView::mouseMoveEvent(QMouseEvent* ev) {
       break;
     case 3:
       newPos.setX(bezier.getP3().x());
-      newPos.setY(std::clamp(glPos.y(), cpDelta, 1.0f));
+      newPos.setY(std::clamp(glPos.y(), 0.01f, 1.0f));
       break;
   default:
     return;
