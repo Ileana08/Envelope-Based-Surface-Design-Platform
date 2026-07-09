@@ -23,10 +23,10 @@ void Tool::computeTool() {
             n3 = getToolNormalAt(s0, t1*2*PI);
             n4 = getToolNormalAt(s1, t1*2*PI);
 
-            c1 = QVector3D(0.8f, 0.0f, 0.0f);
-            c2 = QVector3D(0.8f, 0.0f, 0.0f);
-            c3 = QVector3D(0.8f, 0.0f, 0.0f);
-            c4 = QVector3D(0.8f, 0.0f, 0.0f);
+            c1 = color;
+            c2 = color;
+            c3 = color;
+            c4 = color;
 
             // Add vertices to array
             vertexArr.append(Vertex(v1, n1, c1));

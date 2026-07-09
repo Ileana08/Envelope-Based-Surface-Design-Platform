@@ -14,6 +14,7 @@ in vec3 vertColor;
 in vec3 vertNormal;
 
 // Specify the Uniforms of the fragment shaders
+uniform vec3 cameraPos;
 uniform vec3 lightPos;
 uniform vec3 lightCol;
 
@@ -33,7 +34,7 @@ void main() {
     //float bands = 0.5f + 0.5f*cos(aux);
 
     //baseColor = vec3(mix(1.0, bands, percentBlack));
-    if (mod(aux, M_PI) < 0.5f*M_PI) {
+    if (mod(aux, M_PI) < (1.0f - percentBlack)*M_PI) {
       baseColor = vec3(1.0f);
     } else {
       baseColor = vec3(0.0f);
@@ -43,11 +44,18 @@ void main() {
     baseColor = vertColor;
   }
 
+
   vec3 L = normalize(lightPos - vertPos);
-  vec3 V = -normalize(vertPos);
-  vec3 R = normalize(2.0f*max(0.0f, dot(L, vertNormal)) * vertNormal - L);
+  vec3 V = normalize(cameraPos - vertPos);
+  vec3 N = vertNormal;
+  if (dot(N, V) < 0.0){
+    N = -N;
+  }
+  float diffCoeff = max(0.0f, dot(L, N));
+  vec3 R = normalize(2.0f*diffCoeff * N - L);
+
   vec3 ambient = baseColor * ka;
-  vec3 diffuse = baseColor * lightCol * kd * max(0.0f, dot(L, vertNormal));
+  vec3 diffuse = baseColor * lightCol * kd * diffCoeff;
   vec3 specular = pow(max(0.0f, dot(V, R)), p) * lightCol * ks;
   vec3 color = ambient + diffuse + specular;
 

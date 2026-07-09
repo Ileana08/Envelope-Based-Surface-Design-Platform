@@ -31,8 +31,12 @@ typedef struct Settings {
     float panSensitivity = 0.005f;
     float scaleSensitivity = 0.1f;
 
+    //Colors for tools
+    QVector3D defaultColor = QVector3D(0.8f, 0.0f, 0.0f);
+    QVector3D selectedColor = QVector3D(0.8f, 0.8f, 0.0f);
+
     //shader settings
-    QVector3D lightPos = QVector3D(0.0f, 5.0f, 0.0f);
+    QVector3D lightPos = QVector3D(0.0f, 2.0f, 0.0f);
     QVector3D lightColor = QVector3D(1.0f, 1.0f, 1.0f);
 
     const size_t NUM_ENVELOPES = 16;

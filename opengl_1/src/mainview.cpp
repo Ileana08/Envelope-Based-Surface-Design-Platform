@@ -228,7 +228,8 @@ void MainView::initializeGL()
     glClearColor(0.37f, 0.42f, 0.45f, 1.0f);
 
     // Set model translation
-    modelTranslation.translate(-2, 0, -6);
+    modelTranslation.translate(0, 0, 0);
+    cameraPosition = QVector3D(2, 0, 6);
 
     // Set the initial model transformation to
     // just the translation
@@ -378,19 +379,44 @@ void MainView::paintGL()
         modelTransf = modelTranslation * modelScaling * modelRotation;
         normalTransf = modelTransf.normalMatrix();
 
+        QMatrix4x4 camera;
+        camera.translate(cameraPosition);
+        camera.rotate(cameraRotation);
+        viewTransf = camera.inverted();
+
+        QVector3D lightPos = cameraPosition + cameraRotation.rotatedVector(settings.lightPos);
+
+
+
+
         for (int i = 0; i < indicesUsed.size(); i++) {
             if (!indicesUsed[i]) continue;
             if (!envelopes[i]->isActive()) continue;
             toolRenderers[i]->setModelTransf(modelTransf);
             toolRenderers[i]->setNormalTransf(normalTransf);
+            toolRenderers[i]->setViewTransf(viewTransf);
+            toolRenderers[i]->setLightPos(lightPos);
+            toolRenderers[i]->setCameraPos(cameraPosition);
             envelopeRenderers[i]->setModelTransf(modelTransf);
             envelopeRenderers[i]->setNormalTransf(normalTransf);
+            envelopeRenderers[i]->setViewTransf(viewTransf);
+            envelopeRenderers[i]->setLightPos(lightPos);
+            envelopeRenderers[i]->setCameraPos(cameraPosition);
             moveRenderers[i]->setModelTransf(modelTransf);
             moveRenderers[i]->setNormalTransf(normalTransf);
+            moveRenderers[i]->setViewTransf(viewTransf);
+            moveRenderers[i]->setLightPos(lightPos);
+            moveRenderers[i]->setCameraPos(cameraPosition);
             controlPointsRenderers[i]->setModelTransf(modelTransf);
             controlPointsRenderers[i]->setNormalTransf(normalTransf);
+            controlPointsRenderers[i]->setViewTransf(viewTransf);
+            controlPointsRenderers[i]->setLightPos(lightPos);
+            controlPointsRenderers[i]->setCameraPos(cameraPosition);
             orientationCPsRenderers[i]->setModelTransf(modelTransf);
             orientationCPsRenderers[i]->setNormalTransf(normalTransf);
+            orientationCPsRenderers[i]->setViewTransf(viewTransf);
+            orientationCPsRenderers[i]->setLightPos(lightPos);
+            orientationCPsRenderers[i]->setCameraPos(cameraPosition);
         }
         updateToolTransf();
         updateUniforms();
@@ -542,7 +568,7 @@ void MainView::updateToolTransf(){
 }
 
 QVector2D MainView::toScreenCoordinates(const QVector3D &Position) {
-    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(Position, 1.0f);
+    QVector4D clipCoordinates = projTransf * viewTransf * modelTransf * QVector4D(Position, 1.0f);
     QVector3D normalizedDeviceCoord = clipCoordinates.toVector3D() / clipCoordinates.w();
     float screenX = normalizedDeviceCoord.x() * 0.5f * viewportWidth + 0.5f * viewportWidth;
     // Invert y coordinates because in the screen coordinates y goes down
@@ -553,7 +579,7 @@ QVector3D MainView::toWorldCoordinates(const QVector2D &screenPosition, float no
     float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
     float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
     QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);
-    QVector4D worldCoordinates4D = modelTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector4D worldCoordinates4D = modelTransf.inverted() * viewTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
     QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
     return worldCoordinates;
 }

@@ -74,10 +74,12 @@ void MoveRenderer::updateUniforms()
     shader.bind();
     shader.setUniformValue("modelTransform", modelTransform);
     shader.setUniformValue("normalTransform", normalTransform);
+    shader.setUniformValue("viewTransform", viewTransform);
     shader.setUniformValue("projTransform", projTransform);
 
-    shader.setUniformValue("lightPos", settings->lightPos);
+    shader.setUniformValue("cameraPos", cameraPos);
     shader.setUniformValue("lightCol", settings->lightColor);
+    shader.setUniformValue("lightPos", lightPos);
 
     shader.setUniformValue("reflFlag", false);
     shader.setUniformValue("reflFreq", settings->reflFreq);

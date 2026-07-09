@@ -24,15 +24,6 @@ MainWindow::MainWindow(QWidget* parent)
   ui->aSlider->setMaximum(ui->mainView->settings.aSectors);
   ui->TimeSlider->setMaximum(ui->mainView->settings.tSectors);
 
-  // connect(ui->p0x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p0y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p1x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p1y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p2x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p2y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p3x, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-  // connect(ui->p3y, &QDoubleSpinBox::editingFinished, this, &MainWindow::on_controlPointChanged);
-
   connect(ui->bezierToolView, &BezierToolView::bezierToolChanged,
     this, &MainWindow::on_bezierToolChanged);
 
@@ -226,6 +217,22 @@ void MainWindow::on_envelopeSelectBox_currentIndexChanged(int index)
   int prevIdx = ui->mainView->settings.selectedIdx;
   qDebug() << "Selected envelope" << idx;
   ui->mainView->settings.selectedIdx = idx;
+
+  ui->mainView->bezierTools[idx]->setColor(ui->mainView->settings.selectedColor);
+  ui->mainView->drums[idx]->setColor(ui->mainView->settings.selectedColor);
+  ui->mainView->cylinders[idx]->setColor(ui->mainView->settings.selectedColor);
+  ui->mainView->toolMeshUpdates += idx;
+
+  if (prevIdx >= 0)
+  {
+    ui->mainView->bezierTools[prevIdx]->setColor(ui->mainView->settings.defaultColor);
+    ui->mainView->drums[prevIdx]->setColor(ui->mainView->settings.defaultColor);
+    ui->mainView->cylinders[prevIdx]->setColor(ui->mainView->settings.defaultColor);
+    ui->mainView->toolMeshUpdates += prevIdx;
+  }
+
+  ui->mainView->update();
+
 
   updateUI(prevIdx);
 }

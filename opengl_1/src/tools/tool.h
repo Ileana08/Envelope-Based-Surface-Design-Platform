@@ -13,6 +13,7 @@ class Tool
 protected:
   ToolType toolType;
   float height = 2;
+  QVector3D color;
 
   float PI = acos(-1.0f);
 
@@ -25,7 +26,7 @@ protected:
   QVector<Vertex> vertexArr;
 
 public:
-  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0, 0, 0))
+  Tool(ToolType toolType) : toolType(toolType), vertexArr(), sectors(50), height(2), posit(QVector3D(0, 0, 0)), color(0.8f, 0.0f, 0.0f)
   {
   }
 
@@ -44,6 +45,8 @@ public:
 
   inline void setPosit(QVector3D position) { posit = position; }
   inline QVector3D getPosition() { return posit; }
+
+  inline void setColor(QVector3D color) { this->color = color; }
 
 
   //TODO: Rename these appropriately

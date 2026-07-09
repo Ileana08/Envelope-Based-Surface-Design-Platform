@@ -78,6 +78,11 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
     // Transformation matrix for the normal
     QMatrix3x3 normalTransf;
 
+    // View matrix
+    QVector3D cameraPosition;
+    QQuaternion cameraRotation;
+    QMatrix4x4 viewTransf;
+
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
 

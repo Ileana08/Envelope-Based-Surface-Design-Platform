@@ -89,7 +89,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     ControlPoint* orientationControlPoint = orientationcps[selectedControlPoint];
     QVector3D position = controlPoint->getPosition();
 
-    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
+    QVector4D clipCoordinates = projTransf * viewTransf * modelTransf * QVector4D(position, 1.0f);
     float ndcZ = clipCoordinates.z() / clipCoordinates.w();
     QVector2D currentScreenPos = toScreenCoordinates(position);
     QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
@@ -113,7 +113,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     ControlPoint* orientationControlPoint = orientationcps[selectedOrientationControlPoint];
     QVector3D position = orientationControlPoint->getPosition();
 
-    QVector4D clipCoordinates = projTransf * modelTransf * QVector4D(position, 1.0f);
+    QVector4D clipCoordinates = projTransf * viewTransf * modelTransf * QVector4D(position, 1.0f);
     if (clipCoordinates.w() != 0.0f) {
       float ndcZ = clipCoordinates.z() / clipCoordinates.w();
       QVector2D currentScreenPos = toScreenCoordinates(position);
@@ -298,7 +298,6 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
  * @param ev Mouse event.
  */
 void MainView::wheelEvent(QWheelEvent *ev) {
-  // Implement something
   //qDebug() << "Mouse wheel:" << ev->angleDelta();
   QPoint delta = ev->angleDelta();
   float scroll = delta.y();

@@ -139,12 +139,14 @@ void EnvelopeRenderer::updateUniforms()
     shader.bind();
     shader.setUniformValue("modelTransform", modelTransform);
     shader.setUniformValue("normalTransform", normalTransform);
+    shader.setUniformValue("viewTransform", viewTransform);
     shader.setUniformValue("projTransform", projTransform);
 
-    shader.setUniformValue("lightPos", settings->lightPos);
+    shader.setUniformValue("lightPos", lightPos);
     shader.setUniformValue("lightCol", settings->lightColor);
+    shader.setUniformValue("cameraPos", cameraPos);
 
-    shader.setUniformValue("reflFlag", settings->reflectionLines);
+    shader.setUniformValue("reflFlag", false);
     shader.setUniformValue("reflFreq", settings->reflFreq);
     shader.setUniformValue("percentBlack", settings->percentBlack);
 
@@ -159,6 +161,7 @@ void EnvelopeRenderer::paintGL()
 {
     shader.bind();
 
+    shader.setUniformValue("reflFlag", settings->reflectionLines);
     if(settings->showEnvelope){
         //qDebug() << "EnvelopeRenderer::paintGL envelope";
         // Bind envelope buffer
@@ -166,6 +169,7 @@ void EnvelopeRenderer::paintGL()
         // Draw envelope
         gl->glDrawArrays(GL_TRIANGLES,0,envelope->getVertexArr().size());
     }
+    shader.setUniformValue("reflFlag", false);
 
     if(settings->showToolAxis){
         //qDebug() << "EnvelopeRenderer::paintGL axis";

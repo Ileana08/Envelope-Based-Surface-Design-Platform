@@ -107,9 +107,11 @@ void ToolRenderer::updateUniforms()
     shader.bind();
     shader.setUniformValue("modelTransform", fullModelTransform);
     shader.setUniformValue("normalTransform", fullNormalTransform);
+    shader.setUniformValue("viewTransform", viewTransform);
     shader.setUniformValue("projTransform", projTransform);
 
-    shader.setUniformValue("lightPos", settings->lightPos);
+    shader.setUniformValue("cameraPos", cameraPos);
+    shader.setUniformValue("lightPos", lightPos);
     shader.setUniformValue("lightCol", settings->lightColor);
 
     shader.setUniformValue("reflFlag", false);
