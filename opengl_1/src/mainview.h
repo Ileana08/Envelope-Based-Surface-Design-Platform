@@ -85,6 +85,8 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
     // Transformation matrix for the projection
     QMatrix4x4 projTransf;
+    float near = 0.2f;
+    float far = 20.0f;
 
     // Mouse input for rotating and panning
     bool isSingleDragging = false;
@@ -130,7 +132,8 @@ protected:
     void resizeGL(int newWidth, int newHeight) override;
     void paintGL() override;
     QVector2D toScreenCoordinates(const QVector3D &worldPos);
-    QVector3D toWorldCoordinates(const QVector2D &screenPos, float ndcZ);
+    QVector3D toModelWorldCoordinates(const QVector2D &screenPos, float ndcZ);
+    QVector3D toWorldCoordinates(const QVector2D& screenPosition, float normalizedDeviceCoordZ);
 
     QList<int> getTopoSortEnvelopes();
 

@@ -93,7 +93,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
     float ndcZ = clipCoordinates.z() / clipCoordinates.w();
     QVector2D currentScreenPos = toScreenCoordinates(position);
     QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
-    QVector3D newWorldPos = toWorldCoordinates(newScreenPos, ndcZ);
+    QVector3D newWorldPos = toModelWorldCoordinates(newScreenPos, ndcZ);
     controlPoint->setPosition(newWorldPos);
 
     // Maintain the distance and direction between a control point and its orientation control point
@@ -118,7 +118,7 @@ void MainView::mouseMoveEvent(QMouseEvent *ev) {
       float ndcZ = clipCoordinates.z() / clipCoordinates.w();
       QVector2D currentScreenPos = toScreenCoordinates(position);
       QVector2D newScreenPos = currentScreenPos + (currentMousePos - lastMousePos);
-      QVector3D newWorldPos = toWorldCoordinates(newScreenPos, ndcZ);
+      QVector3D newWorldPos = toModelWorldCoordinates(newScreenPos, ndcZ);
       orientationControlPoint->setPosition(newWorldPos);
 
       // Orientation path continuity
@@ -297,14 +297,19 @@ void MainView::mouseReleaseEvent(QMouseEvent *ev) {
  * wheel on the mouse.
  * @param ev Mouse event.
  */
-void MainView::wheelEvent(QWheelEvent *ev) {
-  //qDebug() << "Mouse wheel:" << ev->angleDelta();
-  QPoint delta = ev->angleDelta();
-  float scroll = delta.y();
-  float scale = powf(1.1f, -settings.scaleSensitivity * scroll);
-  scalingFactor = qBound(0.1f, scalingFactor*scale, 20.0f);
+void MainView::wheelEvent(QWheelEvent *ev)
+{
+  float scroll = ev->angleDelta().y();
+
+  float zoomAmount = settings.scaleSensitivity * scroll * 0.01f;
+
+  QVector3D cursorWorldSpace = toWorldCoordinates(QVector2D(ev->position()), far);
+
+  // Move camera forward/backward
+  QVector3D forward = (cursorWorldSpace - cameraPosition).normalized();
+
+  cameraPosition += forward * zoomAmount;
 
   updateAllUniforms = true;
-
   update();
 }

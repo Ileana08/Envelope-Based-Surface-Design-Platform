@@ -371,12 +371,8 @@ void MainView::paintGL()
     gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (updateAllUniforms) {
-        // Reset the scale matrix
-        modelScaling.setToIdentity();
-        // Make the new scale matrix
-        modelScaling.scale(scalingFactor);
 
-        modelTransf = modelTranslation * modelScaling * modelRotation;
+        modelTransf = modelTranslation * modelRotation;
         normalTransf = modelTransf.normalMatrix();
 
         QMatrix4x4 camera;
@@ -505,7 +501,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
 
     // Set the viewport to the new size
     projTransf.setToIdentity();
-    projTransf.perspective(60.0f, aspectRatio, 0.2f, 20.0f);
+    projTransf.perspective(60.0f, aspectRatio, near, far);
 
     for (int i = 0; i < indicesUsed.size(); i++) {
         if (!indicesUsed[i]) continue;
@@ -575,11 +571,21 @@ QVector2D MainView::toScreenCoordinates(const QVector3D &Position) {
     float screenY = viewportHeight - normalizedDeviceCoord.y() * 0.5f * viewportHeight - 0.5f* viewportHeight;
     return QVector2D(screenX, screenY);
 }
+QVector3D MainView::toModelWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
+    float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
+    float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
+    QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);
+    //QVector4D worldCoordinates4D = modelTransf.inverted() * viewTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector4D worldCoordinates4D = modelTransf.inverted() * viewTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
+    return worldCoordinates;
+}
+
 QVector3D MainView::toWorldCoordinates(const QVector2D &screenPosition, float normalizedDeviceCoordZ) {
     float normalizedDeviceCoordX = (screenPosition.x() / viewportWidth) * 2.0f - 1.0f;
     float normalizedDeviceCoordY = 1.0f - (screenPosition.y() / viewportHeight) * 2.0f;
     QVector3D normalizedDeviceCoord = QVector3D(normalizedDeviceCoordX, normalizedDeviceCoordY, normalizedDeviceCoordZ);
-    QVector4D worldCoordinates4D = modelTransf.inverted() * viewTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
+    QVector4D worldCoordinates4D = viewTransf.inverted() * projTransf.inverted() * QVector4D(normalizedDeviceCoord, 1.0f);
     QVector3D worldCoordinates = worldCoordinates4D.toVector3D() / worldCoordinates4D.w();
     return worldCoordinates;
 }
